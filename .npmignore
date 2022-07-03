@@ -1,0 +1,8 @@
+example
+node_modules
+src
+.prettierrc
+.eslintrc
+.editorconfig
+dev-server.js
+esbuild.config.js

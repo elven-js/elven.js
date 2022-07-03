@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elven.js demo</title>
+  <style>
+    body {
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .button {
+      padding: 10px 15px;
+      color: #fff;
+      background-color: #0f172a;
+      border: 0;
+      text-align: center;
+      font-size: 16px;
+      margin: 10px;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .button.right {
+      margin-left: auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      height: 100px;
+      border-bottom: 1px dashed #000;
+      margin-bottom: 60px;
+      padding-bottom: 20px;
+    }
+
+    a {
+      color: #000;
+      font-size: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header" id="header">
+      <button class="button" id="button-tx" onclick="signAndSendEgld()" style="display: none;">Send predefined
+        transaction</button>
+      <button class="button" id="button-mint" onclick="mintNFT()" style="display: none;">Mint NFT</button>
+      <button class="button" id="button-login" onclick="login()" style="display: none;">Login</button>
+      <button class="button" id="button-logout" onclick="logout()" style="display: none;">Logout</button>
+      <a class="button right" href="https://github.com/juliancwirko/elven.js" target="_blank"
+        rel="noopener noreferrer">GitHub</a>
+    </div>
+
+    <h1>ElvenJS (example demo)</h1>
+    <p>Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser. No need for
+      bundlers, frameworks, etc. Just attach the script source, and you are ready to go.</p>
+    <p>For now only Maiar browser extension is supported, check the GitHub for more info!</p>
+    <p>The primary purpose of this tool is to have a lite script for browser usage where you can authenticate and
+      sign/send transactions on the Elrond blockchain and do this without any additional build steps.</p>
+    <p>The demo here is basic for now, but it presents the full path of initialization, logging in, and sending a
+      transaction.</p>
+    <p>
+      It is a script to be used in browsers with a global Window namespace: `ElvenJS`
+
+      If you need fully functional JavaScript/Typescript SDK (also in Nodejs), please use
+      <a href="https://github.com/ElrondNetwork/elrond-sdk-erdjs" target="_blank" rel="noopener noreferrer">erdjs</a>, a
+      powerful tool. For now, it includes basic
+      functionality. Internally it uses <a href="https://docs.elrond.com/sdk-and-tools/erdjs/erdjs/" target="_blank"
+        rel="noopener noreferrer">erdjs libraries</a>.
+    </p>
+    <h4>Soon there will be more docs and examples!</h4>
+
+    <h4>Check the source code of this page to get the complete code. All is static, not bundled. The main script is
+      minified. But you can see the code in the <a href="https://github.com/juliancwirko/elven.js" target="_blank"
+        rel="noopener noreferrer">repository</a>.</h4>
+
+    <h3>Demo transactions:</h3>
+    <div>First one:</div>
+    <ul>
+      <li>simple EGLD transfer on the devnet chain</li>
+      <li>it will go to a predefined wallet</li>
+      <li>the value will be 0,001 EGLD</li>
+      <li>after the transaction is finished below, you will find the transaction hash</li>
+    </ul>
+
+    <div>Second one:</div>
+    <ul>
+      <li>Smart Contract call (devnet)</li>
+      <li>it will call predefined smart contract and mint NFT</li>
+    </ul>
+
+    <div id="tx-hash"></div>
+  </div>
+
+  <script src="elven.js"></script>
+
+  <script>
+    // ==============================================================
+    // UI manipulation for demo purposes, for ElvenJS see below
+    // ==============================================================
+
+    const uiState = (loggedIn) => {
+      const loginButton = document.getElementById('button-login');
+      const logoutButton = document.getElementById('button-logout');
+      const txButton = document.getElementById('button-tx');
+      const mintButton = document.getElementById('button-mint');
+      if (loggedIn) {
+        loginButton.style.display = 'none';
+        logoutButton.style.display = 'block';
+        txButton.style.display = 'block';
+        mintButton.style.display = 'block';
+      } else {
+        loginButton.style.display = 'block';
+        logoutButton.style.display = 'none';
+        txButton.style.display = 'none';
+        mintButton.style.display = 'none';
+      }
+    }
+    const uiSpinnerState = (isLoading, button) => {
+      const buttonEgld = document.getElementById('button-tx');
+      const buttonMint = document.getElementById('button-mint');
+      if (isLoading) {
+        if (button === 'egld') {
+          buttonEgld.innerText = 'Transaction pending...';
+          buttonEgld.setAttribute('disabled', true);
+        }
+        if (button === 'mint') {
+          buttonMint.innerText = 'Transaction pending...';
+          buttonMint.setAttribute('disabled', true);
+        }
+      } else {
+        if (button === 'egld') {
+          buttonEgld.innerText = 'Send predefined transaction';
+          buttonEgld.removeAttribute('disabled');
+        }
+        if (button === 'mint') {
+          buttonMint.innerText = 'Mint NFT';
+          buttonMint.removeAttribute('disabled');
+        }
+      }
+    }
+    const updateTxHashContainer = (txHash) => {
+      const txHashContainer = document.getElementById('tx-hash');
+      if (txHash) {
+        const url = `https://devnet-explorer.elrond.com/transactions/${txHash}`;
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.classList.add('transaction-link');
+        link.innerText = url;
+        txHashContainer.appendChild(link);
+      } else {
+        txHashContainer?.querySelector('a')?.remove();
+      }
+    }
+    const uiInitFinished = (finished) => {
+      const header = document.getElementById('header');
+      if (finished) {
+        header.style.visibility = 'visible';
+      } else {
+        header.style.visibility = 'hidden';
+      }
+    }
+
+    // ==============================================================
+    // ElvenJS stuff
+    // ==============================================================
+
+    const init = async () => {
+      // Options are the defaults, repeated here for purpose
+      uiInitFinished(false);
+      const isLoggedIn = await ElvenJS.init(
+        'extension',
+        {
+          apiUrl: 'https://devnet-api.elrond.com',
+          chainType: 'devnet',
+          apiTimeout: 10000
+        }
+      );
+      uiState(isLoggedIn);
+      uiInitFinished(true);
+    }
+
+    init();
+
+    // Functions which use ElvenJS API
+    const login = async () => {
+      uiInitFinished(false);
+      const isLoggedIn = await ElvenJS.login();
+      uiState(isLoggedIn);
+      uiInitFinished(true);
+    }
+
+    const logout = async () => {
+      uiInitFinished(false);
+      const isLoggedOut = await ElvenJS.logout();
+      uiState(!isLoggedOut);
+      uiInitFinished(true);
+    }
+
+    // Simple transaction, you can build different transaction types and payload structures
+    const egldTransferAddress = 'erd17a4wydhhd6t3hhssvcp9g23ppn7lgkk4g2tww3eqzx4mlq95dukss0g50f';
+    const signAndSendEgld = async () => {
+      updateTxHashContainer(false);
+      const demoMessage = 'Transaction demo from Elven.js!';
+
+      const tx = new ElvenJS.Transaction({
+        nonce: ElvenJS.storage.get('nonce'),
+        receiver: new ElvenJS.Address(egldTransferAddress),
+        gasLimit: 50000 + 1500 * demoMessage.length,
+        chainID: 'D',
+        data: new ElvenJS.TransactionPayload(demoMessage),
+        value: ElvenJS.TokenPayment.egldFromAmount(0.001),
+        sender: new ElvenJS.Address(ElvenJS.storage.get('address')),
+      });
+
+      try {
+        uiSpinnerState(true, 'egld');
+        const transaction = await ElvenJS.signAndSendTransaction(tx);
+        uiSpinnerState(false, 'egld');
+        updateTxHashContainer(transaction.hash)
+      } catch (e) {
+        uiSpinnerState(false, 'egld');
+        throw new Error(e?.message);
+      }
+    }
+
+    // Mint nft function
+    // It mints on the smart contract from: https://dapp-demo.elven.tools/
+    const nftMinterSmartContract = 'erd1qqqqqqqqqqqqqpgq5maff85xn0t3r8wr3zn4vhthej9c2ne2gtks8u4tr3';
+    const mintNFT = async () => {
+      updateTxHashContainer(false);
+      const data = new ElvenJS.ContractCallPayloadBuilder()
+        .setFunction(new ElvenJS.ContractFunction('mint'))
+        .setArgs([new ElvenJS.U32Value(1)])
+        .build();
+
+      const tx = new ElvenJS.Transaction({
+        data,
+        gasLimit: 14000000,
+        value: ElvenJS.TokenPayment.egldFromAmount(0.001),
+        chainID: 'D',
+        receiver: new ElvenJS.Address(nftMinterSmartContract),
+        sender: new ElvenJS.Address(ElvenJS.storage.get('address')),
+      });
+
+      try {
+        uiSpinnerState(true, 'mint');
+        const transaction = await ElvenJS.signAndSendTransaction(tx);
+        uiSpinnerState(false, 'mint');
+        updateTxHashContainer(transaction.hash)
+      } catch (e) {
+        uiSpinnerState(false, 'mint');
+        throw new Error(e?.message);
+      }
+    }
+  </script>
+</body>
+
+</html>
