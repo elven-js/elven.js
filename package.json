@@ -1,5 +1,5 @@
 {
-  "name": "elvenjs",
+  "name": "elven.js",
   "version": "0.1.0",
   "description": "Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser.",
   "types": "build/types",
