@@ -33,16 +33,25 @@ Just copy and include the `elven.js` script from the `build` directory or CDN (h
   <script src="elven.js"></script>
   
   <script>
-    let provider;
-
     const init = async () => {
-      provider = await ElvenJS.init('extension');
+      const isLoggedIn = await ElvenJS.init(
+        'extension',
+        {
+          apiUrl: 'https://devnet-api.elrond.com',
+          chainType: 'devnet',
+          apiTimeout: 10000
+        }
+      );
     }
 
     init();
 
-    const login = () => {
-      provider.login();
+    const login = async () => {
+      const isLoggedIn = await ElvenJS.login();
+    }
+
+    const logout = async () => {
+      const isLoggedOut = await ElvenJS.logout();
     }
   </script>
 </body>
@@ -50,7 +59,7 @@ Just copy and include the `elven.js` script from the `build` directory or CDN (h
 </html>
 ```
 
-You will find the demo directory in the repository so that you can play with it first.
+You will find the demo directory in the repository so that you can play with its final version, here only an example.
 
 ### What can it do? 
 
