@@ -1,4 +1,3 @@
-import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
 import { TokenPayment } from '@elrondnetwork/erdjs/out/tokenPayment';
 import { Address } from '@elrondnetwork/erdjs/out/address';
 import { Account } from '@elrondnetwork/erdjs/out/account';
@@ -14,9 +13,13 @@ import { BooleanValue } from '@elrondnetwork/erdjs/out/smartcontracts/typesystem
 import { ContractCallPayloadBuilder } from '@elrondnetwork/erdjs/out/smartcontracts/transactionPayloadBuilders';
 import { ContractFunction } from '@elrondnetwork/erdjs/out/smartcontracts/function';
 import { initExtensionProvider } from './init-extension-provider';
+import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
+import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
+// import { initMaiarMobileProvider } from './init-maiar-mobile-provider';
 import { ls } from './ls-helpers';
 import { getNewLoginExpiresTimestamp } from './expires-at';
 import { ApiNetworkProvider, InitOptions } from './network-provider';
+import { DappProvider, LoginMethodsEnum } from './types';
 
 declare global {
   interface Window {
@@ -25,30 +28,51 @@ declare global {
 }
 
 class ElvenJS {
-  private static dappProvider: ExtensionProvider | undefined;
+  private static dappProvider: DappProvider;
   private static initOptions: InitOptions;
   static networkProvider: ApiNetworkProvider;
 
-  static async init(type: string, options: InitOptions) {
+  static async init(options: InitOptions) {
     this.initOptions = options;
-
-    if (type === 'extension') {
-      this.dappProvider = await initExtensionProvider();
-    }
 
     this.networkProvider = new ApiNetworkProvider(this.initOptions);
 
     const state = ls.get();
 
-    if (state?.address) {
+    if (state?.address && state?.loginMethod) {
+      if (state.loginMethod === LoginMethodsEnum.maiarBrowserExtension) {
+        this.dappProvider = await initExtensionProvider();
+      }
       return true;
     }
     return false;
   }
 
-  static async login() {
-    if (!this.dappProvider) {
+  static async login(loginMethod: LoginMethodsEnum) {
+    const isProperLoginMethod =
+      Object.values(LoginMethodsEnum).includes(loginMethod);
+    if (!isProperLoginMethod) {
+      throw new Error('Error: Wrong login method!');
+    }
+
+    if (!this.networkProvider) {
       throw new Error('Error: Login failed: Use ElvenJs.init() first!');
+    }
+
+    if (
+      !this.dappProvider &&
+      loginMethod === LoginMethodsEnum.maiarBrowserExtension
+    ) {
+      this.dappProvider = await initExtensionProvider();
+    }
+    if (!this.dappProvider && loginMethod === LoginMethodsEnum.maiarMobile) {
+      // this.dappProvider = await initMaiarMobileProvider();
+    }
+
+    if (!this.dappProvider) {
+      throw new Error(
+        'Error: There were problems with auth provider initialization!'
+      );
     }
 
     try {
@@ -59,13 +83,13 @@ class ElvenJS {
       );
     }
 
-    const { address } = this.dappProvider.account;
-
-    const userAddressInstance = new Address(address);
-    const userAccountInstance = new Account(userAddressInstance);
-
     if (this.networkProvider) {
       try {
+        const address = await this.dappProvider.getAddress();
+
+        const userAddressInstance = new Address(address);
+        const userAccountInstance = new Account(userAddressInstance);
+
         const userAccountOnNetwork = await this.networkProvider.getAccount(
           userAddressInstance
         );
@@ -79,17 +103,17 @@ class ElvenJS {
         addressBech && ls.set('address', addressBech);
         nonce && ls.set('nonce', nonce);
         balance && ls.set('balance', userAccountInstance.balance.toString());
+
+        ls.set('loginMethod', loginMethod);
+        ls.set('expires', getNewLoginExpiresTimestamp().toString());
+
+        return address;
       } catch (e: any) {
         console.warn(
           `Something went wrong trying to synchronize the user account: ${e?.message}`
         );
       }
     }
-
-    ls.set('loginMethod', 'extension');
-    ls.set('expires', getNewLoginExpiresTimestamp().toString());
-
-    return address;
   }
 
   static async logout() {
@@ -104,7 +128,7 @@ class ElvenJS {
     }
   }
 
-  static async signAndSendTransaction(transaction: any) {
+  static async signAndSendTransaction(transaction: Transaction) {
     if (!this.dappProvider) {
       throw new Error(
         'Error: Transaction signing failed: There is no active session!'
@@ -119,7 +143,14 @@ class ElvenJS {
     try {
       const currentNonce = ls.get('nonce');
       transaction.setNonce(currentNonce);
-      await this.dappProvider.signTransaction(transaction);
+
+      if (this.dappProvider instanceof ExtensionProvider) {
+        await this.dappProvider.signTransaction(transaction);
+      }
+      if (this.dappProvider instanceof WalletConnectProvider) {
+        await this.dappProvider.signTransaction(transaction);
+      }
+
       await this.networkProvider.sendTransaction(transaction);
 
       const transactionWatcher = new TransactionWatcher(this.networkProvider);
@@ -156,7 +187,5 @@ class ElvenJS {
   static ContractCallPayloadBuilder = ContractCallPayloadBuilder;
   static ContractFunction = ContractFunction;
 }
-
-// Handle the expiration time
 
 window.ElvenJS = ElvenJS;
