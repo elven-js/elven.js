@@ -1,5 +1,5 @@
 import BigNumber from 'big.js';
-import { networkConfig, chainTypeConfig } from './constants';
+import { networkConfig, chainTypeConfig } from './utils/constants';
 import { Address } from '@elrondnetwork/erdjs/out/address';
 import { TransactionStatus } from '@elrondnetwork/erdjs-network-providers/out/transactionStatus';
 import { TransactionReceipt } from '@elrondnetwork/erdjs-network-providers/out/transactionReceipt';

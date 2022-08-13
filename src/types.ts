@@ -12,3 +12,8 @@ export type DappProvider =
   | ExtensionProvider
   | WalletConnectProvider
   | undefined;
+
+export interface LoginOptions {
+  qrCodeContainerId?: string;
+  token?: string;
+}

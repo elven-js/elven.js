@@ -12,14 +12,16 @@ import {
 import { BooleanValue } from '@elrondnetwork/erdjs/out/smartcontracts/typesystem/boolean';
 import { ContractCallPayloadBuilder } from '@elrondnetwork/erdjs/out/smartcontracts/transactionPayloadBuilders';
 import { ContractFunction } from '@elrondnetwork/erdjs/out/smartcontracts/function';
-import { initExtensionProvider } from './init-extension-provider';
+import { initExtensionProvider } from './auth/init-extension-provider';
 import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
 import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
-// import { initMaiarMobileProvider } from './init-maiar-mobile-provider';
-import { ls } from './ls-helpers';
-import { getNewLoginExpiresTimestamp } from './expires-at';
+import { initMaiarMobileProvider } from './auth/init-maiar-mobile-provider';
+import { ls } from './utils/ls-helpers';
 import { ApiNetworkProvider, InitOptions } from './network-provider';
-import { DappProvider, LoginMethodsEnum } from './types';
+import { DappProvider, LoginMethodsEnum, LoginOptions } from './types';
+import { logout } from './auth/logout';
+import { loginWithExtension } from './auth/login-with-extension';
+import { loginWithMobile } from './auth/login-with-mobile';
 
 declare global {
   interface Window {
@@ -43,12 +45,18 @@ class ElvenJS {
       if (state.loginMethod === LoginMethodsEnum.maiarBrowserExtension) {
         this.dappProvider = await initExtensionProvider();
       }
+      if (state.loginMethod === LoginMethodsEnum.maiarMobile) {
+        this.dappProvider = await initMaiarMobileProvider(
+          this.networkProvider,
+          this.dappProvider
+        );
+      }
       return true;
     }
     return false;
   }
 
-  static async login(loginMethod: LoginMethodsEnum) {
+  static async login(loginMethod: LoginMethodsEnum, options?: LoginOptions) {
     const isProperLoginMethod =
       Object.values(LoginMethodsEnum).includes(loginMethod);
     if (!isProperLoginMethod) {
@@ -59,73 +67,40 @@ class ElvenJS {
       throw new Error('Error: Login failed: Use ElvenJs.init() first!');
     }
 
+    // Login with Maiar browser extension
     if (
       !this.dappProvider &&
       loginMethod === LoginMethodsEnum.maiarBrowserExtension
     ) {
-      this.dappProvider = await initExtensionProvider();
+      const response = await loginWithExtension(
+        this.dappProvider,
+        this.networkProvider,
+        options?.token
+      );
+
+      this.dappProvider = response?.dappProvider;
+
+      return response?.address;
     }
+
+    // Login with Maiar mobile app
     if (!this.dappProvider && loginMethod === LoginMethodsEnum.maiarMobile) {
-      // this.dappProvider = await initMaiarMobileProvider();
-    }
-
-    if (!this.dappProvider) {
-      throw new Error(
-        'Error: There were problems with auth provider initialization!'
+      const response = await loginWithMobile(
+        this.dappProvider,
+        this.networkProvider,
+        options?.qrCodeContainerId,
+        options?.token
       );
-    }
+      this.dappProvider = response?.dappProvider;
 
-    try {
-      await this.dappProvider.login();
-    } catch (e: any) {
-      console.warn(
-        `Something went wrong trying to login the user: ${e?.message}`
-      );
-    }
-
-    if (this.networkProvider) {
-      try {
-        const address = await this.dappProvider.getAddress();
-
-        const userAddressInstance = new Address(address);
-        const userAccountInstance = new Account(userAddressInstance);
-
-        const userAccountOnNetwork = await this.networkProvider.getAccount(
-          userAddressInstance
-        );
-
-        userAccountInstance.update(userAccountOnNetwork);
-
-        const addressBech = userAccountInstance.address.bech32();
-        const nonce = userAccountInstance.nonce.valueOf();
-        const balance = userAccountInstance.balance.toString();
-
-        addressBech && ls.set('address', addressBech);
-        nonce && ls.set('nonce', nonce);
-        balance && ls.set('balance', userAccountInstance.balance.toString());
-
-        ls.set('loginMethod', loginMethod);
-        ls.set('expires', getNewLoginExpiresTimestamp().toString());
-
-        return address;
-      } catch (e: any) {
-        console.warn(
-          `Something went wrong trying to synchronize the user account: ${e?.message}`
-        );
-      }
+      return response?.address;
     }
   }
 
   static async logout() {
-    if (!this.dappProvider) {
-      throw new Error('Error: Logout failed: There is no active session!');
-    }
-
-    const isLoggedOut = await this.dappProvider.logout();
-    if (isLoggedOut) {
-      ls.clear();
-      return isLoggedOut;
-    }
+    const isLoggedOut = await logout(this.dappProvider);
+    this.dappProvider = undefined;
+    return isLoggedOut;
   }
 
   static async signAndSendTransaction(transaction: Transaction) {

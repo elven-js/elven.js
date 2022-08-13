@@ -1,16 +1,16 @@
-const handler = require('serve-handler');
-const http = require('http');
+import handler from 'serve-handler';
+import http from 'http';
 
 const server = http.createServer((request, response) => {
   return handler(request, response, {
     public: 'example',
     headers: [
       {
-        source: "**/*",
+        source: '**/*',
         headers: [
           {
-            key: "Cache-Control",
-            value: "no-cache",
+            key: 'Cache-Control',
+            value: 'no-cache',
           },
         ],
       },
