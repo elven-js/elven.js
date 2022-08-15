@@ -17,6 +17,7 @@ const buildDeepLink = (walletConnectUri: string) => {
   aElem.setAttribute('rel', 'noopener noreferrer nofollow');
   aElem.setAttribute('target', '_blank');
   aElem.textContent = 'Maiar login';
+  aElem.classList.add('elven-qr-code-deep-link');
 
   return aElem;
 };
@@ -60,4 +61,6 @@ export const qrCodeBuilder = async (
       qrCodeElem.appendChild(buildDeepLink(walletConnectUri));
     }
   }
+
+  return qrCodeElem;
 };

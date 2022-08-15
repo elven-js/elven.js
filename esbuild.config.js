@@ -10,6 +10,7 @@ esbuild
       global: 'global',
       process: 'process',
       Buffer: 'Buffer',
+      'process.env.NODE_ENV': 'production',
     },
     plugins: [plugin(stdLibBrowser)],
     entryPoints: ['./src/elven.ts'],

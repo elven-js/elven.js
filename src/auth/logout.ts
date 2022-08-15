@@ -1,12 +1,17 @@
 import { ls } from '../utils/ls-helpers';
-import { DappProvider } from '../types';
 
-export const logout = async (dappProvider: DappProvider) => {
-  if (!dappProvider) {
+declare global {
+  interface Window {
+    ElvenJS: any;
+  }
+}
+
+export const logout = async () => {
+  if (!window.ElvenJS.dappProvider) {
     throw new Error('Error: Logout failed: There is no active session!');
   }
 
-  const isLoggedOut = await dappProvider.logout();
+  const isLoggedOut = await window.ElvenJS.dappProvider.logout();
   if (isLoggedOut) {
     ls.clear();
   }

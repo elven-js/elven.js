@@ -14,6 +14,8 @@ export type DappProvider =
   | undefined;
 
 export interface LoginOptions {
+  onWalletConnectLogin?: () => void;
+  onWalletConnectLogout?: () => void;
   qrCodeContainerId?: string;
   token?: string;
 }

@@ -1,19 +1,18 @@
-import { Address } from '@elrondnetwork/erdjs/out/address';
-import { Account } from '@elrondnetwork/erdjs/out/account';
-import { DappProvider } from '../types';
 import { ls } from '../utils/ls-helpers';
 import { initExtensionProvider } from './init-extension-provider';
 import { errorParse } from '../utils/errorParse';
-import { ApiNetworkProvider } from '../network-provider';
 import { LoginMethodsEnum } from '../types';
 import { getNewLoginExpiresTimestamp } from './expires-at';
+import { accountSync } from './account-sync';
 
-export const loginWithExtension = async (
-  dappProvider: DappProvider,
-  networkProvider: ApiNetworkProvider,
-  token?: string
-) => {
-  dappProvider = await initExtensionProvider();
+declare global {
+  interface Window {
+    ElvenJS: any;
+  }
+}
+
+export const loginWithExtension = async (token?: string) => {
+  const dappProvider = await initExtensionProvider();
 
   try {
     if (dappProvider) await dappProvider.login();
@@ -38,34 +37,17 @@ export const loginWithExtension = async (
     ls.set('signature', signature);
   }
 
-  if (networkProvider) {
+  if (window.ElvenJS.networkProvider) {
     try {
       const address = await dappProvider.getAddress();
 
-      const userAddressInstance = new Address(address);
-      const userAccountInstance = new Account(userAddressInstance);
-
-      const userAccountOnNetwork = await networkProvider.getAccount(
-        userAddressInstance
-      );
-
-      userAccountInstance.update(userAccountOnNetwork);
-
-      const addressBech = userAccountInstance.address.bech32();
-      const nonce = userAccountInstance.nonce.valueOf();
-      const balance = userAccountInstance.balance.toString();
-
-      addressBech && ls.set('address', addressBech);
-      nonce && ls.set('nonce', nonce);
-      balance && ls.set('balance', userAccountInstance.balance.toString());
-
+      ls.set('address', address);
       ls.set('loginMethod', LoginMethodsEnum.maiarBrowserExtension);
-      ls.set('expires', getNewLoginExpiresTimestamp().toString());
+      ls.set('expires', getNewLoginExpiresTimestamp());
 
-      return {
-        dappProvider,
-        address,
-      };
+      await accountSync();
+
+      return dappProvider;
     } catch (e: any) {
       console.warn(
         `Something went wrong trying to synchronize the user account: ${e?.message}`

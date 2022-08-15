@@ -13,6 +13,9 @@
   "parserOptions": {
     "ecmaVersion": 2020
   },
+  "globals": {
+    "ElvenJS": "readonly"
+  },
   "rules": {
     "no-var": "error",
     "prefer-const": "error",

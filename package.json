@@ -9,7 +9,7 @@
   },
   "exports": "./build/elven.js",
   "author": "Julian Ćwirko <julian.io>",
-  "license": "GPLv3",
+  "license": "MIT",
   "homepage": "https://github.com/juliancwirko/elven.js",
   "repository": {
     "type": "git",

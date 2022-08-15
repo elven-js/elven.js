@@ -22,6 +22,9 @@ import { DappProvider, LoginMethodsEnum, LoginOptions } from './types';
 import { logout } from './auth/logout';
 import { loginWithExtension } from './auth/login-with-extension';
 import { loginWithMobile } from './auth/login-with-mobile';
+import { accountSync } from './auth/account-sync';
+import { errorParse } from './utils/errorParse';
+import { isLoginExpired } from './auth/expires-at';
 
 declare global {
   interface Window {
@@ -30,32 +33,44 @@ declare global {
 }
 
 class ElvenJS {
-  private static dappProvider: DappProvider;
   private static initOptions: InitOptions;
+  static dappProvider: DappProvider;
   static networkProvider: ApiNetworkProvider;
 
+  /**
+   * Initialization of the Elven.js
+   */
   static async init(options: InitOptions) {
+    const state = ls.get();
+
+    if (state.expires && isLoginExpired(state.expires)) {
+      ls.clear();
+      this.dappProvider = undefined;
+      return;
+    }
+
     this.initOptions = options;
 
     this.networkProvider = new ApiNetworkProvider(this.initOptions);
-
-    const state = ls.get();
 
     if (state?.address && state?.loginMethod) {
       if (state.loginMethod === LoginMethodsEnum.maiarBrowserExtension) {
         this.dappProvider = await initExtensionProvider();
       }
       if (state.loginMethod === LoginMethodsEnum.maiarMobile) {
-        this.dappProvider = await initMaiarMobileProvider(
-          this.networkProvider,
-          this.dappProvider
-        );
+        this.dappProvider = await initMaiarMobileProvider();
       }
+
+      await accountSync();
+
       return true;
     }
     return false;
   }
 
+  /**
+   * Login function
+   */
   static async login(loginMethod: LoginMethodsEnum, options?: LoginOptions) {
     const isProperLoginMethod =
       Object.values(LoginMethodsEnum).includes(loginMethod);
@@ -67,42 +82,45 @@ class ElvenJS {
       throw new Error('Error: Login failed: Use ElvenJs.init() first!');
     }
 
-    // Login with Maiar browser extension
-    if (
-      !this.dappProvider &&
-      loginMethod === LoginMethodsEnum.maiarBrowserExtension
-    ) {
-      const response = await loginWithExtension(
-        this.dappProvider,
-        this.networkProvider,
-        options?.token
-      );
+    try {
+      // Login with Maiar browser extension
+      if (
+        !this.dappProvider &&
+        loginMethod === LoginMethodsEnum.maiarBrowserExtension
+      ) {
+        const dappProvider = await loginWithExtension(options?.token);
+        this.dappProvider = dappProvider;
+      }
 
-      this.dappProvider = response?.dappProvider;
+      // Login with Maiar mobile app
+      if (!this.dappProvider && loginMethod === LoginMethodsEnum.maiarMobile) {
+        const dappProvider = await loginWithMobile(
+          options?.onWalletConnectLogin,
+          options?.onWalletConnectLogout,
+          options?.qrCodeContainerId,
+          options?.token
+        );
 
-      return response?.address;
-    }
-
-    // Login with Maiar mobile app
-    if (!this.dappProvider && loginMethod === LoginMethodsEnum.maiarMobile) {
-      const response = await loginWithMobile(
-        this.dappProvider,
-        this.networkProvider,
-        options?.qrCodeContainerId,
-        options?.token
-      );
-      this.dappProvider = response?.dappProvider;
-
-      return response?.address;
+        this.dappProvider = dappProvider;
+      }
+    } catch (e) {
+      const err = errorParse(e);
+      throw new Error(`Error: ${err}`);
     }
   }
 
+  /**
+   * Logout function
+   */
   static async logout() {
-    const isLoggedOut = await logout(this.dappProvider);
+    const isLoggedOut = await logout();
     this.dappProvider = undefined;
     return isLoggedOut;
   }
 
+  /**
+   * Sign and send function
+   */
   static async signAndSendTransaction(transaction: Transaction) {
     if (!this.dappProvider) {
       throw new Error(
@@ -146,9 +164,14 @@ class ElvenJS {
     return transaction;
   }
 
+  /**
+   * Main storage exposed
+   */
   static storage = ls;
 
-  // TODO: probably move to separate file
+  /**
+   * erdjs most usefull exports
+   */
   static TokenPayment = TokenPayment;
   static Address = Address;
   static Account = Account;
@@ -163,4 +186,7 @@ class ElvenJS {
   static ContractFunction = ContractFunction;
 }
 
+/**
+ * The ElvenJS is exposed as a global, in the future it can relay only on ES6 modules
+ */
 window.ElvenJS = ElvenJS;

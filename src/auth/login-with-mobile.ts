@@ -1,22 +1,23 @@
-import { Address } from '@elrondnetwork/erdjs/out/address';
-import { Account } from '@elrondnetwork/erdjs/out/account';
 import { errorParse } from '../utils/errorParse';
-import { qrCodeBuilder } from '../auth/qr-code-builder';
+import { qrCodeBuilder } from './qr-code-builder';
 import { networkConfig, chainTypeConfig } from '../utils/constants';
-import { ApiNetworkProvider } from '../network-provider';
-import {
-  getBridgeAddressFromNetwork,
-  WcOnLogin,
-} from '../auth/init-maiar-mobile-provider';
+import { getBridgeAddressFromNetwork } from './init-maiar-mobile-provider';
 import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
-import { DappProvider } from '../types';
+import { LoginMethodsEnum } from '../types';
 import { ls } from '../utils/ls-helpers';
-import { logout } from '../auth/logout';
-import { getNewLoginExpiresTimestamp } from '../auth/expires-at';
+import { logout } from './logout';
+import { getNewLoginExpiresTimestamp } from './expires-at';
+import { accountSync } from './account-sync';
+
+declare global {
+  interface Window {
+    ElvenJS: any;
+  }
+}
 
 export const loginWithMobile = async (
-  dappProvider: DappProvider,
-  networkProvider: ApiNetworkProvider,
+  onWalletConnectLogin?: () => void,
+  onWalletConnectLogout?: () => void,
   qrCodeContainerId?: string,
   token?: string
 ) => {
@@ -30,24 +31,25 @@ export const loginWithMobile = async (
     networkConfig[chainTypeConfig].walletConnectBridgeAddresses
   );
 
-  if (!bridgeAddress || !networkProvider) {
+  if (!bridgeAddress || !window.ElvenJS.networkProvider) {
     throw Error(
       "Something wen't wrong with the initialization (ApiNetworkProvider or Wallet Connect Bridge address), plese try to refresh the page!"
     );
   }
 
+  let qrCodeElement: HTMLElement | null;
+
   const providerHandlers = {
     onClientLogin: async () => {
-      if (dappProvider instanceof WalletConnectProvider) {
-        const address = await dappProvider.getAddress();
-        const signature = await dappProvider.getSignature();
-        const account = new Account(new Address(address));
+      if (window.ElvenJS.dappProvider instanceof WalletConnectProvider) {
+        const address = await window.ElvenJS.dappProvider.getAddress();
+        const signature = await window.ElvenJS.dappProvider.getSignature();
 
-        // TODO: sync doesn't work, fix it
         ls.set('address', address);
-        ls.set('nonce', account.nonce.valueOf());
-        ls.set('balance', account.balance.toString());
-        ls.set('expires', getNewLoginExpiresTimestamp().toString());
+        ls.set('loginMethod', LoginMethodsEnum.maiarMobile);
+        ls.set('expires', getNewLoginExpiresTimestamp());
+
+        await accountSync();
 
         if (signature) {
           ls.set('signature', signature);
@@ -56,26 +58,36 @@ export const loginWithMobile = async (
           ls.set('loginToken', token);
         }
 
-        WcOnLogin(networkProvider, dappProvider);
+        onWalletConnectLogin?.();
+        qrCodeElement?.replaceChildren();
       }
     },
-    onClientLogout: async () => await logout(dappProvider),
+    onClientLogout: async () => {
+      if (window.ElvenJS.dappProvider instanceof WalletConnectProvider) {
+        await logout();
+        onWalletConnectLogout?.();
+      }
+    },
   };
 
-  dappProvider = new WalletConnectProvider(bridgeAddress, providerHandlers);
+  const dappProvider = new WalletConnectProvider(
+    bridgeAddress,
+    providerHandlers
+  );
 
   try {
     if (dappProvider) {
       const walletConnectUri: string | undefined = await dappProvider.login();
 
-      qrCodeContainerId && qrCodeBuilder(qrCodeContainerId, walletConnectUri);
+      const wCUri = token
+        ? `${walletConnectUri}&token=${token}`
+        : walletConnectUri;
 
-      const address = await dappProvider.getAddress();
+      if (qrCodeContainerId && walletConnectUri) {
+        qrCodeElement = await qrCodeBuilder(qrCodeContainerId, wCUri);
+      }
 
-      return {
-        dappProvider,
-        address,
-      };
+      return dappProvider;
     }
   } catch (e) {
     const err = errorParse(e);
