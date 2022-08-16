@@ -4,5 +4,5 @@ src
 .prettierrc
 .eslintrc
 .editorconfig
-dev-server.js
+dev-server.mjs
 esbuild.config.js
