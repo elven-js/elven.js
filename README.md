@@ -1,6 +1,10 @@
 ## ElvenJS
 
-**You can use it already, but it is under active development, and the API might change, and there could be breaking changes.**
+### One static file to rule it all on the Elrond blockchain!
+
+## Demos
+- [elvenjs.netlify.app](https://elvenjs.netlify.app/)
+- [StackBlitz demo](https://stackblitz.com/edit/web-platform-d4rx5v?file=index.html)
 
 Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser. No need for bundlers, frameworks, etc. Just attach the script source, and you are ready to go. You can incorporate it into your preferred CMS framework like WordPress or an e-commerce system. Plus, it will also work on a standard static HTML website.
 
@@ -9,6 +13,8 @@ The primary purpose of this tool is to have a lite script for browser usage wher
 The purpose is to simplify the usage for primary use cases and open the doors for many frontend tools and approaches.
 
 It is a script for browsers with a global Window namespace: `ElvenJS`. If you need fully functional JavaScript/Typescript SDK (also in Nodejs), please use [erdjs](https://github.com/ElrondNetwork/elrond-sdk-erdjs), an official Typescriot Elrond SDK.
+
+**You can use it already, but it is under active development, and the API might change, and there could be breaking changes.**
 
 ### How to use it
 
