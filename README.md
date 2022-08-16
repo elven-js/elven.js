@@ -1,71 +1,205 @@
 ## ElvenJS
 
-**(!not ready for usage yet! stay tuned, under active development)**
+**You can use it already, but it is under active development, and the API might change, and there could be breaking changes.**
 
-Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser. No need for bundlers, frameworks, etc. Just attach the script source, and you are ready to go.
+Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser. No need for bundlers, frameworks, etc. Just attach the script source, and you are ready to go. You can incorporate it into your preferred CMS framework like WordPress or an e-commerce system. Plus, it will also work on a standard static HTML website.
 
 The primary purpose of this tool is to have a lite script for browser usage where you can authenticate and sign/send transactions on the Elrond blockchain and do this without any additional build steps.
 
-It is a script to be used in browsers with a global Window namespace: `ElvenJS`
+The purpose is to simplify the usage for primary use cases and open the doors for many frontend tools and approaches.
 
-If you need fully functional JavaScript/Typescript SDK (also in Nodejs), please use [erdjs](https://github.com/ElrondNetwork/elrond-sdk-erdjs), a powerful tool. For now, it includes basic functionality. Internally it uses [erdjs libraries](https://docs.elrond.com/sdk-and-tools/erdjs/erdjs/).
+It is a script for browsers with a global Window namespace: `ElvenJS`. If you need fully functional JavaScript/Typescript SDK (also in Nodejs), please use [erdjs](https://github.com/ElrondNetwork/elrond-sdk-erdjs), an official Typescriot Elrond SDK.
 
 ### How to use it
 
-Just copy and include the `elven.js` script from the `build` directory or CDN (https://unpkg.com/elven.js/build/elven.js).
+Just copy and include the `elven.js` script from the `build` directory or CDN (https://unpkg.com/elven.js/build/elven.js). Example: 
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elven.js demo</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Elven.js demo</title>
-</head>
+  <body>
+    <div class="header" id="header">
+      <button
+        class="button"
+        id="button-tx"
+        onclick="signAndSendEgld()"
+        style="display: none;"
+      >
+        Send predefined transaction
+      </button>
+      <button
+        class="button"
+        id="button-mint"
+        onclick="mintNFT()"
+        style="display: none;"
+      >
+        Mint NFT
+      </button>
+      <button
+        class="button"
+        id="button-login-extension"
+        onclick="loginWithBrowserExtension()"
+        style="display: none;"
+      >
+        Login with Extension
+      </button>
+      <button
+        class="button"
+        id="button-login-mobile"
+        onclick="loginWithMaiarMobileApp()"
+        style="display: none;"
+      >
+        Login with Maiar mobile
+      </button>
+      <button
+        class="button"
+        id="button-logout"
+        onclick="logout()"
+        style="display: none;"
+      >
+        Logout
+      </button>
+    </div>
 
-<body>
-  <button onclick="login()">Login</button>
+    <div id="tx-hash" class="tx-hash"></div>
+    <div id="qr-code-container"></div>
 
-  <!-- Include the script from local file system or CDN -->
-  <!-- https://unpkg.com/elven.js/build/elven.js -->
-  <script src="elven.js"></script>
-  
-  <script>
-    const init = async () => {
-      const isLoggedIn = await ElvenJS.init(
-        'extension',
-        {
+    <!-- Include the script from local file system or CDN -->
+    <!-- https://unpkg.com/elven.js/build/elven.js -->
+    <script src="elven.js"></script>
+
+    <script>
+      const initElven = async () => {
+        const isLoggedIn = await ElvenJS.init({
           apiUrl: 'https://devnet-api.elrond.com',
           chainType: 'devnet',
-          apiTimeout: 10000
+          apiTimeout: 10000,
+        });
+
+        uiLoggedInState(isLoggedIn);
+      };
+
+      initElven();
+
+      const loginWithBrowserExtension = async () => {
+        try {
+          uiSpinnerState(true, 'loginExtension');
+          await ElvenJS.login('maiar-browser-extension');
+          uiLoggedInState(true);
+        } catch (e) {
+          console.log('Login: Something went wrong, try again!', e?.message);
+        } finally {
+          uiSpinnerState(false, 'loginExtension');
         }
-      );
-    }
+      };
 
-    init();
+      const loginWithMaiarMobileApp = async () => {
+        try {
+          uiSpinnerState(true, 'loginMobile');
+          await ElvenJS.login('maiar-mobile', {
+            qrCodeContainerId: 'qr-code-container',
+            onWalletConnectLogin: () => {
+              uiLoggedInState(true);
+            },
+            onWalletConnectLogout: () => {
+              uiLoggedInState(false);
+            },
+          });
+        } catch (e) {
+          console.log('Login: Something went wrong, try again!', e?.message);
+        } finally {
+          uiSpinnerState(false, 'loginMobile');
+        }
+      };
 
-    const login = async () => {
-      const isLoggedIn = await ElvenJS.login();
-    }
+      const logout = async () => {
+        try {
+          const isLoggedOut = await ElvenJS.logout();
+          uiLoggedInState(!isLoggedOut);
+        } catch (e) {
+          console.error(e.message);
+        }
+      };
 
-    const logout = async () => {
-      const isLoggedOut = await ElvenJS.logout();
-    }
-  </script>
-</body>
+      // Simple transaction, you can build different transaction types and payload structures
+      const egldTransferAddress =
+        'erd17a4wydhhd6t3hhssvcp9g23ppn7lgkk4g2tww3eqzx4mlq95dukss0g50f';
+      const signAndSendEgld = async () => {
+        updateTxHashContainer(false);
+        const demoMessage = 'Transaction demo from Elven.js!';
 
+        const tx = new ElvenJS.Transaction({
+          nonce: ElvenJS.storage.get('nonce'),
+          receiver: new ElvenJS.Address(egldTransferAddress),
+          gasLimit: 50000 + 1500 * demoMessage.length,
+          chainID: 'D',
+          data: new ElvenJS.TransactionPayload(demoMessage),
+          value: ElvenJS.TokenPayment.egldFromAmount(0.001),
+          sender: new ElvenJS.Address(ElvenJS.storage.get('address')),
+        });
+
+        try {
+          uiSpinnerState(true, 'egld');
+          const transaction = await ElvenJS.signAndSendTransaction(tx);
+          uiSpinnerState(false, 'egld');
+          updateTxHashContainer(transaction.hash);
+        } catch (e) {
+          uiSpinnerState(false, 'egld');
+          throw new Error(e?.message);
+        }
+      };
+
+      // Mint nft function
+      // It mints on the smart contract from: https://dapp-demo.elven.tools/
+      const nftMinterSmartContract =
+        'erd1qqqqqqqqqqqqqpgq5za2pty2tlfqhj20z9qmrrpjmyt6advcgtkscm7xep';
+      const mintNFT = async () => {
+        updateTxHashContainer(false);
+        const data = new ElvenJS.ContractCallPayloadBuilder()
+          .setFunction(new ElvenJS.ContractFunction('mint'))
+          .setArgs([new ElvenJS.U32Value(1)])
+          .build();
+
+        const tx = new ElvenJS.Transaction({
+          data,
+          gasLimit: 14000000,
+          value: ElvenJS.TokenPayment.egldFromAmount(0.01),
+          chainID: 'D',
+          receiver: new ElvenJS.Address(nftMinterSmartContract),
+          sender: new ElvenJS.Address(ElvenJS.storage.get('address')),
+        });
+
+        try {
+          uiSpinnerState(true, 'mint');
+          const transaction = await ElvenJS.signAndSendTransaction(tx);
+          uiSpinnerState(false, 'mint');
+          updateTxHashContainer(transaction.hash);
+        } catch (e) {
+          uiSpinnerState(false, 'mint');
+          throw new Error(e?.message);
+        }
+      };
+    </script>
+  </body>
 </html>
 ```
 
-You will find the demo directory in the repository so that you can play with its final version, here only an example.
+You will find the demo directory in the repository so that you can play with its final version, here only as an example.
 
-### What can it do? 
+### What can it do?
 
 The API is limited for now, this will change, but even now, it can do much:
 
-- authenticate using the Maiar browser extension
+- authenticate using the Maiar mobile and Maiar browser extension
+- handle expiration of the auth state
+- handle login with tokens to be able to get the signature
 - sign transactions
 - send transactions (also custom smart contracts)
 - basic global states handling (local storage)
@@ -74,18 +208,15 @@ The API is limited for now, this will change, but even now, it can do much:
 
 ### What will it do soon? (TODO):
 
-- authenticate using Maiar mobile app
-- handle expiration of the auth state
 - query smart contracts
-- handle login with tokens to be able to get the signature
 - sign messages
-- more advanced global state handling and (real-time updates?)
+- more advanced global state handling and (real-time updates (if needed)?)
 - more structures and simplification for payload builders
 - authenticate with Ledger Nano
 - authenticate with Elrond Web Wallet
 - rethink the structure and split it into more files
 - make it as small as possible, for now, it is pretty big
-- make it load as an ES6 module in browser probably two separate builds will be required
+- make it load as an ES6 module in browser probably two separate builds will be required, maybe only ES6 will be enough?
 
 ### What it won't probably do:
 
@@ -96,30 +227,47 @@ Why? Because it is supposed to be a browser script, it should be as small as pos
 
 ### API
 
-The main initialization function: 
+The main initialization function (init providers, sync the network):
+
 ```javascript
-const isLoggedIn = await ElvenJS.init(
-  'extension',
-  {
-    apiUrl: 'https://devnet-api.elrond.com',
-    chainType: 'devnet',
-    apiTimeout: 10000
-  }
-);
+await ElvenJS.init({
+  apiUrl: 'https://devnet-api.elrond.com',
+  chainType: 'devnet',
+  apiTimeout: 10000,
+});
 ```
+
 You can define the API endpoint and chain type also the API timeout if needed. These values are set by default. So it will work like that even without them.
 
-Login using previously initialized provider, here Maiar browser extension.
+Login using Maiar mobile app (optionally you can also pass login token, it will be used to generate the signature):
+
 ```javascript
-const isLoggedIn = await ElvenJS.login();
+await ElvenJS.login('maiar-mobile', {
+  qrCodeContainerId: 'qr-code-container', // Your qr code container id
+  onWalletConnectLogin: () => {
+    // Your logic here, the wallet connect is connected
+  },
+  onWalletConnectLogout: () => {
+    // Your logic here, the wallet connect is disconnected
+  },
+  token: '<your_login_token_here>'
+});
+```
+
+Login using Maiar browser extension (optionally you can also pass login token, it will be used to generate the signature):
+
+```javascript
+await ElvenJS.login('maiar-browser-extension', { token: '<your_login_token_here>' });
 ```
 
 Logout using previously initialized provider, here Maiar browser extension.
+
 ```javascript
 const isLoggedIn = await ElvenJS.logout();
 ```
 
 Transaction builder:
+
 ```javascript
 const tx = new ElvenJS.Transaction({
   nonce: ElvenJS.storage.get('nonce'),
@@ -131,15 +279,18 @@ const tx = new ElvenJS.Transaction({
   sender: new ElvenJS.Address(ElvenJS.storage.get('address')),
 });
 ```
+
 The API is similar to erdjs, but all are placed under the `ElvenJS` namespace. Not all APIs are exported from erdjs, only the basic ones. This will change in the future.
 
 Sign and send transaction using previously initialized provider:
+
 ```javascript
 const transaction = await ElvenJS.signAndSendTransaction(tx);
 ```
+
 Here the `tx` is the transaction from the previous example.
 
-### All exposed erdjs types:
+### All exposed erdjs classes/types:
 
 - `ElvenJS.TokenPayment`,
 - `ElvenJS.Address`,
@@ -162,6 +313,7 @@ There will be more, for now only basic ones.
 
 - `ElvenJS.storage` - `ElvenJS.storage.get(key?)`, `ElvenJS.storage.set(key, value)`, `ElvenJS.storage.clear()` - storage helper for localStorage `elvenjs_state` where couple of information is stored: `{ address: '', nonce: '', expires: '', loginMethod: '', balance: '' }` you can get and set them (be careful, they are used also internally)
 - `ElvenJS.networkProvider` - access to the simplified network provider which gives some API related helpers, it is also used internally
+- `ElvenJS.dappProvider` - access to the auth provider instance, it is also used internally
 
 ### Development
 
@@ -173,7 +325,7 @@ There will be more, for now only basic ones.
 
 ### Other tools
 
-If you need to use Elrond SDK with React-based projects, you can try these tools: 
+If you need to use Elrond SDK with React-based projects, you can try these tools:
 
 - [dapp-core](https://github.com/ElrondNetwork/dapp-core) - for standard React based SPA
 - [nextjs-dapp-template](https://github.com/ElrondDevGuild/nextjs-dapp-template) - or Nextjs apps
@@ -183,5 +335,6 @@ If you are interested in creating and managing your own PFP NFT collection, you 
 - [Elven Tools](https://www.elven.tools) - What is included: NFT minter smart contract (decentralized way of minting), minter Nextjs dapp (interaction on the frontend side), CLI tool (deploy, configuration, interaction)
 - [nft-art-maker](https://github.com/juliancwirko/nft-art-maker) - tool for creating png assets from provided layers. It can also pack files and upload them to IPFS using nft.storage. All CIDs will be auto-updated
 
-Other tools: 
+Other tools:
+
 - [Buildo Begins](https://github.com/ElrondDevGuild/buildo-begins) - all Elrond blockchain CLI interactions with erdjs SDK still in progress

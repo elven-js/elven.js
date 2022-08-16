@@ -1,0 +1,85 @@
+body {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+body * {
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.button {
+  padding: 10px 15px;
+  color: #fff;
+  background-color: #0f172a;
+  border: 0;
+  text-align: center;
+  font-size: 16px;
+  margin: 10px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.button.right {
+  margin-left: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px dashed #000;
+  margin-bottom: 60px;
+  padding-bottom: 20px;
+}
+
+a {
+  color: #000;
+  font-size: 15px;
+  font-weight: bold;
+  max-width: 100%;
+  display: inline-block;
+}
+
+.tx-hash {
+  font-size: 18px;
+  word-break: break-all;
+}
+
+.qr-code-container {
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0px 0px 26px -8px rgba(66, 68, 90, 0.43);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.qr-code-container .elven-qr-code-deep-link {
+  margin-bottom: 24px;
+  font-size: 16px;
+  display: inline-block;
+  background-color: #000;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+}
+
+@media screen and (max-width: 680px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  .button.right {
+    margin-left: 10px;
+  }
+}

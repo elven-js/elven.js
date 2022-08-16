@@ -1,5 +1,5 @@
 import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
-import { ls } from './ls-helpers';
+import { ls } from '../utils/ls-helpers';
 
 export const initExtensionProvider = async () => {
   const dappProvider = ExtensionProvider.getInstance();
