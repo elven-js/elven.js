@@ -1,4 +1,4 @@
-### [0.2.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.2.0) (2022-07-...)
+### [0.2.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.2.0) (2022-07-16)
 - Maiar mobile app auth functionality with QR code generation
 - changes for the init function, you don't set the auth provider there anymore, it is moved to the login function
 - a lot of refactoring
