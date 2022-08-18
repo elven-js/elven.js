@@ -329,6 +329,9 @@ There will be more, for now only basic ones.
 4. test on example -> `npm run dev:server`
 5. rebuild with every change in the script
 
+### TODO
+- [Kanban board](https://github.com/juliancwirko/elven.js/projects/1)
+
 ### Other tools
 
 If you need to use Elrond SDK with React-based projects, you can try these tools:
