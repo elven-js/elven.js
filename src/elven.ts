@@ -14,4 +14,4 @@ export { ContractCallPayloadBuilder } from '@elrondnetwork/erdjs/out/smartcontra
 export { ContractFunction } from '@elrondnetwork/erdjs/out/smartcontracts/function';
 export { ElvenJS } from './main';
 
-export type { LoginMethodsEnum } from './types';
+export { LoginMethodsEnum } from './types';

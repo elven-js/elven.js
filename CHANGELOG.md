@@ -1,3 +1,7 @@
+### [0.3.2](https://github.com/juliancwirko/elven.js/releases/tag/v0.3.2) (2022-08-21)
+- fix type export
+- add Solid.js demo
+
 ### [0.3.1](https://github.com/juliancwirko/elven.js/releases/tag/v0.3.1) (2022-08-20)
 - fix types export
 
