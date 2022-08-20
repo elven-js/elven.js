@@ -4,7 +4,8 @@
 
 ## Demos
 - [elvenjs.netlify.app](https://elvenjs.netlify.app/)
-- [StackBlitz demo](https://stackblitz.com/edit/web-platform-d4rx5v?file=index.html)
+- [StackBlitz vanilla html demo](https://stackblitz.com/edit/web-platform-d4rx5v?file=index.html)
+- [StackBlitz Astro demo](https://stackblitz.com/edit/withastro-astro-pwareu?file=src%2Fpages%2Findex.astro)
 
 Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser. No need for bundlers, frameworks, etc. Just attach the script source, and you are ready to go. You can incorporate it into your preferred CMS framework like WordPress or an e-commerce system. Plus, it will also work on a standard static HTML website.
 
