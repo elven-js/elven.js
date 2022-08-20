@@ -36,6 +36,24 @@ Just copy and include the `elven.js` script from the `build` directory or CDN (h
   // Your code here
 </script>
 ```
+or from CDN:
+
+```html
+<script type="module">
+  import {
+    ElvenJS,
+    Transaction,
+    Address,
+    TransactionPayload,
+    TokenPayment,
+    ContractCallPayloadBuilder,
+    ContractFunction,
+    U32Value,
+  } from 'https://unpkg.com/elven.js@0.3.0/build/elven.js';
+
+  // Your code here
+</script>
+```
 
 Check what exactly is included below:
 
