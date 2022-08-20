@@ -5,13 +5,7 @@ import { LoginMethodsEnum } from '../types';
 import { getNewLoginExpiresTimestamp } from './expires-at';
 import { accountSync } from './account-sync';
 
-declare global {
-  interface Window {
-    ElvenJS: any;
-  }
-}
-
-export const loginWithExtension = async (token?: string) => {
+export const loginWithExtension = async (elven: any, token?: string) => {
   const dappProvider = await initExtensionProvider();
 
   try {
@@ -37,7 +31,7 @@ export const loginWithExtension = async (token?: string) => {
     ls.set('signature', signature);
   }
 
-  if (window.ElvenJS.networkProvider) {
+  if (elven.networkProvider) {
     try {
       const address = await dappProvider.getAddress();
 
@@ -45,7 +39,7 @@ export const loginWithExtension = async (token?: string) => {
       ls.set('loginMethod', LoginMethodsEnum.maiarBrowserExtension);
       ls.set('expires', getNewLoginExpiresTimestamp());
 
-      await accountSync();
+      await accountSync(elven);
 
       return dappProvider;
     } catch (e: any) {

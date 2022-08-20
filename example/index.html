@@ -28,14 +28,13 @@
 <body>
   <div class="container">
     <div class="header" id="header">
-      <button class="button" id="button-tx" onclick="signAndSendEgld()" style="display: none;">Send predefined
+      <button class="button" id="button-tx" style="display: none;">Send predefined
         transaction</button>
-      <button class="button" id="button-mint" onclick="mintNFT()" style="display: none;">Mint NFT</button>
-      <button class="button" id="button-login-extension" onclick="loginWithBrowserExtension()"
-        style="display: none;">Login with Extension</button>
-      <button class="button" id="button-login-mobile" onclick="loginWithMaiarMobileApp()" style="display: none;">Login
+      <button class="button" id="button-mint" style="display: none;">Mint NFT</button>
+      <button class="button" id="button-login-extension" style="display: none;">Login with Extension</button>
+      <button class="button" id="button-login-mobile" style="display: none;">Login
         with Maiar mobile</button>
-      <button class="button" id="button-logout" onclick="logout()" style="display: none;">Logout</button>
+      <button class="button" id="button-logout" style="display: none;">Logout</button>
       <a class="button right" href="https://github.com/juliancwirko/elven.js" target="_blank"
         rel="noopener noreferrer">GitHub</a>
     </div>
@@ -43,29 +42,30 @@
     <div id="tx-hash" class="tx-hash"></div>
     <div id="qr-code-container" class="qr-code-container"></div>
 
-    <h1>ElvenJS (working demo)</h1>
+    <h1>ElvenJS (demo)</h1>
+    <h4>Docs and code: <a href="https://github.com/juliancwirko/elven.js">elven.js</a></h4>
     <p>Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser. No need for
       bundlers, frameworks, etc. Just attach the script source, and you are ready to go. You can incorporate it into
       your preferred CMS framework like WordPress or an e-commerce system. Plus, it will also work on a standard static
       HTML website.</p>
-    <p>For now, only Maiar mobile app and Maiar browser extension are supported. Check GitHub for more info!</p>
+    <p>For now, Maiar mobile app and Maiar browser extension are supported. Check GitHub for more info!</p>
     <p>The primary purpose of this tool is to have a lite script for browser usage where you can authenticate and
       sign/send transactions on the Elrond blockchain and do this without any additional build steps.</p>
     <p>The purpose is to simplify the usage for primary use cases and open the doors for many frontend tools and
       approaches.</p>
-    <p>The demo here is essential for now, but it presents the full path of initialization, logging in, and sending a
+    <p>The demo here presents the full path of initialization, logging in, and sending a
       transaction.</p>
     <p>
-      It is a script for browsers with a global Window namespace: `ElvenJS`. If you need fully functional
+      It is a script for browsers that incorporates ES6 modules. If you need fully functional
       JavaScript/Typescript SDK (also in Nodejs), please use <a href="https://github.com/ElrondNetwork/elrond-sdk-erdjs"
-        target="_blank" rel="noopener noreferrer">erdjs</a>, an official Typescriot Elrond SDK.
+        target="_blank" rel="noopener noreferrer">erdjs</a>, an official Typescript Elrond SDK.
     </p>
     <h4>Soon there will be more docs and examples!</h4>
-    <h4>Check the source code of this page to get the complete code. All is static, not bundled. The main script is
+    <h4>Check the source code of this page to get the complete code. All is static. The main script is
       minified. But you can see the code in the <a href="https://github.com/juliancwirko/elven.js" target="_blank"
         rel="noopener noreferrer">repository</a></h4>
 
-    <h3>Demo transactions description:</h3>
+    <h3>Demo transactions description (devnet):</h3>
     <div>First one:</div>
     <ul>
       <li>simple EGLD transfer on the devnet chain</li>
@@ -76,15 +76,33 @@
 
     <div>Second one:</div>
     <ul>
-      <li>Smart Contract call (devnet)</li>
+      <li>Smart Contract call on the devnet chain</li>
       <li>it will call predefined smart contract and mint NFT</li>
+      <li>after the transaction is finished below, you will find the transaction hash</li>
     </ul>
   </div>
 
-  <script src="elven.js"></script>
-  <script src="demo-ui-tools.js"></script>
+  <!-- From v0.3.0 you would need to use the module type and import what you need -->
+  <script type="module">
+    // Just for the demo
+    import {
+      uiLoggedInState,
+      uiSpinnerState,
+      updateTxHashContainer,
+    } from './demo-ui-tools.js'
 
-  <script>
+    // Elven.js tools
+    import {
+      ElvenJS,
+      Transaction,
+      Address,
+      TransactionPayload,
+      TokenPayment,
+      ContractCallPayloadBuilder,
+      ContractFunction,
+      U32Value,
+    } from './elven.js';
+
     // Options are the defaults
     const initElven = async () => {
       const isLoggedIn = await ElvenJS.init(
@@ -100,7 +118,7 @@
 
     initElven();
 
-    const loginWithBrowserExtension = async () => {
+    document.getElementById('button-login-extension').addEventListener('click', async () => {
       try {
         uiSpinnerState(true, 'loginExtension')
         await ElvenJS.login('maiar-browser-extension');
@@ -110,9 +128,9 @@
       } finally {
         uiSpinnerState(false, 'loginExtension');
       }
-    }
+    });
 
-    const loginWithMaiarMobileApp = async () => {
+    document.getElementById('button-login-mobile').addEventListener('click', async () => {
       try {
         uiSpinnerState(true, 'loginMobile')
         await ElvenJS.login('maiar-mobile', {
@@ -129,31 +147,32 @@
       } finally {
         uiSpinnerState(false, 'loginMobile');
       }
-    }
+    });
 
-    const logout = async () => {
+    document.getElementById('button-logout').addEventListener('click', async () => {
       try {
         const isLoggedOut = await ElvenJS.logout();
         uiLoggedInState(!isLoggedOut);
       } catch (e) {
         console.error(e.message);
       }
-    }
+    });
 
     // Simple transaction, you can build different transaction types and payload structures
     const egldTransferAddress = 'erd17a4wydhhd6t3hhssvcp9g23ppn7lgkk4g2tww3eqzx4mlq95dukss0g50f';
-    const signAndSendEgld = async () => {
+
+    document.getElementById('button-tx').addEventListener('click', async () => {
       updateTxHashContainer(false);
       const demoMessage = 'Transaction demo from Elven.js!';
 
-      const tx = new ElvenJS.Transaction({
+      const tx = new Transaction({
         nonce: ElvenJS.storage.get('nonce'),
-        receiver: new ElvenJS.Address(egldTransferAddress),
+        receiver: new Address(egldTransferAddress),
         gasLimit: 50000 + 1500 * demoMessage.length,
         chainID: 'D',
-        data: new ElvenJS.TransactionPayload(demoMessage),
-        value: ElvenJS.TokenPayment.egldFromAmount(0.001),
-        sender: new ElvenJS.Address(ElvenJS.storage.get('address')),
+        data: new TransactionPayload(demoMessage),
+        value: TokenPayment.egldFromAmount(0.001),
+        sender: new Address(ElvenJS.storage.get('address')),
       });
 
       try {
@@ -165,25 +184,25 @@
         uiSpinnerState(false, 'egld');
         throw new Error(e?.message);
       }
-    }
+    });
 
     // Mint nft function
     // It mints on the smart contract from: https://dapp-demo.elven.tools/
     const nftMinterSmartContract = 'erd1qqqqqqqqqqqqqpgq5za2pty2tlfqhj20z9qmrrpjmyt6advcgtkscm7xep';
-    const mintNFT = async () => {
+    document.getElementById('button-mint').addEventListener('click', async () => {
       updateTxHashContainer(false);
-      const data = new ElvenJS.ContractCallPayloadBuilder()
-        .setFunction(new ElvenJS.ContractFunction('mint'))
-        .setArgs([new ElvenJS.U32Value(1)])
+      const data = new ContractCallPayloadBuilder()
+        .setFunction(new ContractFunction('mint'))
+        .setArgs([new U32Value(1)])
         .build();
 
-      const tx = new ElvenJS.Transaction({
+      const tx = new Transaction({
         data,
         gasLimit: 14000000,
-        value: ElvenJS.TokenPayment.egldFromAmount(0.01),
+        value: TokenPayment.egldFromAmount(0.01),
         chainID: 'D',
-        receiver: new ElvenJS.Address(nftMinterSmartContract),
-        sender: new ElvenJS.Address(ElvenJS.storage.get('address')),
+        receiver: new Address(nftMinterSmartContract),
+        sender: new Address(ElvenJS.storage.get('address')),
       });
 
       try {
@@ -195,7 +214,7 @@
         uiSpinnerState(false, 'mint');
         throw new Error(e?.message);
       }
-    }
+    });
   </script>
 </body>
 

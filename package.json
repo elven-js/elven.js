@@ -1,8 +1,10 @@
 {
   "name": "elven.js",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser.",
-  "types": "build/types",
+  "type": "module",
+  "types": "build/types/elven.d.ts",
+  "main": "build/elven.js",
   "browser": {
     ".": "./build/elven.js",
     "punycode": "rollup-plugin-node-polyfills/polyfills/punycode.js"
@@ -16,7 +18,7 @@
     "url": "https://github.com/juliancwirko/elven.js"
   },
   "scripts": {
-    "build": "rimraf build && node ./esbuild.config.js && cp build/elven.js example/elven.js",
+    "build": "rimraf build && node ./esbuild.config.cjs && tsc && cp build/elven.js example/elven.js",
     "dev:server": "node dev-server.mjs",
     "dev:lint": "eslint src/** --fix",
     "dev:prettier": "prettier --write 'src/**/*.{js,ts,json}'",

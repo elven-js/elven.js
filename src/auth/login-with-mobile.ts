@@ -9,13 +9,8 @@ import { logout } from './logout';
 import { getNewLoginExpiresTimestamp } from './expires-at';
 import { accountSync } from './account-sync';
 
-declare global {
-  interface Window {
-    ElvenJS: any;
-  }
-}
-
 export const loginWithMobile = async (
+  elven: any,
   onWalletConnectLogin?: () => void,
   onWalletConnectLogout?: () => void,
   qrCodeContainerId?: string,
@@ -31,7 +26,7 @@ export const loginWithMobile = async (
     networkConfig[chainTypeConfig].walletConnectBridgeAddresses
   );
 
-  if (!bridgeAddress || !window.ElvenJS.networkProvider) {
+  if (!bridgeAddress || !elven.networkProvider) {
     throw Error(
       "Something wen't wrong with the initialization (ApiNetworkProvider or Wallet Connect Bridge address), plese try to refresh the page!"
     );
@@ -41,15 +36,15 @@ export const loginWithMobile = async (
 
   const providerHandlers = {
     onClientLogin: async () => {
-      if (window.ElvenJS.dappProvider instanceof WalletConnectProvider) {
-        const address = await window.ElvenJS.dappProvider.getAddress();
-        const signature = await window.ElvenJS.dappProvider.getSignature();
+      if (elven.dappProvider instanceof WalletConnectProvider) {
+        const address = await elven.dappProvider.getAddress();
+        const signature = await elven.dappProvider.getSignature();
 
         ls.set('address', address);
         ls.set('loginMethod', LoginMethodsEnum.maiarMobile);
         ls.set('expires', getNewLoginExpiresTimestamp());
 
-        await accountSync();
+        await accountSync(elven);
 
         if (signature) {
           ls.set('signature', signature);
@@ -63,8 +58,8 @@ export const loginWithMobile = async (
       }
     },
     onClientLogout: async () => {
-      if (window.ElvenJS.dappProvider instanceof WalletConnectProvider) {
-        await logout();
+      if (elven.dappProvider instanceof WalletConnectProvider) {
+        await logout(elven);
         onWalletConnectLogout?.();
       }
     },
