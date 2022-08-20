@@ -5,4 +5,4 @@ src
 .eslintrc
 .editorconfig
 dev-server.mjs
-esbuild.config.js
+esbuild.config.cjs
