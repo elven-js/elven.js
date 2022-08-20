@@ -82,7 +82,7 @@ The types should also be exported.
 
 ### Usage example with static website: 
 
-Check out the example file: [examle/index.html](/example/index.html)
+Check out the example file: [example/index.html](/example/index.html)
 
 You will find the whole demo there. The same that is deployed here: [elvenjs.netlify.app](https://elvenjs.netlify.app)
 
