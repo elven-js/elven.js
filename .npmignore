@@ -6,3 +6,4 @@ src
 .editorconfig
 dev-server.mjs
 esbuild.config.cjs
+tsconfig.json
