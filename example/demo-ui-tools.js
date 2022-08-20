@@ -3,7 +3,7 @@
 // UI manipulation for demo purposes, for ElvenJS see below
 // ==============================================================
 
-const uiLoggedInState = (loggedIn) => {
+export const uiLoggedInState = (loggedIn) => {
   const loginExtensionButton = document.getElementById(
     'button-login-extension'
   );
@@ -25,7 +25,8 @@ const uiLoggedInState = (loggedIn) => {
     mintButton.style.display = 'none';
   }
 };
-const uiSpinnerState = (isLoading, button) => {
+
+export const uiSpinnerState = (isLoading, button) => {
   const buttonLoginExtension = document.getElementById(
     'button-login-extension'
   );
@@ -68,7 +69,8 @@ const uiSpinnerState = (isLoading, button) => {
     }
   }
 };
-const updateTxHashContainer = (txHash) => {
+
+export const updateTxHashContainer = (txHash) => {
   const txHashContainer = document.getElementById('tx-hash');
   if (txHash) {
     const url = `https://devnet-explorer.elrond.com/transactions/${txHash}`;

@@ -11,10 +11,10 @@ export function getBridgeAddressFromNetwork(
   ];
 }
 
-export const initMaiarMobileProvider = async () => {
+export const initMaiarMobileProvider = async (elven: any) => {
   const providerHandlers = {
-    onClientLogin: () => accountSync(),
-    onClientLogout: () => logout(),
+    onClientLogin: () => accountSync(elven),
+    onClientLogout: () => logout(elven),
   };
 
   const bridgeAddress = getBridgeAddressFromNetwork(
