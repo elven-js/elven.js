@@ -225,6 +225,10 @@ Here the `tx` is the transaction from the previous example.
 4. test on example -> `npm run dev:server`
 5. rebuild with every change in the script
 
+### Articles
+
+- [How to Interact With the Elrond Blockchain in a Simple Static Website](https://hackernoon.com/how-to-interact-with-the-elrond-blockchain-in-a-simple-static-website)
+
 ### TODO
 - [Kanban board](https://github.com/juliancwirko/elven.js/projects/1)
 
