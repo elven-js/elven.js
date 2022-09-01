@@ -34,7 +34,6 @@ body * {
   display: flex;
   align-items: center;
   border-bottom: 1px dashed #000;
-  margin-bottom: 60px;
   padding-bottom: 20px;
 }
 
@@ -82,4 +81,13 @@ a {
   .button.right {
     margin-left: 10px;
   }
+}
+
+.esdt-info {
+  margin-top: 10px;
+  margin-bottom: 60px;
+}
+
+.esdt-info, .esdt-info a {
+  font-size: 13px;
 }

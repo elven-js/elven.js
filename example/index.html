@@ -28,8 +28,8 @@
 <body>
   <div class="container">
     <div class="header" id="header">
-      <button class="button" id="button-tx" style="display: none;">Send predefined
-        transaction</button>
+      <button class="button" id="button-tx" style="display: none;">EGLD transaction</button>
+      <button class="button" id="button-tx-esdt" style="display: none;">ESDT transaction*</button>
       <button class="button" id="button-mint" style="display: none;">Mint NFT</button>
       <button class="button" id="button-login-extension" style="display: none;">Login with Extension</button>
       <button class="button" id="button-login-mobile" style="display: none;">Login
@@ -38,6 +38,10 @@
       <a class="button right" href="https://github.com/juliancwirko/elven.js" target="_blank"
         rel="noopener noreferrer">GitHub</a>
     </div>
+    <div class="esdt-info">* For the ESDT transfer you will need to get the <a
+        href="https://devnet-explorer.elrond.com/tokens/BUILDO-890d14" target="_blank"
+        rel="noopener noreferrer">BUILDO-890d14</a> token from the faucet: <a href="https://r3d4.fr/faucet"
+        target="_blank" rel="noopener noreferrer">r3d4.fr/faucet</a> (you can also modify the hardcoded token and test it with yours locally, check the sourcecode of this website).</div>
 
     <div id="tx-hash" class="tx-hash"></div>
     <div id="qr-code-container" class="qr-code-container"></div>
@@ -80,6 +84,13 @@
       <li>it will call predefined smart contract and mint NFT</li>
       <li>after the transaction is finished below, you will find the transaction hash</li>
     </ul>
+
+    <h3>Other demos:</h3>
+    <ol>
+      <li><a href="https://stackblitz.com/edit/web-platform-d4rx5v?file=index.html" target="_blank" rel="noopener noreferrer">StackBlitz vanilla html demo</a></li>
+      <li><a href="https://stackblitz.com/edit/withastro-astro-pwareu?file=src%2Fpages%2Findex.astro" target="_blank" rel="noopener noreferrer">StackBlitz Astro demo</a></li>
+      <li><a href="https://stackblitz.com/edit/vitejs-vite-rbo6du?file=src/App.tsx" target="_blank" rel="noopener noreferrer">StackBlitz Solid.js demo</a></li>
+    </ol>
   </div>
 
   <!-- From v0.3.0 you would need to use the module type and import what you need -->
@@ -101,6 +112,7 @@
       ContractCallPayloadBuilder,
       ContractFunction,
       U32Value,
+      ESDTTransferPayloadBuilder,
     } from './elven.js';
 
     // Options are the defaults
@@ -158,7 +170,7 @@
       }
     });
 
-    // Simple transaction, you can build different transaction types and payload structures
+    // Simple EGLD transfer transaction
     const egldTransferAddress = 'erd17a4wydhhd6t3hhssvcp9g23ppn7lgkk4g2tww3eqzx4mlq95dukss0g50f';
 
     document.getElementById('button-tx').addEventListener('click', async () => {
@@ -182,6 +194,42 @@
         updateTxHashContainer(transaction.hash)
       } catch (e) {
         uiSpinnerState(false, 'egld');
+        throw new Error(e?.message);
+      }
+    });
+
+    // Simple ESDT transfer transaction
+    const esdtTransferAddress = 'erd17a4wydhhd6t3hhssvcp9g23ppn7lgkk4g2tww3eqzx4mlq95dukss0g50f';
+
+    document.getElementById('button-tx-esdt').addEventListener('click', async () => {
+      updateTxHashContainer(false);
+
+      // The preconfigured transaction is for the 1 'BUILDO-890d14' ESDT token on the devnet
+      // You need to know its ticker and how many decimals places it has
+      // In this case, the token has 18 decimal places. You can check it in the Elrond devnet explorer
+      // You can use the community-based faucet to get the BUILDO-890d14 token: https://r3d4.fr/faucet
+      const payment = TokenPayment.fungibleFromAmount(
+        'BUILDO-890d14',
+        '1',
+        18
+      );
+      const data = new ESDTTransferPayloadBuilder().setPayment(payment).build();
+
+      const tx = new Transaction({
+        data,
+        gasLimit: 50000 + 1500 * data.length() + 300000,
+        receiver: new Address(esdtTransferAddress),
+        sender: new Address(ElvenJS.storage.get('address')),
+        chainID: 'D',
+      });
+
+      try {
+        uiSpinnerState(true, 'esdt');
+        const transaction = await ElvenJS.signAndSendTransaction(tx);
+        uiSpinnerState(false, 'esdt');
+        updateTxHashContainer(transaction.hash)
+      } catch (e) {
+        uiSpinnerState(false, 'esdt');
         throw new Error(e?.message);
       }
     });

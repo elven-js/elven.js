@@ -1,4 +1,5 @@
 export { TokenPayment } from '@elrondnetwork/erdjs/out/tokenPayment';
+export { ESDTNFTTransferPayloadBuilder, ESDTTransferPayloadBuilder, } from '@elrondnetwork/erdjs/out/tokenTransferBuilders';
 export { Address } from '@elrondnetwork/erdjs/out/address';
 export { Account } from '@elrondnetwork/erdjs/out/account';
 export { Transaction } from '@elrondnetwork/erdjs/out/transaction';

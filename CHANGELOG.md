@@ -1,3 +1,7 @@
+### [0.3.3](https://github.com/juliancwirko/elven.js/releases/tag/v0.3.3) (2022-09-01)
+- additional exports from erdjs required for esdt/sft/nft/meta sending (`ESDTNFTTransferPayloadBuilder`, `ESDTTransferPayloadBuilder`)
+- Updated demo. By default you can send a predefined ESDT token
+
 ### [0.3.2](https://github.com/juliancwirko/elven.js/releases/tag/v0.3.2) (2022-08-21)
 - fix type export
 - add Solid.js demo

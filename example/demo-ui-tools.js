@@ -10,18 +10,21 @@ export const uiLoggedInState = (loggedIn) => {
   const loginMaiarButton = document.getElementById('button-login-mobile');
   const logoutButton = document.getElementById('button-logout');
   const txButton = document.getElementById('button-tx');
+  const txEsdtButton = document.getElementById('button-tx-esdt');
   const mintButton = document.getElementById('button-mint');
   if (loggedIn) {
     loginExtensionButton.style.display = 'none';
     loginMaiarButton.style.display = 'none';
     logoutButton.style.display = 'block';
     txButton.style.display = 'block';
+    txEsdtButton.style.display = 'block';
     mintButton.style.display = 'block';
   } else {
     loginExtensionButton.style.display = 'block';
     loginMaiarButton.style.display = 'block';
     logoutButton.style.display = 'none';
     txButton.style.display = 'none';
+    txEsdtButton.style.display = 'none';
     mintButton.style.display = 'none';
   }
 };
@@ -32,7 +35,9 @@ export const uiSpinnerState = (isLoading, button) => {
   );
   const buttonLoginMobile = document.getElementById('button-login-mobile');
   const buttonEgld = document.getElementById('button-tx');
+  const buttonEsdt = document.getElementById('button-tx-esdt');
   const buttonMint = document.getElementById('button-mint');
+  const spinnerText = 'Transaction pending...';
   if (isLoading) {
     if (button === 'loginExtension') {
       buttonLoginExtension.innerText = 'Logging in...';
@@ -43,11 +48,15 @@ export const uiSpinnerState = (isLoading, button) => {
       buttonLoginMobile.setAttribute('disabled', true);
     }
     if (button === 'egld') {
-      buttonEgld.innerText = 'Transaction pending...';
+      buttonEgld.innerText = spinnerText;
       buttonEgld.setAttribute('disabled', true);
     }
+    if (button === 'esdt') {
+      buttonEsdt.innerText = spinnerText;
+      buttonEsdt.setAttribute('disabled', true);
+    }
     if (button === 'mint') {
-      buttonMint.innerText = 'Transaction pending...';
+      buttonMint.innerText = spinnerText;
       buttonMint.setAttribute('disabled', true);
     }
   } else {
@@ -60,8 +69,12 @@ export const uiSpinnerState = (isLoading, button) => {
       buttonLoginMobile.removeAttribute('disabled');
     }
     if (button === 'egld') {
-      buttonEgld.innerText = 'Send predefined transaction';
+      buttonEgld.innerText = 'EGLD transaction';
       buttonEgld.removeAttribute('disabled');
+    }
+    if (button === 'esdt') {
+      buttonEsdt.innerText = 'ESDT transaction*';
+      buttonEsdt.removeAttribute('disabled');
     }
     if (button === 'mint') {
       buttonMint.innerText = 'Mint NFT';
