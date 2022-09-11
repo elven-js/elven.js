@@ -16,6 +16,8 @@ export {
 export { BooleanValue } from '@elrondnetwork/erdjs/out/smartcontracts/typesystem/boolean';
 export { ContractCallPayloadBuilder } from '@elrondnetwork/erdjs/out/smartcontracts/transactionPayloadBuilders';
 export { ContractFunction } from '@elrondnetwork/erdjs/out/smartcontracts/function';
+export { AddressValue } from '@elrondnetwork/erdjs/out/smartcontracts/typesystem/address';
+
 export { ElvenJS } from './main';
 
 export { LoginMethodsEnum } from './types';

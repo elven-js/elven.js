@@ -6,14 +6,20 @@ import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
 import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
 import { initMaiarMobileProvider } from './auth/init-maiar-mobile-provider';
 import { ls } from './utils/ls-helpers';
-import { ApiNetworkProvider, InitOptions } from './network-provider';
-import { DappProvider, LoginMethodsEnum, LoginOptions } from './types';
+import { ApiNetworkProvider, SmartContractQueryArgs } from './network-provider';
+import {
+  DappProvider,
+  LoginMethodsEnum,
+  LoginOptions,
+  InitOptions,
+} from './types';
 import { logout } from './auth/logout';
 import { loginWithExtension } from './auth/login-with-extension';
 import { loginWithMobile } from './auth/login-with-mobile';
 import { accountSync } from './auth/account-sync';
 import { errorParse } from './utils/errorParse';
 import { isLoginExpired } from './auth/expires-at';
+import { EventsStore } from './events-store';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
@@ -35,6 +41,16 @@ export class ElvenJS {
     this.initOptions = options;
 
     this.networkProvider = new ApiNetworkProvider(this.initOptions);
+
+    if (this.initOptions.onLoginPending) {
+      EventsStore.set('onLoginPending', this.initOptions.onLoginPending);
+    }
+    if (this.initOptions.onLoggedIn) {
+      EventsStore.set('onLoggedIn', this.initOptions.onLoggedIn);
+    }
+    if (this.initOptions.onLogout) {
+      EventsStore.set('onLogout', this.initOptions.onLogout);
+    }
 
     if (state?.address && state?.loginMethod) {
       if (state.loginMethod === LoginMethodsEnum.maiarBrowserExtension) {
@@ -79,8 +95,6 @@ export class ElvenJS {
       if (!this.dappProvider && loginMethod === LoginMethodsEnum.maiarMobile) {
         const dappProvider = await loginWithMobile(
           this,
-          options?.onWalletConnectLogin,
-          options?.onWalletConnectLogout,
           options?.qrCodeContainerId,
           options?.token
         );
@@ -147,6 +161,42 @@ export class ElvenJS {
     }
 
     return transaction;
+  }
+
+  /**
+   * Query Smart Contracts
+   */
+  static async queryContract({
+    address,
+    func,
+    args = [],
+    value = 0,
+    caller,
+  }: SmartContractQueryArgs) {
+    if (!this.networkProvider) {
+      throw new Error(
+        'Error: Query failed: There is no active network provider!'
+      );
+    }
+
+    if (!address || !func) {
+      throw new Error(
+        'Error: Query failed: The Query arguments are not valid! Address and func required'
+      );
+    }
+
+    try {
+      return await this.networkProvider.queryContract({
+        address,
+        func,
+        args,
+        value,
+        caller,
+      });
+    } catch (e) {
+      const err = errorParse(e);
+      throw new Error(`Error: Smart contract query failed! ${err}`);
+    }
   }
 
   /**

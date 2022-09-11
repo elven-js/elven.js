@@ -1,6 +1,15 @@
 import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
 import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
 
+export interface InitOptions {
+  apiUrl: string;
+  chainType: string;
+  apiTimeout: number;
+  onLoginPending?: () => void;
+  onLoggedIn?: () => void;
+  onLogout?: () => void;
+}
+
 export enum LoginMethodsEnum {
   ledger = 'ledger',
   maiarMobile = 'maiar-mobile',
@@ -14,8 +23,6 @@ export type DappProvider =
   | undefined;
 
 export interface LoginOptions {
-  onWalletConnectLogin?: () => void;
-  onWalletConnectLogout?: () => void;
   qrCodeContainerId?: string;
   token?: string;
 }

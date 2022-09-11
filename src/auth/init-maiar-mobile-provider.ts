@@ -2,6 +2,7 @@ import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provi
 import { networkConfig, chainTypeConfig } from '../utils/constants';
 import { logout } from './logout';
 import { accountSync } from './account-sync';
+import { EventsStore } from '../events-store';
 
 export function getBridgeAddressFromNetwork(
   walletConnectBridgeAddresses: string[]
@@ -13,7 +14,9 @@ export function getBridgeAddressFromNetwork(
 
 export const initMaiarMobileProvider = async (elven: any) => {
   const providerHandlers = {
-    onClientLogin: () => accountSync(elven),
+    onClientLogin: () => {
+      accountSync(elven), EventsStore.run('onLoggedIn');
+    },
     onClientLogout: () => logout(elven),
   };
 

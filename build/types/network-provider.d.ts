@@ -5,15 +5,17 @@ import { TransactionStatus } from '@elrondnetwork/erdjs-network-providers/out/tr
 import { TransactionReceipt } from '@elrondnetwork/erdjs-network-providers/out/transactionReceipt';
 import { TransactionLogs } from '@elrondnetwork/erdjs-network-providers/out/transactionLogs';
 import { ContractResults } from '@elrondnetwork/erdjs-network-providers/out/contractResults';
+import { ContractQueryResponse } from '@elrondnetwork/erdjs-network-providers/out/contractQueryResponse';
+import { QueryArguments } from '@elrondnetwork/erdjs/out/smartcontracts/interface';
 import { Buffer } from 'buffer';
+import { InitOptions } from './types';
 export interface IAddress {
     bech32: () => string;
 }
-export interface InitOptions {
-    apiUrl: string;
-    chainType: string;
-    apiTimeout: number;
+export interface SmartContractQueryArgs extends QueryArguments {
+    address: IAddress;
 }
+export declare type NetworkProviderOptions = Pick<InitOptions, 'apiUrl' | 'chainType' | 'apiTimeout'>;
 export interface AccountOnNetwork {
     address: IAddress;
     nonce: number;
@@ -28,7 +30,7 @@ export declare class ApiNetworkProvider {
     private apiUrl;
     private chainType;
     private apiTimeout;
-    constructor({ apiUrl, chainType, apiTimeout }: InitOptions);
+    constructor({ apiUrl, chainType, apiTimeout }: NetworkProviderOptions);
     private apiGet;
     private apiPost;
     private handleApiError;
@@ -56,4 +58,5 @@ export declare class ApiNetworkProvider {
         contractResults: ContractResults;
         isCompleted: boolean;
     }>;
+    queryContract({ address, func, args, value, caller, }: SmartContractQueryArgs): Promise<ContractQueryResponse | undefined>;
 }

@@ -8,7 +8,7 @@
 - [StackBlitz Astro demo](https://stackblitz.com/edit/withastro-astro-pwareu?file=src%2Fpages%2Findex.astro)
 - [StackBlitz Solid.js demo](https://stackblitz.com/edit/vitejs-vite-rbo6du?file=src/App.tsx)
 
-Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser. No need for bundlers, frameworks, etc. Just attach the script source, and you are ready to go. You can incorporate it into your preferred CMS framework like WordPress or an e-commerce system. Plus, it will also work on a standard static HTML website.
+Authenticate, sign and send transactions on the Elrond blockchain in the browser. No need for bundlers, frameworks, etc. Just attach the script source, and you are ready to go. You can incorporate it into your preferred CMS framework like WordPress or an e-commerce system. Plus, it will also work on a standard static HTML website.
 
 The primary purpose of this tool is to have a lite script for browser usage where you can authenticate and sign/send transactions on the Elrond blockchain and do this without any additional build steps.
 
@@ -20,7 +20,7 @@ It is a script for browsers incorporates ES6 modules. If you need fully function
 
 ### How to use it
 
-Just copy and include the `elven.js` script from the `build` directory or CDN (https://unpkg.com/elven.js/build/elven.js). Use module type, like:
+Just copy and include the `elven.js` script from the `build` directory (in this repository) or CDN (https://unpkg.com/elven.js/build/elven.js). Use module type, like:
 
 ```html
 <script type="module">
@@ -51,7 +51,7 @@ or from CDN:
     ContractCallPayloadBuilder,
     ContractFunction,
     U32Value,
-  } from 'https://unpkg.com/elven.js@0.3.0/build/elven.js';
+  } from 'https://unpkg.com/elven.js@0.4.0/build/elven.js';
 
   // Your code here
 </script>
@@ -60,10 +60,11 @@ or from CDN:
 Check what exactly is included below:
 
 ### All exported erdjs classes/types:
-(not all is exported)
+(not all is exported from erdjs, and probably never will, but please report all requirements)
 
-- `TokenPayment`,
-- `Address`,
+- `TokenPayment`
+- `Address`
+- `AddressValue`
 - `Account`
 - `Transaction`
 - `TransactionPayload`
@@ -76,8 +77,9 @@ Check what exactly is included below:
 - `ESDTTransferPayloadBuilder`
 - `ESDTNFTTransferPayloadBuilder`
 - `ContractFunction`
+- `SmartContract`
 
-There will be more, for now only most used ones.
+For now only most used ones.
 
 ### What else is exposed:
 
@@ -100,17 +102,15 @@ import { ElvenJS } from 'elven.js';
 
 The types should also be exported.
 
-### Usage example with static website: 
+### Usage example with static website (base demo): 
 
 Check out the example file: [example/index.html](/example/index.html)
 
 You will find the whole demo there. The same that is deployed here: [elvenjs.netlify.app](https://elvenjs.netlify.app)
 
-You will find the demo directory in the repository so you can play with its final version, here only as an example.
-
 ### What can it do?
 
-The API is limited for now, this will change, but even now, it can do much:
+The API is limited for now, this will change, but even now, it can do most of the core operations:
 
 - authenticate using the Maiar mobile and Maiar browser extension
 - handle expiration of the auth state
@@ -120,54 +120,60 @@ The API is limited for now, this will change, but even now, it can do much:
 - basic global states handling (local storage)
 - basic structures for transaction payload
 - sync the network on page load
+- querying the smart contracts (without tools for result parsing yet)
 
 ### What will it do soon? (TODO):
 
-- query smart contracts with network provider
+- authenticate with Ledger Nano
+- authenticate with Elrond Web Wallet
+- result parsing (separate library)
 - sign messages
 - more advanced global state handling and (real-time updates (if needed)?)
 - more structures and simplification for payload builders
-- authenticate with Ledger Nano
-- authenticate with Elrond Web Wallet
 - rethink the structure and split it into more files (???)
 - make it as small as possible, for now, it is pretty big
 
 ### What it won't probably do:
 
 - crypto tasks
-- results parsing (but maybe it will land in a separate package)
+- results parsing (but it will land in a separate package)
 
 Why? Because it is supposed to be a browser script, it should be as small as possible. All that functionality can be replaced if needed by a custom implementation or other libraries. There will be docs with examples for that. And in the future, there may be more similar libraries, but optional and separated.
 
 ### API
 
+#### Initialize
+
 The main initialization function (init providers, sync the network):
 
 ```javascript
 import { ElvenJS } from 'elven.js';
+
 (...)
+
 await ElvenJS.init({
   apiUrl: 'https://devnet-api.elrond.com',
   chainType: 'devnet',
   apiTimeout: 10000,
+  onLoginPending: () => { /* Your login pending function call here */ },
+  onLoggedIn: () => { /* Your logged in function call here */ },
+  onLogout: () => {  /* Your logged out function call here */  },
 });
 ```
 
 You can define the API endpoint and chain type also the API timeout if needed. These values are set by default. So it will work like that even without them.
 
+#### Login with auth providers
+
 Login using Maiar mobile app (optionally you can also pass login token, it will be used to generate the signature):
 
 ```javascript
 import { ElvenJS } from 'elven.js';
+
 (...)
+
 await ElvenJS.login('maiar-mobile', {
   qrCodeContainerId: 'qr-code-container', // Your qr code container id
-  onWalletConnectLogin: () => {
-    // Your logic here, the wallet connect is connected
-  },
-  onWalletConnectLogout: () => {
-    // Your logic here, the wallet connect is disconnected
-  },
   token: '<your_login_token_here>'
 });
 ```
@@ -176,22 +182,31 @@ Login using Maiar browser extension (optionally you can also pass login token, i
 
 ```javascript
 import { ElvenJS } from 'elven.js';
+
 (...)
+
 await ElvenJS.login('maiar-browser-extension', { token: '<your_login_token_here>' });
 ```
+
+#### Logout
 
 Logout using previously initialized provider, here Maiar browser extension.
 
 ```javascript
 import { ElvenJS } from 'elven.js';
+
 (...)
+
 const isLoggedIn = await ElvenJS.logout();
 ```
+
+#### Transactions
 
 Transaction builder:
 
 ```javascript
 import { ElvenJS, Transaction, Address, TransactionPayload, TokenPayment } from 'elven.js';
+
 (...)
 
 const tx = new Transaction({
@@ -211,11 +226,78 @@ Sign and send transaction using previously initialized provider:
 
 ```javascript
 import { ElvenJS } from 'elven.js';
+
 (...)
+
 const transaction = await ElvenJS.signAndSendTransaction(tx);
 ```
 
 Here the `tx` is the transaction from the previous example.
+
+ESDT payload and transaction builder
+
+```javascript
+import { ElvenJS, TokenPayment, ESDTTransferPayloadBuilder, Transaction, Address } from 'elven.js';
+
+(...)
+
+const payment = TokenPayment.fungibleFromAmount(
+  'BUILDO-890d14',
+  '1',
+  18
+);
+const data = new ESDTTransferPayloadBuilder().setPayment(payment).build();
+
+const tx = new Transaction({
+  data,
+  gasLimit: 50000 + 1500 * data.length() + 300000,
+  receiver: new Address(esdtTransferAddress),
+  sender: new Address(ElvenJS.storage.get('address')),
+  chainID: 'D',
+});
+```
+
+You can use exported helpers/types and build ESDT payloads, it should also work for the NFT/SFT because `ESDTNFTTransferPayloadBuilder` is also exported.
+
+#### Interact with smart contracts
+
+```javascript
+import { ElvenJS, ContractCallPayloadBuilder, ContractFunction, U32Valuem, TokenPayment, Address, Transaction } from 'elven.js';
+
+(...)
+
+const data = new ContractCallPayloadBuilder()
+  .setFunction(new ContractFunction('mint'))
+  .setArgs([new U32Value(1)])
+  .build();
+
+const tx = new Transaction({
+  data,
+  gasLimit: 14000000,
+  value: TokenPayment.egldFromAmount(0.01),
+  chainID: 'D',
+  receiver: new Address(nftMinterSmartContract),
+  sender: new Address(ElvenJS.storage.get('address')),
+});
+```
+
+#### Smart contract queries
+
+You can query a smart contract
+
+```javascript
+import { ElvenJS, Address, ContractFunction, AddressValue } from 'elven.js';
+
+(...)
+
+const results = await ElvenJS.queryContract({
+  address: new Address(nftMinterSmartContract),
+  func: new ContractFunction('getMintedPerAddressTotal'),
+  args: [new AddressValue(new Address(minterAddress))]
+});
+```
+
+Check for more, complete examples in the [example/index.html](/example/index.html)
 
 ### Development
 

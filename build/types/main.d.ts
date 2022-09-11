@@ -1,6 +1,6 @@
 import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
-import { ApiNetworkProvider, InitOptions } from './network-provider';
-import { DappProvider, LoginMethodsEnum, LoginOptions } from './types';
+import { ApiNetworkProvider, SmartContractQueryArgs } from './network-provider';
+import { DappProvider, LoginMethodsEnum, LoginOptions, InitOptions } from './types';
 export declare class ElvenJS {
     private static initOptions;
     static dappProvider: DappProvider;
@@ -21,6 +21,10 @@ export declare class ElvenJS {
      * Sign and send function
      */
     static signAndSendTransaction(transaction: Transaction): Promise<Transaction>;
+    /**
+     * Query Smart Contracts
+     */
+    static queryContract({ address, func, args, value, caller, }: SmartContractQueryArgs): Promise<import("@elrondnetwork/erdjs-network-providers/out/contractQueryResponse").ContractQueryResponse | undefined>;
     /**
      * Main storage exposed
      */

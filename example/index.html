@@ -26,11 +26,15 @@
 </head>
 
 <body>
+  <div class="overlay">
+    <div class="loader">Loading...</div>
+  </div>
   <div class="container">
     <div class="header" id="header">
       <button class="button" id="button-tx" style="display: none;">EGLD transaction</button>
       <button class="button" id="button-tx-esdt" style="display: none;">ESDT transaction*</button>
       <button class="button" id="button-mint" style="display: none;">Mint NFT</button>
+      <button class="button" id="button-query" style="display: none;">Query SC**</button>
       <button class="button" id="button-login-extension" style="display: none;">Login with Extension</button>
       <button class="button" id="button-login-mobile" style="display: none;">Login
         with Maiar mobile</button>
@@ -44,8 +48,10 @@
         href="https://devnet-elrond-esdt-faucet.netlify.app/" target="_blank"
         rel="noopener noreferrer">https://devnet-elrond-esdt-faucet.netlify.app</a> (you can also modify the hardcoded
       token and test it with yours locally, check the sourcecode of this website for more info).</div>
+    <div class="esdt-info">** The query will trigger a 'getMintedPerAddressTotal' with a predefined caller address using
+      the <a href="https://www.elven.tools">Elven Tools</a> Smart Contract.</div>
 
-    <div id="tx-hash" class="tx-hash"></div>
+    <div id="tx-hash-or-query-result" class="tx-hash-or-query-result"></div>
     <div id="qr-code-container" class="qr-code-container"></div>
 
     <h1>ElvenJS (demo)</h1>
@@ -71,8 +77,8 @@
       minified. But you can see the code in the <a href="https://github.com/juliancwirko/elven.js" target="_blank"
         rel="noopener noreferrer">repository</a></h4>
 
-    <h3>Demo transactions description (devnet):</h3>
-    <div>First one:</div>
+    <h3>Demo transactions/queries description (devnet):</h3>
+    <div>EGLD transaction:</div>
     <ul>
       <li>simple EGLD transfer on the devnet chain</li>
       <li>it will go to a predefined wallet</li>
@@ -80,11 +86,27 @@
       <li>after the transaction is finished below, you will find the transaction hash</li>
     </ul>
 
-    <div>Second one:</div>
+    <div>ESDT transaction:</div>
+    <ul>
+      <li>simple ESDT transfer on the devnet chain</li>
+      <li>it will go to a predefined wallet</li>
+      <li>it will be 1 BUILDO-890d14 token</li>
+      <li>after the transaction is finished below, you will find the transaction hash</li>
+    </ul>
+
+    <div>Mint transaction:</div>
     <ul>
       <li>Smart Contract call on the devnet chain</li>
-      <li>it will call predefined smart contract and mint NFT</li>
+      <li>it will call predefined smart contract (Elven Tools Smart Contract) and mint NFT</li>
       <li>after the transaction is finished below, you will find the transaction hash</li>
+    </ul>
+
+    <div>Query the smart contract:</div>
+    <ul>
+      <li>Smart Contract query. The Elven Tools smart contract has the 'getMintedPerAddressTotal' function</li>
+      <li>It will query using a predefined address and return the value</li>
+      <li>There is a custom logic for results decoding. In the future there will be tools for that</li>
+      <li>after the transaction is finished below, you will get the result of the query</li>
     </ul>
 
     <h3>Other demos:</h3>
@@ -98,13 +120,14 @@
     </ol>
   </div>
 
-  <!-- From v0.3.0 you would need to use the module type and import what you need -->
   <script type="module">
     // Just for the demo
     import {
       uiLoggedInState,
-      uiSpinnerState,
+      uiPending,
       updateTxHashContainer,
+      base64ToDecimalHex,
+      updateQueryResultContainer
     } from './demo-ui-tools.js'
 
     // Elven.js tools
@@ -118,58 +141,48 @@
       ContractFunction,
       U32Value,
       ESDTTransferPayloadBuilder,
+      AddressValue,
     } from './elven.js';
 
     // Options are the defaults
     const initElven = async () => {
-      const isLoggedIn = await ElvenJS.init(
+      const isInitialized = await ElvenJS.init(
         {
           apiUrl: 'https://devnet-api.elrond.com',
           chainType: 'devnet',
           apiTimeout: 10000,
+          onLoginPending: () => { uiPending(true) },
+          onLoggedIn: () => { uiLoggedInState(true); uiPending(false) },
+          onLogout: () => { uiLoggedInState(false);  },
         }
       );
 
-      uiLoggedInState(isLoggedIn);
+      uiLoggedInState(isInitialized);
     }
 
     initElven();
 
     document.getElementById('button-login-extension').addEventListener('click', async () => {
       try {
-        uiSpinnerState(true, 'loginExtension')
         await ElvenJS.login('maiar-browser-extension');
-        uiLoggedInState(true);
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);
-      } finally {
-        uiSpinnerState(false, 'loginExtension');
       }
     });
 
     document.getElementById('button-login-mobile').addEventListener('click', async () => {
       try {
-        uiSpinnerState(true, 'loginMobile')
         await ElvenJS.login('maiar-mobile', {
           qrCodeContainerId: 'qr-code-container',
-          onWalletConnectLogin: () => {
-            uiLoggedInState(true);
-          },
-          onWalletConnectLogout: () => {
-            uiLoggedInState(false);
-          },
         });
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);
-      } finally {
-        uiSpinnerState(false, 'loginMobile');
       }
     });
 
     document.getElementById('button-logout').addEventListener('click', async () => {
       try {
         const isLoggedOut = await ElvenJS.logout();
-        uiLoggedInState(!isLoggedOut);
       } catch (e) {
         console.error(e.message);
       }
@@ -193,12 +206,12 @@
       });
 
       try {
-        uiSpinnerState(true, 'egld');
+        uiPending(true);
         const transaction = await ElvenJS.signAndSendTransaction(tx);
-        uiSpinnerState(false, 'egld');
+        uiPending(false);
         updateTxHashContainer(transaction.hash)
       } catch (e) {
-        uiSpinnerState(false, 'egld');
+        uiPending(false);
         throw new Error(e?.message);
       }
     });
@@ -229,12 +242,12 @@
       });
 
       try {
-        uiSpinnerState(true, 'esdt');
+        uiPending(true);
         const transaction = await ElvenJS.signAndSendTransaction(tx);
-        uiSpinnerState(false, 'esdt');
+        uiPending(false);
         updateTxHashContainer(transaction.hash)
       } catch (e) {
-        uiSpinnerState(false, 'esdt');
+        uiPending(false);
         throw new Error(e?.message);
       }
     });
@@ -259,12 +272,40 @@
       });
 
       try {
-        uiSpinnerState(true, 'mint');
+        uiPending(true);
         const transaction = await ElvenJS.signAndSendTransaction(tx);
-        uiSpinnerState(false, 'mint');
+        uiPending(false);
         updateTxHashContainer(transaction.hash)
       } catch (e) {
-        uiSpinnerState(false, 'mint');
+        uiPending(false);
+        throw new Error(e?.message);
+      }
+    });
+
+    // Query the smart contract. It will query the same smart contract as for minting
+    // It will check how many tokens a particular address has minted already (the function name: getMintedPerAddressTotal)
+    // The function takes the address as argument
+    // The results have to be parsed. The result parser tool and abi registry will land in a separate library
+    // You can still decode simple types like numbers, boolean, and strings without them (example below)
+    // Read more about the Elven Tools Smart Contract here: https://www.elven.tools/docs/sc-endpoints.html
+    const minterAddress = "erd1druav0mlt7wzutla33kw80ueaalmec7mz2hus5svdmzlfj286qpstg674t";
+    document.getElementById('button-query').addEventListener('click', async () => {
+      try {
+        updateQueryResultContainer();
+        uiPending(true);
+        const results = await ElvenJS.queryContract({
+          address: new Address(nftMinterSmartContract),
+          func: new ContractFunction('getMintedPerAddressTotal'),
+          args: [new AddressValue(new Address(minterAddress))]
+        });
+
+        uiPending(false);
+
+        // Manual decoding of a simple type (number here), there will be additional tools for that
+        const hexVal = base64ToDecimalHex(results?.returnData?.[0]);
+        updateQueryResultContainer(`➡️ The result of the query is: ${parseInt(hexVal, 16)}`);
+      } catch (e) {
+        uiPending(false);
         throw new Error(e?.message);
       }
     });

@@ -1,3 +1,9 @@
+### [0.4.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.4.0) (2022-09-11)
+- `onLoggedIn`, `onLoginPending` and `onLogout` callbacks are now passed in the `ElvenJS.init()` function. This unifies it and helps in synchronizing the WalletConnect actions. In the future probably also Ledger integration will be simpler because of that
+- added a smart contract query (for now, without result parsing tools, it will probably be a separate library, you can still parse the result manually for simple data types like string or number, check the example/index.html)
+- exported `AddressValue`
+- example demo updates ([example demo](https://github.com/juliancwirko/elven.js/tree/main/example))
+
 ### [0.3.3](https://github.com/juliancwirko/elven.js/releases/tag/v0.3.3) (2022-09-01)
 - additional exports from erdjs required for esdt/sft/nft/meta sending (`ESDTNFTTransferPayloadBuilder`, `ESDTTransferPayloadBuilder`)
 - Updated demo. By default you can send a predefined ESDT token

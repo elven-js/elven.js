@@ -1,6 +1,6 @@
 {
   "name": "elven.js",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser.",
   "type": "module",
   "types": "build/types/elven.d.ts",
@@ -27,7 +27,7 @@
   "devDependencies": {
     "@elrondnetwork/erdjs": "^11.0.0",
     "@elrondnetwork/erdjs-extension-provider": "^2.0.5",
-    "@elrondnetwork/erdjs-network-providers": "^1.0.0",
+    "@elrondnetwork/erdjs-network-providers": "^1.1.0",
     "@elrondnetwork/erdjs-wallet-connect-provider": "^2.0.3",
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
     "@types/big.js": "^6.1.5",

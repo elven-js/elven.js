@@ -4,6 +4,7 @@ import { errorParse } from '../utils/errorParse';
 import { LoginMethodsEnum } from '../types';
 import { getNewLoginExpiresTimestamp } from './expires-at';
 import { accountSync } from './account-sync';
+import { EventsStore } from '../events-store';
 
 export const loginWithExtension = async (elven: any, token?: string) => {
   const dappProvider = await initExtensionProvider();
@@ -33,6 +34,8 @@ export const loginWithExtension = async (elven: any, token?: string) => {
 
   if (elven.networkProvider) {
     try {
+      EventsStore.run('onLoginPending');
+
       const address = await dappProvider.getAddress();
 
       ls.set('address', address);
@@ -40,6 +43,8 @@ export const loginWithExtension = async (elven: any, token?: string) => {
       ls.set('expires', getNewLoginExpiresTimestamp());
 
       await accountSync(elven);
+
+      EventsStore.run('onLoggedIn');
 
       return dappProvider;
     } catch (e: any) {

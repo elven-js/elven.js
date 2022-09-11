@@ -8,11 +8,10 @@ import { ls } from '../utils/ls-helpers';
 import { logout } from './logout';
 import { getNewLoginExpiresTimestamp } from './expires-at';
 import { accountSync } from './account-sync';
+import { EventsStore } from '../events-store';
 
 export const loginWithMobile = async (
   elven: any,
-  onWalletConnectLogin?: () => void,
-  onWalletConnectLogout?: () => void,
   qrCodeContainerId?: string,
   token?: string
 ) => {
@@ -37,6 +36,7 @@ export const loginWithMobile = async (
   const providerHandlers = {
     onClientLogin: async () => {
       if (elven.dappProvider instanceof WalletConnectProvider) {
+        EventsStore.run('onLoginPending');
         const address = await elven.dappProvider.getAddress();
         const signature = await elven.dappProvider.getSignature();
 
@@ -53,14 +53,14 @@ export const loginWithMobile = async (
           ls.set('loginToken', token);
         }
 
-        onWalletConnectLogin?.();
+        EventsStore.run('onLoggedIn');
         qrCodeElement?.replaceChildren();
       }
     },
     onClientLogout: async () => {
       if (elven.dappProvider instanceof WalletConnectProvider) {
         await logout(elven);
-        onWalletConnectLogout?.();
+        EventsStore.run('onLogout');
       }
     },
   };

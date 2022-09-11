@@ -5,17 +5,25 @@ import { TransactionStatus } from '@elrondnetwork/erdjs-network-providers/out/tr
 import { TransactionReceipt } from '@elrondnetwork/erdjs-network-providers/out/transactionReceipt';
 import { TransactionLogs } from '@elrondnetwork/erdjs-network-providers/out/transactionLogs';
 import { ContractResults } from '@elrondnetwork/erdjs-network-providers/out/contractResults';
+import { ContractQueryResponse } from '@elrondnetwork/erdjs-network-providers/out/contractQueryResponse';
+import { ContractQueryRequest } from '@elrondnetwork/erdjs-network-providers/out/contractQueryRequest';
+import { Query } from '@elrondnetwork/erdjs/out/smartcontracts/query';
+import { QueryArguments } from '@elrondnetwork/erdjs/out/smartcontracts/interface';
 import { Buffer } from 'buffer';
+import { InitOptions } from './types';
 
 export interface IAddress {
   bech32: () => string;
 }
 
-export interface InitOptions {
-  apiUrl: string;
-  chainType: string;
-  apiTimeout: number;
+export interface SmartContractQueryArgs extends QueryArguments {
+  address: IAddress;
 }
+
+export type NetworkProviderOptions = Pick<
+  InitOptions,
+  'apiUrl' | 'chainType' | 'apiTimeout'
+>;
 
 export interface AccountOnNetwork {
   address: IAddress;
@@ -37,7 +45,7 @@ export class ApiNetworkProvider {
   private chainType: string;
   private apiTimeout: number;
 
-  constructor({ apiUrl, chainType, apiTimeout }: InitOptions) {
+  constructor({ apiUrl, chainType, apiTimeout }: NetworkProviderOptions) {
     this.chainType = chainType || chainTypeConfig;
     this.apiUrl = apiUrl || networkConfig[this.chainType]?.apiAddress;
     this.apiTimeout = apiTimeout || networkConfig[this.chainType]?.apiTimeout;
@@ -188,6 +196,26 @@ export class ApiNetworkProvider {
     return transaction;
   }
 
-  // TODO
-  // async queryContract() {}
+  async queryContract({
+    address,
+    func,
+    args,
+    value,
+    caller,
+  }: SmartContractQueryArgs): Promise<ContractQueryResponse | undefined> {
+    try {
+      const query = new Query({
+        address,
+        func,
+        args,
+        value,
+        caller,
+      });
+      const request = new ContractQueryRequest(query).toHttpRequest();
+      const response = await this.apiPost('query', request);
+      return ContractQueryResponse.fromHttpResponse(response);
+    } catch (e) {
+      this.handleApiError(e, 'query');
+    }
+  }
 }
