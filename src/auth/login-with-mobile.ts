@@ -12,10 +12,10 @@ import { EventsStore } from '../events-store';
 
 export const loginWithMobile = async (
   elven: any,
-  qrCodeContainerId?: string,
+  qrCodeContainer?: string | HTMLElement,
   token?: string
 ) => {
-  if (!qrCodeContainerId) {
+  if (!qrCodeContainer) {
     throw new Error(
       "You haven't provided the QR code container DOM element id"
     );
@@ -78,8 +78,8 @@ export const loginWithMobile = async (
         ? `${walletConnectUri}&token=${token}`
         : walletConnectUri;
 
-      if (qrCodeContainerId && walletConnectUri) {
-        qrCodeElement = await qrCodeBuilder(qrCodeContainerId, wCUri);
+      if (qrCodeContainer && walletConnectUri) {
+        qrCodeElement = await qrCodeBuilder(qrCodeContainer, wCUri);
       }
 
       return dappProvider;

@@ -127,7 +127,8 @@
       uiPending,
       updateTxHashContainer,
       base64ToDecimalHex,
-      updateQueryResultContainer
+      updateQueryResultContainer,
+      clearQrCodeContainer
     } from './demo-ui-tools.js'
 
     // Elven.js tools
@@ -164,6 +165,7 @@
 
     document.getElementById('button-login-extension').addEventListener('click', async () => {
       try {
+        clearQrCodeContainer();
         await ElvenJS.login('maiar-browser-extension');
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);
@@ -173,7 +175,9 @@
     document.getElementById('button-login-mobile').addEventListener('click', async () => {
       try {
         await ElvenJS.login('maiar-mobile', {
-          qrCodeContainerId: 'qr-code-container',
+          // You can also use the DOM element here: 
+          // qrCodeContainer: document.querySelector('#qr-code-container')
+          qrCodeContainer: 'qr-code-container',
         });
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);

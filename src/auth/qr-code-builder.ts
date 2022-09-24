@@ -40,14 +40,21 @@ const generateQRCode = async (walletConnectUri: string) => {
 };
 
 export const qrCodeBuilder = async (
-  qrCodeContainerId: string,
+  qrCodeContainer: string | HTMLElement,
   walletConnectUri: string
 ) => {
-  if (!qrCodeContainerId)
+  if (!qrCodeContainer)
     throw new Error('Please provide the QR Code container id!');
 
   const qrCodeElementString = await generateQRCode(walletConnectUri);
-  const qrCodeElem = document.getElementById(qrCodeContainerId);
+
+  let qrCodeElem: HTMLElement | null = null;
+
+  if (typeof qrCodeContainer === 'string') {
+    qrCodeElem = document.getElementById(qrCodeContainer);
+  } else if (qrCodeContainer instanceof HTMLElement) {
+    qrCodeElem = qrCodeContainer;
+  }
 
   let qrCodeSvg: Node | undefined;
 

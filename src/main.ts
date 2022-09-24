@@ -83,19 +83,16 @@ export class ElvenJS {
 
     try {
       // Login with Maiar browser extension
-      if (
-        !this.dappProvider &&
-        loginMethod === LoginMethodsEnum.maiarBrowserExtension
-      ) {
+      if (loginMethod === LoginMethodsEnum.maiarBrowserExtension) {
         const dappProvider = await loginWithExtension(this, options?.token);
         this.dappProvider = dappProvider;
       }
 
       // Login with Maiar mobile app
-      if (!this.dappProvider && loginMethod === LoginMethodsEnum.maiarMobile) {
+      if (loginMethod === LoginMethodsEnum.maiarMobile) {
         const dappProvider = await loginWithMobile(
           this,
-          options?.qrCodeContainerId,
+          options?.qrCodeContainer,
           options?.token
         );
 

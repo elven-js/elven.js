@@ -1,1 +1,1 @@
-export declare const qrCodeBuilder: (qrCodeContainerId: string, walletConnectUri: string) => Promise<HTMLElement | null>;
+export declare const qrCodeBuilder: (qrCodeContainer: string | HTMLElement, walletConnectUri: string) => Promise<HTMLElement | null>;

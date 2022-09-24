@@ -1,3 +1,7 @@
+### [0.5.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.5.0) (2022-09-24)
+- a couple of login fixes
+- **Breaking change:** Now you can pass not only the id for the QR container but also the DOM element, so there are changes in how you should define it. New way: `await ElvenJS.login('maiar-mobile', { qrCodeContainer: <elem_id_as_string_or_DOM_element>});` 
+
 ### [0.4.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.4.0) (2022-09-11)
 - `onLoggedIn`, `onLoginPending` and `onLogout` callbacks are now passed in the `ElvenJS.init()` function. This unifies it and helps in synchronizing the WalletConnect actions. In the future probably also Ledger integration will be simpler because of that
 - added a smart contract query (for now, without result parsing tools, it will probably be a separate library, you can still parse the result manually for simple data types like string or number, check the example/index.html)

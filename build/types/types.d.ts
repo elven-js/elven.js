@@ -16,6 +16,6 @@ export declare enum LoginMethodsEnum {
 }
 export declare type DappProvider = ExtensionProvider | WalletConnectProvider | undefined;
 export interface LoginOptions {
-    qrCodeContainerId?: string;
+    qrCodeContainer?: string | HTMLElement;
     token?: string;
 }

@@ -76,3 +76,10 @@ export const base64ToDecimalHex = (str) => {
   ).join``;
   return result.toUpperCase();
 };
+
+export const clearQrCodeContainer = () => {
+  const qrContainer = document.querySelector('#qr-code-container');
+  if (qrContainer?.childNodes?.length > 0) {
+    qrContainer?.replaceChildren();
+  }
+};

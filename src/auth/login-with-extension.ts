@@ -34,9 +34,13 @@ export const loginWithExtension = async (elven: any, token?: string) => {
 
   if (elven.networkProvider) {
     try {
-      EventsStore.run('onLoginPending');
-
       const address = await dappProvider.getAddress();
+
+      if (!address) {
+        throw new Error('Canceled!');
+      }
+
+      EventsStore.run('onLoginPending');
 
       ls.set('address', address);
       ls.set('loginMethod', LoginMethodsEnum.maiarBrowserExtension);

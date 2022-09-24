@@ -23,6 +23,6 @@ export type DappProvider =
   | undefined;
 
 export interface LoginOptions {
-  qrCodeContainerId?: string;
+  qrCodeContainer?: string | HTMLElement;
   token?: string;
 }
