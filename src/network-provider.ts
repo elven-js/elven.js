@@ -1,5 +1,5 @@
 import BigNumber from 'big.js';
-import { networkConfig, chainTypeConfig } from './utils/constants';
+import { networkConfig, defaultChainTypeConfig } from './utils/constants';
 import { Address } from '@elrondnetwork/erdjs/out/address';
 import { TransactionStatus } from '@elrondnetwork/erdjs-network-providers/out/transactionStatus';
 import { TransactionReceipt } from '@elrondnetwork/erdjs-network-providers/out/transactionReceipt';
@@ -46,7 +46,7 @@ export class ApiNetworkProvider {
   private apiTimeout: number;
 
   constructor({ apiUrl, chainType, apiTimeout }: NetworkProviderOptions) {
-    this.chainType = chainType || chainTypeConfig;
+    this.chainType = chainType || defaultChainTypeConfig;
     this.apiUrl = apiUrl || networkConfig[this.chainType]?.apiAddress;
     this.apiTimeout = apiTimeout || networkConfig[this.chainType]?.apiTimeout;
   }

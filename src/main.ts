@@ -16,10 +16,18 @@ import {
 import { logout } from './auth/logout';
 import { loginWithExtension } from './auth/login-with-extension';
 import { loginWithMobile } from './auth/login-with-mobile';
+import { loginWithWebWallet } from './auth/login-with-web-wallet';
 import { accountSync } from './auth/account-sync';
 import { errorParse } from './utils/errorParse';
 import { isLoginExpired } from './auth/expires-at';
 import { EventsStore } from './events-store';
+import {
+  networkConfig,
+  defaultApiEndpoint,
+  defaultChainTypeConfig,
+} from './utils/constants';
+import { getParamFromUrl } from './utils/getParamFromUrl';
+import { initWebWalletProvider } from './auth/init-web-wallet-provider';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
@@ -38,7 +46,10 @@ export class ElvenJS {
       return;
     }
 
-    this.initOptions = options;
+    this.initOptions = options || {
+      chainType: defaultChainTypeConfig,
+      apiUrl: defaultApiEndpoint,
+    };
 
     this.networkProvider = new ApiNetworkProvider(this.initOptions);
 
@@ -52,12 +63,22 @@ export class ElvenJS {
       EventsStore.set('onLogout', this.initOptions.onLogout);
     }
 
-    if (state?.address && state?.loginMethod) {
+    const isAddress =
+      state?.address ||
+      (state.loginMethod === LoginMethodsEnum.webWallet &&
+        getParamFromUrl('address'));
+
+    if (isAddress && state?.loginMethod) {
       if (state.loginMethod === LoginMethodsEnum.maiarBrowserExtension) {
         this.dappProvider = await initExtensionProvider();
       }
       if (state.loginMethod === LoginMethodsEnum.maiarMobile) {
         this.dappProvider = await initMaiarMobileProvider(this);
+      }
+      if (state.loginMethod === LoginMethodsEnum.webWallet) {
+        this.dappProvider = await initWebWalletProvider(
+          networkConfig[this.initOptions.chainType].walletAddress
+        );
       }
 
       await accountSync(this);
@@ -95,7 +116,16 @@ export class ElvenJS {
           options?.qrCodeContainer,
           options?.token
         );
+        this.dappProvider = dappProvider;
+      }
 
+      // Login with Web Wallet
+      if (loginMethod === LoginMethodsEnum.webWallet && this.initOptions) {
+        const dappProvider = await loginWithWebWallet(
+          networkConfig[this.initOptions.chainType].walletAddress,
+          options?.callbackRoute,
+          options?.token
+        );
         this.dappProvider = dappProvider;
       }
     } catch (e) {

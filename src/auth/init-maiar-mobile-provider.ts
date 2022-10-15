@@ -1,5 +1,5 @@
 import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
-import { networkConfig, chainTypeConfig } from '../utils/constants';
+import { walletConnectBridgeAddresses } from '../utils/constants';
 import { logout } from './logout';
 import { accountSync } from './account-sync';
 import { EventsStore } from '../events-store';
@@ -21,7 +21,7 @@ export const initMaiarMobileProvider = async (elven: any) => {
   };
 
   const bridgeAddress = getBridgeAddressFromNetwork(
-    networkConfig[chainTypeConfig].walletConnectBridgeAddresses
+    walletConnectBridgeAddresses
   );
 
   const dappProviderInstance = new WalletConnectProvider(

@@ -1,3 +1,7 @@
+### [0.6.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.6.0) (2022-10-16)
+- Elrond Web Wallet support
+- some refactoring around walletconnect provider configuration
+
 ### [0.5.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.5.0) (2022-09-24)
 - a couple of login fixes
 - **Breaking change:** Now you can pass not only the id for the QR container but also the DOM element, so there are changes in how you should define it. New way: `await ElvenJS.login('maiar-mobile', { qrCodeContainer: <elem_id_as_string_or_DOM_element>});` 

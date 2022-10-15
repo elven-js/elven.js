@@ -38,6 +38,8 @@
       <button class="button" id="button-login-extension" style="display: none;">Login with Extension</button>
       <button class="button" id="button-login-mobile" style="display: none;">Login
         with Maiar mobile</button>
+      <button class="button" id="button-login-web" style="display: none;">Login
+        with Web Wallet</button>
       <button class="button" id="button-logout" style="display: none;">Logout</button>
       <a class="button right" href="https://github.com/juliancwirko/elven.js" target="_blank"
         rel="noopener noreferrer">GitHub</a>
@@ -183,6 +185,15 @@
           // qrCodeContainer: document.querySelector('#qr-code-container')
           qrCodeContainer: 'qr-code-container',
         });
+      } catch (e) {
+        console.log('Login: Something went wrong, try again!', e?.message);
+      }
+    });
+
+    document.getElementById('button-login-web').addEventListener('click', async () => {
+      try {
+        clearQrCodeContainer();
+        await ElvenJS.login('web-wallet', { callbackRoute: '/'});
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);
       }

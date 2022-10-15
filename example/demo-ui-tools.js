@@ -16,6 +16,7 @@ export const uiLoggedInState = (loggedIn) => {
     'button-login-extension'
   );
   const loginMaiarButton = document.getElementById('button-login-mobile');
+  const loginWebButton = document.getElementById('button-login-web');
   const logoutButton = document.getElementById('button-logout');
   const txButton = document.getElementById('button-tx');
   const txEsdtButton = document.getElementById('button-tx-esdt');
@@ -24,6 +25,7 @@ export const uiLoggedInState = (loggedIn) => {
   if (loggedIn) {
     loginExtensionButton.style.display = 'none';
     loginMaiarButton.style.display = 'none';
+    loginWebButton.style.display = 'none';
     logoutButton.style.display = 'block';
     txButton.style.display = 'block';
     txEsdtButton.style.display = 'block';
@@ -32,6 +34,7 @@ export const uiLoggedInState = (loggedIn) => {
   } else {
     loginExtensionButton.style.display = 'block';
     loginMaiarButton.style.display = 'block';
+    loginWebButton.style.display = 'block';
     logoutButton.style.display = 'none';
     txButton.style.display = 'none';
     txEsdtButton.style.display = 'none';

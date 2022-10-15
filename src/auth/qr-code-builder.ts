@@ -1,5 +1,5 @@
 import QRCode from 'qrcode';
-import { networkConfig, chainTypeConfig } from '../utils/constants';
+import { walletConnectDeepLink } from '../utils/constants';
 
 const htmlStringToElement = (htmlString: string) => {
   const template = document.createElement('template');
@@ -8,9 +8,9 @@ const htmlStringToElement = (htmlString: string) => {
 };
 
 const buildDeepLink = (walletConnectUri: string) => {
-  const hrefVal = `${
-    networkConfig[chainTypeConfig]?.walletConnectDeepLink
-  }?wallet-connect=${encodeURIComponent(walletConnectUri)}`;
+  const hrefVal = `${walletConnectDeepLink}?wallet-connect=${encodeURIComponent(
+    walletConnectUri
+  )}`;
 
   const aElem = document.createElement('a');
   aElem.setAttribute('href', hrefVal);
