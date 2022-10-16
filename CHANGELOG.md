@@ -1,3 +1,10 @@
+### [0.6.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.6.0) (2022-10-16)
+- Elrond Web Wallet support
+- new way of getting the last transaction status, you can now use a callback function defined when initializing the ElvenJS: `onTxFinalized: (tx) => { ... }`. Check for more info in the docs. You can still use the return value from `await ElvenJS.signAndSendTransaction(tx)`, but it won't work for the Web Wallet (because of its redirections and different flow).
+- there is also another callback to handle transactions states: `onTxStarted: (tx) => { ... }`
+- the `ElvenJS.init` now always returns undefined. You should rely on its callbacks from now on instead of returned booleans
+- some refactoring around walletconnect provider configuration
+
 ### [0.5.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.5.0) (2022-09-24)
 - a couple of login fixes
 - **Breaking change:** Now you can pass not only the id for the QR container but also the DOM element, so there are changes in how you should define it. New way: `await ElvenJS.login('maiar-mobile', { qrCodeContainer: <elem_id_as_string_or_DOM_element>});` 

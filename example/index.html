@@ -35,9 +35,11 @@
       <button class="button" id="button-tx-esdt" style="display: none;">ESDT transaction*</button>
       <button class="button" id="button-mint" style="display: none;">Mint NFT</button>
       <button class="button" id="button-query" style="display: none;">Query SC**</button>
-      <button class="button" id="button-login-extension" style="display: none;">Login with Extension</button>
-      <button class="button" id="button-login-mobile" style="display: none;">Login
+      <button class="button" id="button-login-extension" style="display: block;">Login with Extension</button>
+      <button class="button" id="button-login-mobile" style="display: block;">Login
         with Maiar mobile</button>
+      <button class="button" id="button-login-web" style="display: block;">Login
+        with Web Wallet</button>
       <button class="button" id="button-logout" style="display: none;">Logout</button>
       <a class="button right" href="https://github.com/juliancwirko/elven.js" target="_blank"
         rel="noopener noreferrer">GitHub</a>
@@ -48,14 +50,15 @@
         href="https://devnet-elrond-esdt-faucet.netlify.app/" target="_blank"
         rel="noopener noreferrer">https://devnet-elrond-esdt-faucet.netlify.app</a> (you can also modify the hardcoded
       token and test it with yours locally, check the sourcecode of this website for more info).</div>
-    <div class="esdt-info">** The query will trigger a 'getMintedPerAddressTotal' with a predefined user address using
+    <div class="esdt-info">** The query will trigger a 'getMintedPerAddressTotal' with currently logged in user's address using
       the <a href="https://www.elven.tools">Elven Tools</a> Smart Contract.</div>
 
     <div id="tx-hash-or-query-result" class="tx-hash-or-query-result"></div>
     <div id="qr-code-container" class="qr-code-container"></div>
 
     <h1>ElvenJS (demo)</h1>
-    <h4>Docs and code: <a href="https://www.elvenjs.com">elven.js</a></h4>
+    <div><strong>All transactions will take place on the devent!</strong> Check how to use it on the testnet and mainnet in the docs.</div>
+    <h4>Docs and code: <a href="https://www.elvenjs.com">www.elvenjs.com</a></h4>
     <p>Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser. No need for
       bundlers, frameworks, etc. Just attach the script source, and you are ready to go. You can incorporate it into
       your preferred CMS framework like WordPress or an e-commerce system. Plus, it will also work on a standard static
@@ -151,18 +154,18 @@
 
     // Options are the defaults
     const initElven = async () => {
-      const isInitialized = await ElvenJS.init(
+      await ElvenJS.init(
         {
           apiUrl: 'https://devnet-api.elrond.com',
           chainType: 'devnet',
           apiTimeout: 10000,
           onLoginPending: () => { uiPending(true) },
-          onLoggedIn: () => { uiLoggedInState(true); uiPending(false) },
+          onLoggedIn: () => { uiLoggedInState(true); uiPending(false); }, 
           onLogout: () => { uiLoggedInState(false); },
+          onTxStarted: () => { uiPending(true); },
+          onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); }
         }
       );
-
-      uiLoggedInState(isInitialized);
     }
 
     initElven();
@@ -183,6 +186,15 @@
           // qrCodeContainer: document.querySelector('#qr-code-container')
           qrCodeContainer: 'qr-code-container',
         });
+      } catch (e) {
+        console.log('Login: Something went wrong, try again!', e?.message);
+      }
+    });
+
+    document.getElementById('button-login-web').addEventListener('click', async () => {
+      try {
+        clearQrCodeContainer();
+        await ElvenJS.login('web-wallet', { callbackRoute: '/' });
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);
       }
@@ -214,12 +226,8 @@
       });
 
       try {
-        uiPending(true);
-        const transaction = await ElvenJS.signAndSendTransaction(tx);
-        uiPending(false);
-        updateTxHashContainer(transaction.hash)
+        await ElvenJS.signAndSendTransaction(tx);
       } catch (e) {
-        uiPending(false);
         throw new Error(e?.message);
       }
     });
@@ -250,12 +258,8 @@
       });
 
       try {
-        uiPending(true);
-        const transaction = await ElvenJS.signAndSendTransaction(tx);
-        uiPending(false);
-        updateTxHashContainer(transaction.hash)
+        await ElvenJS.signAndSendTransaction(tx);
       } catch (e) {
-        uiPending(false);
         throw new Error(e?.message);
       }
     });
@@ -280,12 +284,8 @@
       });
 
       try {
-        uiPending(true);
-        const transaction = await ElvenJS.signAndSendTransaction(tx);
-        uiPending(false);
-        updateTxHashContainer(transaction.hash)
+        await ElvenJS.signAndSendTransaction(tx);
       } catch (e) {
-        uiPending(false);
         throw new Error(e?.message);
       }
     });
@@ -296,7 +296,6 @@
     // The results have to be parsed. The result parser tool and abi registry will land in a separate library
     // You can still decode simple types like numbers, boolean, and strings without them (example below)
     // Read more about the Elven Tools Smart Contract here: https://www.elven.tools/docs/sc-endpoints.html
-    const minterAddress = "erd1druav0mlt7wzutla33kw80ueaalmec7mz2hus5svdmzlfj286qpstg674t";
     document.getElementById('button-query').addEventListener('click', async () => {
       try {
         updateQueryResultContainer();
@@ -304,7 +303,7 @@
         const results = await ElvenJS.queryContract({
           address: new Address(nftMinterSmartContract),
           func: new ContractFunction('getMintedPerAddressTotal'),
-          args: [new AddressValue(new Address(minterAddress))]
+          args: [new AddressValue(new Address(ElvenJS.storage.get('address')))]
         });
 
         uiPending(false);

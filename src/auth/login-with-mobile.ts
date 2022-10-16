@@ -1,6 +1,6 @@
-import { errorParse } from '../utils/errorParse';
+import { errorParse } from '../utils/error-parse';
 import { qrCodeBuilder } from './qr-code-builder';
-import { networkConfig, chainTypeConfig } from '../utils/constants';
+import { walletConnectBridgeAddresses } from '../utils/constants';
 import { getBridgeAddressFromNetwork } from './init-maiar-mobile-provider';
 import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
 import { LoginMethodsEnum } from '../types';
@@ -22,7 +22,7 @@ export const loginWithMobile = async (
   }
 
   const bridgeAddress = getBridgeAddressFromNetwork(
-    networkConfig[chainTypeConfig].walletConnectBridgeAddresses
+    walletConnectBridgeAddresses
   );
 
   if (!bridgeAddress || !elven.networkProvider) {

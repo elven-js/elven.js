@@ -25,7 +25,7 @@ The purpose is to simplify the usage for primary use cases and open the doors fo
 
 It is a script for browsers incorporates ES6 modules. If you need fully functional JavaScript/Typescript SDK (also in Nodejs), please use [erdjs](https://github.com/ElrondNetwork/elrond-sdk-erdjs), an official Typescriot Elrond SDK. And if you are React developer, please check the [Nextjs dapp](https://github.com/ElrondDevGuild/nextjs-dapp-template).
 
-**You can use it already, but it is under active development, and the API might change, and there could be breaking changes.**
+**You can use it already, but it is under active development, and the API might change, and there could be breaking changes without changing major versions.**
 
 ### How to use it
 
@@ -90,7 +90,7 @@ You will find the whole demo there. The same that is deployed here: [elvenjs.net
 
 The API is limited for now, this will change, but even now, it can do most of the core operations:
 
-- authenticate using the Maiar mobile and Maiar browser extension
+- authenticate using the Maiar mobile, Maiar browser extension or Elrond Web Wallet
 - handle expiration of the auth state
 - handle login with tokens to be able to get the signature
 - sign transactions
@@ -103,13 +103,12 @@ The API is limited for now, this will change, but even now, it can do most of th
 ### What will it do soon? (TODO):
 
 - authenticate with Ledger Nano
-- authenticate with Elrond Web Wallet
 - result parsing (separate library)
 - sign messages
 - more advanced global state handling and (real-time updates (if needed)?)
 - more structures and simplification for payload builders
 - rethink the structure and split it into more files (???)
-- make it as small as possible, for now, it is pretty big
+- make it as small as possible
 
 ### What it won't probably do:
 
