@@ -2,9 +2,9 @@
 // ==============================================================
 // UI manipulation for demo purposes, for ElvenJS see below
 // ==============================================================
-export const uiPending = (isLoading, button) => {
+export const uiPending = (isPending) => {
   const overlay = document.querySelector('.overlay');
-  if (isLoading) {
+  if (isPending) {
     overlay.classList.add('visible');
   } else {
     overlay.classList.remove('visible');

@@ -1,7 +1,7 @@
 import { Address } from '@elrondnetwork/erdjs/out/address';
 import { Account } from '@elrondnetwork/erdjs/out/account';
 
-import { errorParse } from '../utils/errorParse';
+import { errorParse } from '../utils/error-parse';
 import { ls } from '../utils/ls-helpers';
 import { isLoginExpired } from './expires-at';
 
@@ -17,10 +17,10 @@ export const accountSync = async (elven: any) => {
       const userAccountOnNetwork = await elven.networkProvider.getAccount(
         userAddressInstance
       );
-      userAccountInstance.update(userAccountOnNetwork);
       ls.set('address', address);
-      ls.set('nonce', userAccountInstance.nonce.valueOf());
-      ls.set('balance', userAccountInstance.balance.toString());
+      ls.set('nonce', userAccountOnNetwork.nonce.valueOf());
+      ls.set('balance', userAccountOnNetwork.balance.toString());
+      userAccountInstance.update(userAccountOnNetwork);
     } catch (e) {
       const err = errorParse(e);
       console.warn(

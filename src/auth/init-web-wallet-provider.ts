@@ -1,6 +1,6 @@
 import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider';
 import { ls } from '../utils/ls-helpers';
-import { getParamFromUrl } from '../utils/getParamFromUrl';
+import { getParamFromUrl } from '../utils/get-param-from-url';
 import { DAPP_INIT_ROUTE } from '../utils/constants';
 
 export const initWebWalletProvider = async (webWalletAddress: string) => {
@@ -14,7 +14,7 @@ export const initWebWalletProvider = async (webWalletAddress: string) => {
   if (urlAddress || lsAddress) {
     if (urlAddress) {
       ls.set('address', urlAddress);
-      window.location.href = window.location.href.split('?')[0];
+      window.history.replaceState(null, '', window.location.pathname);
     }
     const dappProvider = new WalletProvider(
       `${webWalletAddress}${DAPP_INIT_ROUTE}`

@@ -1,5 +1,3 @@
-import { Account } from '@elrondnetwork/erdjs/out/account';
-import { TransactionWatcher } from '@elrondnetwork/erdjs/out/transactionWatcher';
 import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
 import { initExtensionProvider } from './auth/init-extension-provider';
 import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
@@ -18,7 +16,7 @@ import { loginWithExtension } from './auth/login-with-extension';
 import { loginWithMobile } from './auth/login-with-mobile';
 import { loginWithWebWallet } from './auth/login-with-web-wallet';
 import { accountSync } from './auth/account-sync';
-import { errorParse } from './utils/errorParse';
+import { errorParse } from './utils/error-parse';
 import { isLoginExpired } from './auth/expires-at';
 import { EventsStore } from './events-store';
 import {
@@ -26,8 +24,11 @@ import {
   defaultApiEndpoint,
   defaultChainTypeConfig,
 } from './utils/constants';
-import { getParamFromUrl } from './utils/getParamFromUrl';
+import { getParamFromUrl } from './utils/get-param-from-url';
 import { initWebWalletProvider } from './auth/init-web-wallet-provider';
+import { postSendTx } from './interaction/post-send-tx';
+import { webWalletTxFinalize } from './interaction/web-wallet-tx-finalize';
+import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider/out';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
@@ -62,6 +63,12 @@ export class ElvenJS {
     if (this.initOptions.onLogout) {
       EventsStore.set('onLogout', this.initOptions.onLogout);
     }
+    if (this.initOptions.onTxStarted) {
+      EventsStore.set('onTxStarted', this.initOptions.onTxStarted);
+    }
+    if (this.initOptions.onTxFinalized) {
+      EventsStore.set('onTxFinalized', this.initOptions.onTxFinalized);
+    }
 
     const isAddress =
       state?.address ||
@@ -69,6 +76,8 @@ export class ElvenJS {
         getParamFromUrl('address'));
 
     if (isAddress && state?.loginMethod) {
+      EventsStore.run('onLoginPending');
+
       if (state.loginMethod === LoginMethodsEnum.maiarBrowserExtension) {
         this.dappProvider = await initExtensionProvider();
       }
@@ -83,9 +92,19 @@ export class ElvenJS {
 
       await accountSync(this);
 
-      return true;
+      EventsStore.run('onLoggedIn');
+
+      if (state.loginMethod === LoginMethodsEnum.webWallet) {
+        // After successful web wallet transaction we will land back on our website
+        // We need to get params from callback url and finalize the transaction
+        // It will only trigger when there is a WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED in url params
+        await webWalletTxFinalize(
+          this.dappProvider,
+          this.networkProvider,
+          state.nonce
+        );
+      }
     }
-    return false;
   }
 
   /**
@@ -159,8 +178,11 @@ export class ElvenJS {
     }
 
     try {
-      const currentNonce = ls.get('nonce');
-      transaction.setNonce(currentNonce);
+      EventsStore.run('onTxStarted', transaction);
+
+      const currentState = ls.get();
+
+      transaction.setNonce(currentState.nonce);
 
       if (this.dappProvider instanceof ExtensionProvider) {
         await this.dappProvider.signTransaction(transaction);
@@ -168,22 +190,17 @@ export class ElvenJS {
       if (this.dappProvider instanceof WalletConnectProvider) {
         await this.dappProvider.signTransaction(transaction);
       }
+      if (this.dappProvider instanceof WalletProvider) {
+        await this.dappProvider.signTransaction(transaction);
+      }
 
-      await this.networkProvider.sendTransaction(transaction);
-
-      const transactionWatcher = new TransactionWatcher(this.networkProvider);
-      await transactionWatcher.awaitCompleted(transaction);
-      const sender = transaction.getSender();
-      const senderAccount = new Account(sender);
-      const userAccountOnNetwork = await this.networkProvider.getAccount(
-        sender
-      );
-      senderAccount.update(userAccountOnNetwork);
-      ls.set('address', senderAccount.address.bech32());
-      ls.set('nonce', senderAccount.getNonceThenIncrement().valueOf());
-      ls.set('balance', senderAccount.balance.toString());
+      if (currentState.loginMethod !== LoginMethodsEnum.webWallet) {
+        await this.networkProvider.sendTransaction(transaction);
+        await postSendTx(transaction, this.networkProvider);
+      }
     } catch (e) {
       const err = errorParse(e);
+      EventsStore.run('onTxFinalized', transaction);
       throw new Error(`Error: Transaction signing failed! ${err}`);
     }
 
@@ -227,7 +244,7 @@ export class ElvenJS {
   }
 
   /**
-   * Main storage exposed
+   * Main storage
    */
   static storage = ls;
 
@@ -238,5 +255,6 @@ export class ElvenJS {
     this.networkProvider = undefined;
     this.dappProvider = undefined;
     this.initOptions = undefined;
+    EventsStore.clear();
   };
 }

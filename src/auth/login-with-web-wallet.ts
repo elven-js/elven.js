@@ -1,7 +1,7 @@
 import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider';
 import { LoginMethodsEnum } from '../types';
 import { DAPP_INIT_ROUTE } from '../utils/constants';
-import { errorParse } from '../utils/errorParse';
+import { errorParse } from '../utils/error-parse';
 import { ls } from '../utils/ls-helpers';
 import { getNewLoginExpiresTimestamp } from './expires-at';
 import { EventsStore } from '../events-store';

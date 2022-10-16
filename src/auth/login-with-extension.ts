@@ -1,6 +1,6 @@
 import { ls } from '../utils/ls-helpers';
 import { initExtensionProvider } from './init-extension-provider';
-import { errorParse } from '../utils/errorParse';
+import { errorParse } from '../utils/error-parse';
 import { LoginMethodsEnum } from '../types';
 import { getNewLoginExpiresTimestamp } from './expires-at';
 import { accountSync } from './account-sync';

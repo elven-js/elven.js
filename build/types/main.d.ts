@@ -8,7 +8,7 @@ export declare class ElvenJS {
     /**
      * Initialization of the Elven.js
      */
-    static init(options: InitOptions): Promise<boolean | undefined>;
+    static init(options: InitOptions): Promise<void>;
     /**
      * Login function
      */
@@ -26,7 +26,7 @@ export declare class ElvenJS {
      */
     static queryContract({ address, func, args, value, caller, }: SmartContractQueryArgs): Promise<import("@elrondnetwork/erdjs-network-providers/out/contractQueryResponse").ContractQueryResponse | undefined>;
     /**
-     * Main storage exposed
+     * Main storage
      */
     static storage: {
         get(key?: string | undefined): any;

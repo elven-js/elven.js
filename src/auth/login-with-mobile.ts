@@ -1,4 +1,4 @@
-import { errorParse } from '../utils/errorParse';
+import { errorParse } from '../utils/error-parse';
 import { qrCodeBuilder } from './qr-code-builder';
 import { walletConnectBridgeAddresses } from '../utils/constants';
 import { getBridgeAddressFromNetwork } from './init-maiar-mobile-provider';

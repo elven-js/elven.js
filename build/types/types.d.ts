@@ -1,4 +1,5 @@
 import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
+import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
 import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
 import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider/out';
 export interface InitOptions {
@@ -8,6 +9,8 @@ export interface InitOptions {
     onLoginPending?: () => void;
     onLoggedIn?: () => void;
     onLogout?: () => void;
+    onTxStarted?: (transaction: Transaction) => void;
+    onTxFinalized?: (transaction: Transaction) => void;
 }
 export declare enum LoginMethodsEnum {
     ledger = "ledger",
