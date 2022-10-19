@@ -1,3 +1,6 @@
+### [0.7.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.7.0) (2022-10-19)
+- WalletConnect 2 integration through new version of `@elrondnetwork/erdjs-wallet-connect-provider` - let's you use 'Maiar Login 2.0'. No fallback for the old method. We'll see if it is needed.
+
 ### [0.6.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.6.0) (2022-10-16)
 - Elrond Web Wallet support
 - new way of getting the last transaction status, you can now use a callback function defined when initializing the ElvenJS: `onTxFinalized: (tx) => { ... }`. Check for more info in the docs. You can still use the return value from `await ElvenJS.signAndSendTransaction(tx)`, but it won't work for the Web Wallet (because of its redirections and different flow).

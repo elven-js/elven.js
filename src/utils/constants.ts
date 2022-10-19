@@ -28,6 +28,7 @@ export const walletConnectDeepLink =
 export const walletConnectBridgeAddresses = [
   'https://bridge.walletconnect.org',
 ];
+export const walletConnectV2RelayAddresses = ['wss://relay.walletconnect.com'];
 
 export const networkConfig: Record<string, NetworkType> = {
   devnet: {

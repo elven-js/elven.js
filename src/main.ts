@@ -1,7 +1,7 @@
 import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
 import { initExtensionProvider } from './auth/init-extension-provider';
 import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
-import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
+import { WalletConnectProviderV2 } from '@elrondnetwork/erdjs-wallet-connect-provider';
 import { initMaiarMobileProvider } from './auth/init-maiar-mobile-provider';
 import { ls } from './utils/ls-helpers';
 import { ApiNetworkProvider, SmartContractQueryArgs } from './network-provider';
@@ -187,7 +187,7 @@ export class ElvenJS {
       if (this.dappProvider instanceof ExtensionProvider) {
         await this.dappProvider.signTransaction(transaction);
       }
-      if (this.dappProvider instanceof WalletConnectProvider) {
+      if (this.dappProvider instanceof WalletConnectProviderV2) {
         await this.dappProvider.signTransaction(transaction);
       }
       if (this.dappProvider instanceof WalletProvider) {
