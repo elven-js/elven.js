@@ -6,7 +6,7 @@ import {
 } from '../utils/constants';
 import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-network';
 import {
-  WalletConnectProviderV2,
+  WalletConnectV2Provider,
   SessionEventTypes,
 } from '@elrondnetwork/erdjs-wallet-connect-provider';
 import { LoginMethodsEnum } from '../types';
@@ -52,7 +52,7 @@ export const loginWithMobile = async (
 
   const providerHandlers = {
     onClientLogin: async () => {
-      if (elven.dappProvider instanceof WalletConnectProviderV2) {
+      if (elven.dappProvider instanceof WalletConnectV2Provider) {
         EventsStore.run('onLoginPending');
         const address = await elven.dappProvider.getAddress();
         const signature = await elven.dappProvider.getSignature();
@@ -75,7 +75,7 @@ export const loginWithMobile = async (
       }
     },
     onClientLogout: async () => {
-      if (elven.dappProvider instanceof WalletConnectProviderV2) {
+      if (elven.dappProvider instanceof WalletConnectV2Provider) {
         await logout(elven);
         EventsStore.run('onLogout');
       }
@@ -85,7 +85,7 @@ export const loginWithMobile = async (
     },
   };
 
-  const dappProvider = new WalletConnectProviderV2(
+  const dappProvider = new WalletConnectV2Provider(
     providerHandlers,
     networkConfig[elven.initOptions.chainType].shortId,
     relayAddress,

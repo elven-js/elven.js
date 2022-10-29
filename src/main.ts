@@ -1,7 +1,7 @@
 import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
 import { initExtensionProvider } from './auth/init-extension-provider';
 import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
-import { WalletConnectProviderV2 } from '@elrondnetwork/erdjs-wallet-connect-provider';
+import { WalletConnectV2Provider } from '@elrondnetwork/erdjs-wallet-connect-provider';
 import { initMaiarMobileProvider } from './auth/init-maiar-mobile-provider';
 import { ls } from './utils/ls-helpers';
 import { ApiNetworkProvider, SmartContractQueryArgs } from './network-provider';
@@ -187,8 +187,10 @@ export class ElvenJS {
       if (this.dappProvider instanceof ExtensionProvider) {
         await this.dappProvider.signTransaction(transaction);
       }
-      if (this.dappProvider instanceof WalletConnectProviderV2) {
-        await this.dappProvider.signTransaction(transaction);
+      if (this.dappProvider instanceof WalletConnectV2Provider) {
+        // TODO: replace with signTransaction when the issue is fixed
+        // https://github.com/ElrondNetwork/elrond-sdk-erdjs-wallet-connect-provider/issues/11
+        await this.dappProvider.signTransactions([transaction]);
       }
       if (this.dappProvider instanceof WalletProvider) {
         await this.dappProvider.signTransaction(transaction);

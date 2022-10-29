@@ -1,6 +1,6 @@
 import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
 import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
-import { WalletConnectProviderV2 } from '@elrondnetwork/erdjs-wallet-connect-provider';
+import { WalletConnectV2Provider } from '@elrondnetwork/erdjs-wallet-connect-provider';
 import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider/out';
 export interface InitOptions {
     apiUrl: string;
@@ -19,7 +19,7 @@ export declare enum LoginMethodsEnum {
     webWallet = "web-wallet",
     maiarBrowserExtension = "maiar-browser-extension"
 }
-export declare type DappProvider = ExtensionProvider | WalletConnectProviderV2 | WalletProvider | undefined;
+export declare type DappProvider = ExtensionProvider | WalletConnectV2Provider | WalletProvider | undefined;
 export interface LoginOptions {
     qrCodeContainer?: string | HTMLElement;
     token?: string;

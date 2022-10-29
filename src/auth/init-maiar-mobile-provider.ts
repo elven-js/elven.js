@@ -1,5 +1,5 @@
 import {
-  WalletConnectProviderV2,
+  WalletConnectV2Provider,
   SessionEventTypes,
 } from '@elrondnetwork/erdjs-wallet-connect-provider';
 import {
@@ -33,7 +33,7 @@ export const initMaiarMobileProvider = async (elven: any) => {
     walletConnectV2RelayAddresses
   );
 
-  const dappProviderInstance = new WalletConnectProviderV2(
+  const dappProviderInstance = new WalletConnectV2Provider(
     providerHandlers,
     networkConfig[elven.initOptions.chainType].shortId,
     relayAddress,

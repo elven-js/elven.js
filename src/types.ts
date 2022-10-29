@@ -1,6 +1,6 @@
 import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
 import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
-import { WalletConnectProviderV2 } from '@elrondnetwork/erdjs-wallet-connect-provider';
+import { WalletConnectV2Provider } from '@elrondnetwork/erdjs-wallet-connect-provider';
 import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider/out';
 
 export interface InitOptions {
@@ -24,7 +24,7 @@ export enum LoginMethodsEnum {
 
 export type DappProvider =
   | ExtensionProvider
-  | WalletConnectProviderV2
+  | WalletConnectV2Provider
   | WalletProvider
   | undefined;
 
