@@ -1,7 +1,7 @@
-import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
+import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider/out/extensionProvider';
 import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
-import { WalletConnectV2Provider } from '@elrondnetwork/erdjs-wallet-connect-provider';
-import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider/out';
+import { WalletConnectV2Provider } from '@elrondnetwork/erdjs-wallet-connect-provider/out/walletConnectV2Provider';
+import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider/out/walletProvider';
 
 export interface InitOptions {
   apiUrl: string;

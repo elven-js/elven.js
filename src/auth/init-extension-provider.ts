@@ -1,4 +1,4 @@
-import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
+import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider/out/extensionProvider';
 import { ls } from '../utils/ls-helpers';
 
 export const initExtensionProvider = async () => {

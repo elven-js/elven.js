@@ -1,7 +1,8 @@
 import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
 import { initExtensionProvider } from './auth/init-extension-provider';
-import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
-import { WalletConnectV2Provider } from '@elrondnetwork/erdjs-wallet-connect-provider';
+import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider/out/extensionProvider';
+import { WalletConnectV2Provider } from '@elrondnetwork/erdjs-wallet-connect-provider/out/walletConnectV2Provider';
+import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider/out/walletProvider';
 import { initMaiarMobileProvider } from './auth/init-maiar-mobile-provider';
 import { ls } from './utils/ls-helpers';
 import { ApiNetworkProvider, SmartContractQueryArgs } from './network-provider';
@@ -28,7 +29,6 @@ import { getParamFromUrl } from './utils/get-param-from-url';
 import { initWebWalletProvider } from './auth/init-web-wallet-provider';
 import { postSendTx } from './interaction/post-send-tx';
 import { webWalletTxFinalize } from './interaction/web-wallet-tx-finalize';
-import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider/out';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;

@@ -1,7 +1,7 @@
 import {
-  WalletConnectV2Provider,
   SessionEventTypes,
-} from '@elrondnetwork/erdjs-wallet-connect-provider';
+  WalletConnectV2Provider,
+} from '@elrondnetwork/erdjs-wallet-connect-provider/out/walletConnectV2Provider';
 import {
   walletConnectV2RelayAddresses,
   networkConfig,

@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import BigNumber from 'big.js';
+import BigNumber from 'bn.js';
 import { Address } from '@elrondnetwork/erdjs/out/address';
 import { TransactionStatus } from '@elrondnetwork/erdjs-network-providers/out/transactionStatus';
 import { TransactionReceipt } from '@elrondnetwork/erdjs-network-providers/out/transactionReceipt';
@@ -7,7 +7,6 @@ import { TransactionLogs } from '@elrondnetwork/erdjs-network-providers/out/tran
 import { ContractResults } from '@elrondnetwork/erdjs-network-providers/out/contractResults';
 import { ContractQueryResponse } from '@elrondnetwork/erdjs-network-providers/out/contractQueryResponse';
 import { QueryArguments } from '@elrondnetwork/erdjs/out/smartcontracts/interface';
-import { Buffer } from 'buffer';
 import { InitOptions } from './types';
 export interface IAddress {
     bech32: () => string;

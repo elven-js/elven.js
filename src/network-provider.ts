@@ -1,5 +1,4 @@
-import BigNumber from 'big.js';
-import { networkConfig, defaultChainTypeConfig } from './utils/constants';
+import BigNumber from 'bn.js';
 import { Address } from '@elrondnetwork/erdjs/out/address';
 import { TransactionStatus } from '@elrondnetwork/erdjs-network-providers/out/transactionStatus';
 import { TransactionReceipt } from '@elrondnetwork/erdjs-network-providers/out/transactionReceipt';
@@ -9,7 +8,7 @@ import { ContractQueryResponse } from '@elrondnetwork/erdjs-network-providers/ou
 import { ContractQueryRequest } from '@elrondnetwork/erdjs-network-providers/out/contractQueryRequest';
 import { Query } from '@elrondnetwork/erdjs/out/smartcontracts/query';
 import { QueryArguments } from '@elrondnetwork/erdjs/out/smartcontracts/interface';
-import { Buffer } from 'buffer';
+import { networkConfig, defaultChainTypeConfig } from './utils/constants';
 import { InitOptions } from './types';
 
 export interface IAddress {
