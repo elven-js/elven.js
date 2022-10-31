@@ -25,9 +25,7 @@ export const defaultChainTypeConfig = 'devnet';
 
 export const walletConnectDeepLink =
   'https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link=https://maiar.com/';
-export const walletConnectBridgeAddresses = [
-  'https://bridge.walletconnect.org',
-];
+
 export const walletConnectV2RelayAddresses = ['wss://relay.walletconnect.com'];
 
 export const networkConfig: Record<string, NetworkType> = {
