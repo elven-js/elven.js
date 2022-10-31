@@ -152,13 +152,16 @@
       AddressValue,
     } from './elven.js';
 
-    // Options are the defaults
+    // Options are the defaults and here only to show all of them
+    // You don't have to add them if you want to use default setup
+    // You can only add your custom callbacks
     const initElven = async () => {
       await ElvenJS.init(
         {
           apiUrl: 'https://devnet-api.elrond.com',
           chainType: 'devnet',
           apiTimeout: 10000,
+          walletConnectBridgeAddresses: ['https://bridge.walletconnect.org'],
           onLoginPending: () => { uiPending(true) },
           onLoggedIn: () => { uiLoggedInState(true); uiPending(false); }, 
           onLogout: () => { uiLoggedInState(false); },
@@ -180,6 +183,7 @@
     });
 
     document.getElementById('button-login-mobile').addEventListener('click', async () => {
+      clearQrCodeContainer();
       try {
         await ElvenJS.login('maiar-mobile', {
           // You can also use the DOM element here: 

@@ -1,14 +1,11 @@
 import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
-import { walletConnectBridgeAddresses } from '../utils/constants';
 import { logout } from './logout';
 import { accountSync } from './account-sync';
 import { EventsStore } from '../events-store';
 
-export function getBridgeAddressFromNetwork(
-  walletConnectBridgeAddresses: string[]
-) {
-  return walletConnectBridgeAddresses[
-    Math.floor(Math.random() * walletConnectBridgeAddresses.length)
+export function getBridgeAddressFromNetwork(wcBridgeAddresses: string[]) {
+  return wcBridgeAddresses[
+    Math.floor(Math.random() * wcBridgeAddresses.length)
   ];
 }
 
@@ -21,7 +18,7 @@ export const initMaiarMobileProvider = async (elven: any) => {
   };
 
   const bridgeAddress = getBridgeAddressFromNetwork(
-    walletConnectBridgeAddresses
+    elven.initOptions.walletConnectBridgeAddresses
   );
 
   const dappProviderInstance = new WalletConnectProvider(

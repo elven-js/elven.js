@@ -4,9 +4,10 @@ import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provi
 import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider/out';
 
 export interface InitOptions {
-  apiUrl: string;
-  chainType: string;
-  apiTimeout: number;
+  apiUrl?: string;
+  chainType?: string;
+  apiTimeout?: number;
+  walletConnectBridgeAddresses?: string[];
   onLoginPending?: () => void;
   onLoggedIn?: () => void;
   onLogout?: () => void;
