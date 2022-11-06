@@ -1,9 +1,6 @@
 import { errorParse } from '../utils/error-parse';
 import { qrCodeBuilder } from './qr-code-builder';
-import {
-  walletConnectV2RelayAddresses,
-  networkConfig,
-} from '../utils/constants';
+import { networkConfig } from '../utils/constants';
 import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-network';
 import {
   WalletConnectV2Provider,
@@ -29,7 +26,7 @@ export const loginWithMobile = async (
   }
 
   const relayAddress = getRandomAddressFromNetwork(
-    walletConnectV2RelayAddresses
+    elven.initOptions.walletConnectV2RelayAddresses
   );
 
   if (!relayAddress || !elven.networkProvider) {

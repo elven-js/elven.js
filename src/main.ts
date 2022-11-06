@@ -24,6 +24,7 @@ import {
   networkConfig,
   defaultApiEndpoint,
   defaultChainTypeConfig,
+  defaultWalletConnectV2RelayAddresses,
 } from './utils/constants';
 import { getParamFromUrl } from './utils/get-param-from-url';
 import { initWebWalletProvider } from './auth/init-web-wallet-provider';
@@ -47,9 +48,13 @@ export class ElvenJS {
       return;
     }
 
-    this.initOptions = options || {
+    this.initOptions = {
       chainType: defaultChainTypeConfig,
       apiUrl: defaultApiEndpoint,
+      apiTimeout: 10000,
+      walletConnectV2ProjectId: '',
+      walletConnectV2RelayAddresses: defaultWalletConnectV2RelayAddresses,
+      ...options,
     };
 
     this.networkProvider = new ApiNetworkProvider(this.initOptions);
@@ -84,7 +89,10 @@ export class ElvenJS {
       if (state.loginMethod === LoginMethodsEnum.maiarMobile) {
         this.dappProvider = await initMaiarMobileProvider(this);
       }
-      if (state.loginMethod === LoginMethodsEnum.webWallet) {
+      if (
+        state.loginMethod === LoginMethodsEnum.webWallet &&
+        this.initOptions.chainType
+      ) {
         this.dappProvider = await initWebWalletProvider(
           networkConfig[this.initOptions.chainType].walletAddress
         );
@@ -139,7 +147,10 @@ export class ElvenJS {
       }
 
       // Login with Web Wallet
-      if (loginMethod === LoginMethodsEnum.webWallet && this.initOptions) {
+      if (
+        loginMethod === LoginMethodsEnum.webWallet &&
+        this.initOptions?.chainType
+      ) {
         const dappProvider = await loginWithWebWallet(
           networkConfig[this.initOptions.chainType].walletAddress,
           options?.callbackRoute,
