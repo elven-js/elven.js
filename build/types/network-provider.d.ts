@@ -14,7 +14,7 @@ export interface IAddress {
 export interface SmartContractQueryArgs extends QueryArguments {
     address: IAddress;
 }
-export declare type NetworkProviderOptions = Pick<InitOptions, 'apiUrl' | 'chainType' | 'apiTimeout'>;
+export type NetworkProviderOptions = Pick<InitOptions, 'apiUrl' | 'chainType' | 'apiTimeout'>;
 export interface AccountOnNetwork {
     address: IAddress;
     nonce: number;

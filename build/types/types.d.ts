@@ -20,7 +20,7 @@ export declare enum LoginMethodsEnum {
     webWallet = "web-wallet",
     maiarBrowserExtension = "maiar-browser-extension"
 }
-export declare type DappProvider = ExtensionProvider | WalletConnectV2Provider | WalletProvider | undefined;
+export type DappProvider = ExtensionProvider | WalletConnectV2Provider | WalletProvider | undefined;
 export interface LoginOptions {
     qrCodeContainer?: string | HTMLElement;
     token?: string;
