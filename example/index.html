@@ -50,14 +50,16 @@
         href="https://devnet-elrond-esdt-faucet.netlify.app/" target="_blank"
         rel="noopener noreferrer">https://devnet-elrond-esdt-faucet.netlify.app</a> (you can also modify the hardcoded
       token and test it with yours locally, check the sourcecode of this website for more info).</div>
-    <div class="esdt-info">** The query will trigger a 'getMintedPerAddressTotal' with currently logged in user's address using
+    <div class="esdt-info">** The query will trigger a 'getMintedPerAddressTotal' with currently logged in user's
+      address using
       the <a href="https://www.elven.tools">Elven Tools</a> Smart Contract.</div>
 
     <div id="tx-hash-or-query-result" class="tx-hash-or-query-result"></div>
     <div id="qr-code-container" class="qr-code-container"></div>
 
     <h1>ElvenJS (demo)</h1>
-    <div><strong>All transactions will take place on the devent!</strong> Check how to use it on the testnet and mainnet in the docs.</div>
+    <div><strong>All transactions will take place on the devent!</strong> Check how to use it on the testnet and mainnet
+      in the docs.</div>
     <h4>Docs and code: <a href="https://www.elvenjs.com">www.elvenjs.com</a></h4>
     <p>Authenticate, sign and send transactions and messages on the Elrond blockchain in the browser. No need for
       bundlers, frameworks, etc. Just attach the script source, and you are ready to go. You can incorporate it into
@@ -163,10 +165,12 @@
           apiTimeout: 10000,
           walletConnectBridgeAddresses: ['https://bridge.walletconnect.org'],
           onLoginPending: () => { uiPending(true) },
-          onLoggedIn: () => { uiLoggedInState(true); uiPending(false); }, 
+          onLoggedIn: () => { uiLoggedInState(true); uiPending(false); },
           onLogout: () => { uiLoggedInState(false); },
           onTxStarted: () => { uiPending(true); },
-          onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); }
+          onTxSent: (tx) => { console.log('Tx sent, not finalized on chain yet! ', tx.getHash().toString()) },
+          onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
+          onTxError: (tx, error) => { console.log('Tx error: ', error); uiPending(false); }
         }
       );
     }

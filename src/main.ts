@@ -70,8 +70,14 @@ export class ElvenJS {
     if (this.initOptions.onTxStarted) {
       EventsStore.set('onTxStarted', this.initOptions.onTxStarted);
     }
+    if (this.initOptions.onTxSent) {
+      EventsStore.set('onTxSent', this.initOptions.onTxSent);
+    }
     if (this.initOptions.onTxFinalized) {
       EventsStore.set('onTxFinalized', this.initOptions.onTxFinalized);
+    }
+    if (this.initOptions.onTxError) {
+      EventsStore.set('onTxError', this.initOptions.onTxError);
     }
 
     const isAddress =
@@ -210,7 +216,7 @@ export class ElvenJS {
       }
     } catch (e) {
       const err = errorParse(e);
-      EventsStore.run('onTxFinalized', transaction);
+      EventsStore.run('onTxError', transaction, err);
       throw new Error(`Error: Transaction signing failed! ${err}`);
     }
 
