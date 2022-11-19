@@ -9,6 +9,7 @@ export const postSendTx = async (
   transaction: Transaction,
   networkProvider: ApiNetworkProvider
 ) => {
+  EventsStore.run('onTxSent', transaction);
   const transactionWatcher = new TransactionWatcher(networkProvider);
   await transactionWatcher.awaitCompleted(transaction);
   const sender = transaction.getSender();

@@ -11,7 +11,9 @@ export interface InitOptions {
     onLoggedIn?: () => void;
     onLogout?: () => void;
     onTxStarted?: (transaction: Transaction) => void;
+    onTxSent?: (transaction: Transaction) => void;
     onTxFinalized?: (transaction: Transaction) => void;
+    onTxError?: (transaction: Transaction, error: string) => void;
 }
 export declare enum LoginMethodsEnum {
     ledger = "ledger",
@@ -19,7 +21,7 @@ export declare enum LoginMethodsEnum {
     webWallet = "web-wallet",
     maiarBrowserExtension = "maiar-browser-extension"
 }
-export declare type DappProvider = ExtensionProvider | WalletConnectProvider | WalletProvider | undefined;
+export type DappProvider = ExtensionProvider | WalletConnectProvider | WalletProvider | undefined;
 export interface LoginOptions {
     qrCodeContainer?: string | HTMLElement;
     token?: string;
