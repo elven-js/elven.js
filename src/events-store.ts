@@ -1,7 +1,7 @@
 export class EventsStore {
-  private static events: Record<string, (arg?: any) => void> | undefined;
+  private static events: Record<string, (...args: any[]) => void> | undefined;
 
-  static set(name: string, fn: (arg?: any) => void) {
+  static set(name: string, fn: (...args: any[]) => void) {
     if (!name) return;
     const eventsObj = { ...this.events, [name]: fn };
     this.events = eventsObj;
@@ -12,9 +12,9 @@ export class EventsStore {
     return this.events[name];
   }
 
-  static run(name: string, arg?: any) {
+  static run(name: string, ...args: any[]) {
     if (!name || !this.events) return;
-    this.events[name]?.(arg);
+    this.events[name]?.(...args);
   }
 
   static clear() {

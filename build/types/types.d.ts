@@ -12,7 +12,9 @@ export interface InitOptions {
     onLoggedIn?: () => void;
     onLogout?: () => void;
     onTxStarted?: (transaction: Transaction) => void;
+    onTxSent?: (transaction: Transaction) => void;
     onTxFinalized?: (transaction: Transaction) => void;
+    onTxError?: (transaction: Transaction, error: string) => void;
 }
 export declare enum LoginMethodsEnum {
     ledger = "ledger",

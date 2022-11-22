@@ -1,6 +1,10 @@
 ### [0.7.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.7.0) (2022-11-...)
 - WalletConnect 2 integration through new version of `@elrondnetwork/erdjs-wallet-connect-provider` - let's you use 'Maiar Login 2.0'. No fallback for the old method. We'll see if it is needed.
 
+### [0.6.2](https://github.com/juliancwirko/elven.js/releases/tag/v0.6.2) (2022-11-19)
+- added new callbacks for transactions `onTxSent` and `onTxError`. With `onTxSent`, you can get the transaction data before it is finalized on the chain and after signing it. Then you can use `onTxFinalized`. Check the source code of the demo example.
+- dependencies updates
+
 ### [0.6.1](https://github.com/juliancwirko/elven.js/releases/tag/v0.6.1) (2022-10-31)
 - make the WalletConnect bridge addresses configurable. You can use `ElvenJS.init({ walletConnectBridgeAddresses: ['https://...'], })` to overwrite the default ones.
 
