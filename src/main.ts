@@ -205,9 +205,7 @@ export class ElvenJS {
         await this.dappProvider.signTransaction(transaction);
       }
       if (this.dappProvider instanceof WalletConnectV2Provider) {
-        // TODO: replace with signTransaction when the issue is fixed
-        // https://github.com/ElrondNetwork/elrond-sdk-erdjs-wallet-connect-provider/issues/11
-        await this.dappProvider.signTransactions([transaction]);
+        await this.dappProvider.signTransaction(transaction);
       }
       if (this.dappProvider instanceof WalletProvider) {
         await this.dappProvider.signTransaction(transaction);
