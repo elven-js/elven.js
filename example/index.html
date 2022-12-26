@@ -171,7 +171,9 @@
           onTxStarted: () => { uiPending(true); },
           onTxSent: (tx) => { console.log('Tx sent, not finalized on chain yet! ', tx.getHash().toString()) },
           onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
-          onTxError: (tx, error) => { console.log('Tx error: ', error); uiPending(false); }
+          onTxError: (tx, error) => { console.log('Tx error: ', error); uiPending(false); },
+          onQrPending: () => { uiPending(true); },
+          onQrLoaded: () => { uiPending(false); },
         }
       );
     }

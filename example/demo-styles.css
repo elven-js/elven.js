@@ -110,6 +110,47 @@ a {
   display: flex;
 }
 
+/* Elven.js pairings styles - by default it isn't styled */
+
+.elven-wc-pairings {
+  padding-bottom: 20px;
+}
+
+.elven-wc-pairings-header {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.elven-wc-pairing-item {
+  padding: 20px 10px;
+  border: 1px dashed black;
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  max-width: 90%;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.elven-wc-pairings-remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-color: #0f172a;
+  color: white;
+  float: right;
+  border: 0;
+  border-radius: 100%;
+  cursor: pointer;
+  line-height: 1;
+  font-size: 14px;
+}
+
 /* SPINNER */
 /* https://projects.lukehaas.me/css-loaders/ */
 

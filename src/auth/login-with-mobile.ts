@@ -1,12 +1,12 @@
 import { errorParse } from '../utils/error-parse';
-import { qrCodeBuilder } from './qr-code-builder';
+import { qrCodeAndPairingsBuilder } from './qr-code-and-pairings-builder';
 import { networkConfig } from '../utils/constants';
 import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-network';
 import {
   WalletConnectV2Provider,
   SessionEventTypes,
 } from '@elrondnetwork/erdjs-wallet-connect-provider/out/walletConnectV2Provider';
-import { LoginMethodsEnum } from '../types';
+import { EventStoreEvents, LoginMethodsEnum } from '../types';
 import { ls } from '../utils/ls-helpers';
 import { logout } from './logout';
 import { getNewLoginExpiresTimestamp } from './expires-at';
@@ -50,7 +50,7 @@ export const loginWithMobile = async (
   const providerHandlers = {
     onClientLogin: async () => {
       if (elven.dappProvider instanceof WalletConnectV2Provider) {
-        EventsStore.run('onLoginPending');
+        EventsStore.run(EventStoreEvents.onLoginPending);
         const address = await elven.dappProvider.getAddress();
         const signature = await elven.dappProvider.getSignature();
 
@@ -67,14 +67,14 @@ export const loginWithMobile = async (
           ls.set('loginToken', token);
         }
 
-        EventsStore.run('onLoggedIn');
+        EventsStore.run(EventStoreEvents.onLoggedIn);
         qrCodeElement?.replaceChildren();
       }
     },
     onClientLogout: async () => {
       if (elven.dappProvider instanceof WalletConnectV2Provider) {
         await logout(elven);
-        EventsStore.run('onLogout');
+        EventsStore.run(EventStoreEvents.onLogout);
       }
     },
     onClientEvent: (event: SessionEventTypes['event']) => {
@@ -93,6 +93,8 @@ export const loginWithMobile = async (
     if (dappProvider) {
       elven.dappProvider = dappProvider;
 
+      EventsStore.run(EventStoreEvents.onQrPending);
+
       const { uri: walletConnectUri, approval } = await dappProvider.connect({
         methods: [DappCoreWCV2CustomMethodsEnum.erd_cancelAction],
       });
@@ -101,8 +103,14 @@ export const loginWithMobile = async (
         ? `${walletConnectUri}&token=${token}`
         : walletConnectUri;
 
-      if (qrCodeContainer && walletConnectUri && wCUri) {
-        qrCodeElement = await qrCodeBuilder(qrCodeContainer, wCUri);
+      if (qrCodeContainer && wCUri) {
+        qrCodeElement = await qrCodeAndPairingsBuilder(
+          qrCodeContainer,
+          wCUri,
+          dappProvider
+        );
+
+        EventsStore.run(EventStoreEvents.onQrLoaded);
       }
 
       await dappProvider.login({

@@ -7,6 +7,7 @@ import { logout } from './logout';
 import { accountSync } from './account-sync';
 import { EventsStore } from '../events-store';
 import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-network';
+import { EventStoreEvents } from '../types';
 
 export const initMaiarMobileProvider = async (elven: any) => {
   if (
@@ -18,7 +19,7 @@ export const initMaiarMobileProvider = async (elven: any) => {
 
   const providerHandlers = {
     onClientLogin: () => {
-      accountSync(elven), EventsStore.run('onLoggedIn');
+      accountSync(elven), EventsStore.run(EventStoreEvents.onLoggedIn);
     },
     onClientLogout: () => logout(elven),
     onClientEvent: (event: SessionEventTypes['event']) => {

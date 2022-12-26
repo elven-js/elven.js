@@ -11,6 +11,8 @@ export interface InitOptions {
     onLoginPending?: () => void;
     onLoggedIn?: () => void;
     onLogout?: () => void;
+    onQrPending?: () => void;
+    onQrLoaded?: () => void;
     onTxStarted?: (transaction: Transaction) => void;
     onTxSent?: (transaction: Transaction) => void;
     onTxFinalized?: (transaction: Transaction) => void;
@@ -30,4 +32,15 @@ export interface LoginOptions {
 }
 export declare enum DappCoreWCV2CustomMethodsEnum {
     erd_cancelAction = "erd_cancelAction"
+}
+export declare enum EventStoreEvents {
+    onLoginPending = 0,
+    onLoggedIn = 1,
+    onQrPending = 2,
+    onQrLoaded = 3,
+    onLogout = 4,
+    onTxStarted = 5,
+    onTxSent = 6,
+    onTxFinalized = 7,
+    onTxError = 8
 }

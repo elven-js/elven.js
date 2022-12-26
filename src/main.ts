@@ -11,6 +11,7 @@ import {
   LoginMethodsEnum,
   LoginOptions,
   InitOptions,
+  EventStoreEvents,
 } from './types';
 import { logout } from './auth/logout';
 import { loginWithExtension } from './auth/login-with-extension';
@@ -60,25 +61,43 @@ export class ElvenJS {
     this.networkProvider = new ApiNetworkProvider(this.initOptions);
 
     if (this.initOptions.onLoginPending) {
-      EventsStore.set('onLoginPending', this.initOptions.onLoginPending);
+      EventsStore.set(
+        EventStoreEvents.onLoginPending,
+        this.initOptions.onLoginPending
+      );
     }
     if (this.initOptions.onLoggedIn) {
-      EventsStore.set('onLoggedIn', this.initOptions.onLoggedIn);
+      EventsStore.set(EventStoreEvents.onLoggedIn, this.initOptions.onLoggedIn);
+    }
+    if (this.initOptions.onQrPending) {
+      EventsStore.set(
+        EventStoreEvents.onQrPending,
+        this.initOptions.onQrPending
+      );
+    }
+    if (this.initOptions.onQrLoaded) {
+      EventsStore.set(EventStoreEvents.onQrLoaded, this.initOptions.onQrLoaded);
     }
     if (this.initOptions.onLogout) {
-      EventsStore.set('onLogout', this.initOptions.onLogout);
+      EventsStore.set(EventStoreEvents.onLogout, this.initOptions.onLogout);
     }
     if (this.initOptions.onTxStarted) {
-      EventsStore.set('onTxStarted', this.initOptions.onTxStarted);
+      EventsStore.set(
+        EventStoreEvents.onTxStarted,
+        this.initOptions.onTxStarted
+      );
     }
     if (this.initOptions.onTxSent) {
-      EventsStore.set('onTxSent', this.initOptions.onTxSent);
+      EventsStore.set(EventStoreEvents.onTxSent, this.initOptions.onTxSent);
     }
     if (this.initOptions.onTxFinalized) {
-      EventsStore.set('onTxFinalized', this.initOptions.onTxFinalized);
+      EventsStore.set(
+        EventStoreEvents.onTxFinalized,
+        this.initOptions.onTxFinalized
+      );
     }
     if (this.initOptions.onTxError) {
-      EventsStore.set('onTxError', this.initOptions.onTxError);
+      EventsStore.set(EventStoreEvents.onTxError, this.initOptions.onTxError);
     }
 
     const isAddress =
@@ -87,7 +106,7 @@ export class ElvenJS {
         getParamFromUrl('address'));
 
     if (isAddress && state?.loginMethod) {
-      EventsStore.run('onLoginPending');
+      EventsStore.run(EventStoreEvents.onLoginPending);
 
       if (state.loginMethod === LoginMethodsEnum.maiarBrowserExtension) {
         this.dappProvider = await initExtensionProvider();
@@ -106,7 +125,7 @@ export class ElvenJS {
 
       await accountSync(this);
 
-      EventsStore.run('onLoggedIn');
+      EventsStore.run(EventStoreEvents.onLoggedIn);
 
       if (state.loginMethod === LoginMethodsEnum.webWallet) {
         // After successful web wallet transaction we will land back on our website
@@ -195,7 +214,7 @@ export class ElvenJS {
     }
 
     try {
-      EventsStore.run('onTxStarted', transaction);
+      EventsStore.run(EventStoreEvents.onTxStarted, transaction);
 
       const currentState = ls.get();
 
@@ -217,7 +236,7 @@ export class ElvenJS {
       }
     } catch (e) {
       const err = errorParse(e);
-      EventsStore.run('onTxError', transaction, err);
+      EventsStore.run(EventStoreEvents.onTxError, transaction, err);
       throw new Error(`Error: Transaction signing failed! ${err}`);
     }
 

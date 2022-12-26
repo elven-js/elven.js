@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // ==============================================================
-// UI manipulation for demo purposes, for ElvenJS see below
+// UI manipulation for demo purposes
 // ==============================================================
 export const uiPending = (isPending) => {
   const overlay = document.querySelector('.overlay');

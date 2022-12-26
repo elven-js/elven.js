@@ -4,7 +4,7 @@ import {
 } from '@elrondnetwork/erdjs-web-wallet-provider/out';
 import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
 import { getParamFromUrl } from '../utils/get-param-from-url';
-import { DappProvider } from '../types';
+import { DappProvider, EventStoreEvents } from '../types';
 import { ApiNetworkProvider } from '../network-provider';
 import { postSendTx } from './post-send-tx';
 import { errorParse } from '../utils/error-parse';
@@ -32,12 +32,12 @@ export const webWalletTxFinalize = async (
 
       transaction.setNonce(nonce);
       try {
-        EventsStore.run('onTxStarted', transaction);
+        EventsStore.run(EventStoreEvents.onTxStarted, transaction);
         await networkProvider.sendTransaction(transaction);
         await postSendTx(transaction, networkProvider);
       } catch (e) {
         const err = errorParse(e);
-        EventsStore.run('onTxError', transaction, err);
+        EventsStore.run(EventStoreEvents.onTxError, transaction, err);
         throw new Error(`Error: Transaction signing failed! ${err}`);
       }
     }

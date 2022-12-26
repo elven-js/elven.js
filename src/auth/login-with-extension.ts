@@ -1,7 +1,7 @@
 import { ls } from '../utils/ls-helpers';
 import { initExtensionProvider } from './init-extension-provider';
 import { errorParse } from '../utils/error-parse';
-import { LoginMethodsEnum } from '../types';
+import { EventStoreEvents, LoginMethodsEnum } from '../types';
 import { getNewLoginExpiresTimestamp } from './expires-at';
 import { accountSync } from './account-sync';
 import { EventsStore } from '../events-store';
@@ -40,7 +40,7 @@ export const loginWithExtension = async (elven: any, token?: string) => {
         throw new Error('Canceled!');
       }
 
-      EventsStore.run('onLoginPending');
+      EventsStore.run(EventStoreEvents.onLoginPending);
 
       ls.set('address', address);
       ls.set('loginMethod', LoginMethodsEnum.maiarBrowserExtension);
@@ -48,7 +48,7 @@ export const loginWithExtension = async (elven: any, token?: string) => {
 
       await accountSync(elven);
 
-      EventsStore.run('onLoggedIn');
+      EventsStore.run(EventStoreEvents.onLoggedIn);
 
       return dappProvider;
     } catch (e: any) {
