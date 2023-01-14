@@ -1,3 +1,10 @@
+### [0.7.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.7.0) (2023-01-14)
+- rebrand to multiversx (continuation)
+    - npm packages are replaced
+    - public api/explorer endpoints are replaced
+- update dependencies
+- **Breaking:** `ElvenJS.login('maiar-mobile')` is now `ElvenJS.login('mobile')` and `ElvenJS.login('maiar-browser-extension')` is now `ElvenJS.login('browser-extension')`
+
 ### [0.6.2](https://github.com/juliancwirko/elven.js/releases/tag/v0.6.2) (2022-11-19)
 - added new callbacks for transactions `onTxSent` and `onTxError`. With `onTxSent`, you can get the transaction data before it is finalized on the chain and after signing it. Then you can use `onTxFinalized`. Check the source code of the demo example.
 - dependencies updates

@@ -1,8 +1,8 @@
-import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
+import { Transaction } from '@multiversx/sdk-core/out/transaction';
 import { initExtensionProvider } from './auth/init-extension-provider';
-import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
-import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
-import { initMaiarMobileProvider } from './auth/init-maiar-mobile-provider';
+import { ExtensionProvider } from '@multiversx/sdk-extension-provider';
+import { WalletConnectProvider } from '@multiversx/sdk-wallet-connect-provider';
+import { initMobileProvider } from './auth/init-mobile-provider';
 import { ls } from './utils/ls-helpers';
 import { ApiNetworkProvider, SmartContractQueryArgs } from './network-provider';
 import {
@@ -29,7 +29,7 @@ import { getParamFromUrl } from './utils/get-param-from-url';
 import { initWebWalletProvider } from './auth/init-web-wallet-provider';
 import { postSendTx } from './interaction/post-send-tx';
 import { webWalletTxFinalize } from './interaction/web-wallet-tx-finalize';
-import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider/out';
+import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
@@ -88,11 +88,11 @@ export class ElvenJS {
     if (isAddress && state?.loginMethod) {
       EventsStore.run('onLoginPending');
 
-      if (state.loginMethod === LoginMethodsEnum.maiarBrowserExtension) {
+      if (state.loginMethod === LoginMethodsEnum.browserExtension) {
         this.dappProvider = await initExtensionProvider();
       }
-      if (state.loginMethod === LoginMethodsEnum.maiarMobile) {
-        this.dappProvider = await initMaiarMobileProvider(this);
+      if (state.loginMethod === LoginMethodsEnum.mobile) {
+        this.dappProvider = await initMobileProvider(this);
       }
       if (
         state.loginMethod === LoginMethodsEnum.webWallet &&
@@ -135,14 +135,14 @@ export class ElvenJS {
     }
 
     try {
-      // Login with Maiar browser extension
-      if (loginMethod === LoginMethodsEnum.maiarBrowserExtension) {
+      // Login with browser extension
+      if (loginMethod === LoginMethodsEnum.browserExtension) {
         const dappProvider = await loginWithExtension(this, options?.token);
         this.dappProvider = dappProvider;
       }
 
-      // Login with Maiar mobile app
-      if (loginMethod === LoginMethodsEnum.maiarMobile) {
+      // Login with mobile app
+      if (loginMethod === LoginMethodsEnum.mobile) {
         const dappProvider = await loginWithMobile(
           this,
           options?.qrCodeContainer,

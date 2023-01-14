@@ -1,7 +1,7 @@
 import { errorParse } from '../utils/error-parse';
 import { qrCodeBuilder } from './qr-code-builder';
-import { getBridgeAddressFromNetwork } from './init-maiar-mobile-provider';
-import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
+import { getBridgeAddressFromNetwork } from './init-mobile-provider';
+import { WalletConnectProvider } from '@multiversx/sdk-wallet-connect-provider';
 import { LoginMethodsEnum } from '../types';
 import { ls } from '../utils/ls-helpers';
 import { logout } from './logout';
@@ -40,7 +40,7 @@ export const loginWithMobile = async (
         const signature = await elven.dappProvider.getSignature();
 
         ls.set('address', address);
-        ls.set('loginMethod', LoginMethodsEnum.maiarMobile);
+        ls.set('loginMethod', LoginMethodsEnum.mobile);
         ls.set('expires', getNewLoginExpiresTimestamp());
 
         await accountSync(elven);

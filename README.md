@@ -1,29 +1,29 @@
 ## ElvenJS
 
-### One static file to rule it all on the Elrond blockchain!
+### One static file to rule it all on the MultiversX blockchain!
 
 ## Docs
 - [www.elvenjs.com](https://www.elvenjs.com)
 
 ## Videos
-- [JavaScript browser SDK for Elrond Blockchain](https://youtu.be/tcTukpkjcQw)
+- [JavaScript browser SDK for MultiversX Blockchain](https://youtu.be/tcTukpkjcQw)
 
 ## Demos
 - [elvenjs.netlify.app](https://elvenjs.netlify.app/) - EGLD, ESDT transactions, smart contract queries and transactions
-- [elrond-donate-widget-demo.netlify.app](https://elrond-donate-widget-demo.netlify.app/) - donation-like widget demo on Astro based blog example
+- [elrond-donate-widget-demo.netlify.app](https://multiversx-donate-widget-demo.netlify.app/) - donation-like widget demo on Astro based blog example
 - [StackBlitz vanilla html demo](https://stackblitz.com/edit/web-platform-d4rx5v?file=index.html)
 - [StackBlitz Astro demo](https://stackblitz.com/edit/withastro-astro-pwareu?file=src%2Fpages%2Findex.astro)
 - [StackBlitz Solid.js demo](https://stackblitz.com/edit/vitejs-vite-rbo6du?file=src/App.tsx)
 - [StackBlitz React demo](https://stackblitz.com/edit/vitejs-vite-qr2u7l?file=src/App.tsx)
 - [StackBlitz Vue demo](https://stackblitz.com/edit/vue-zrb8y5?file=src/App.vue)
 
-Authenticate, sign and send transactions on the Elrond blockchain in the browser. No need for bundlers, frameworks, etc. Just attach the script source, and you are ready to go. You can incorporate it into your preferred CMS framework like WordPress or an e-commerce system. Plus, it will also work on a standard static HTML website.
+Authenticate, sign and send transactions on the MultiversX blockchain in the browser. No need for bundlers, frameworks, etc. Just attach the script source, and you are ready to go. You can incorporate it into your preferred CMS framework like WordPress or an e-commerce system. Plus, it will also work on a standard static HTML website.
 
-The primary purpose of this tool is to have a lite script for browser usage where you can authenticate and sign/send transactions on the Elrond blockchain and do this without any additional build steps.
+The primary purpose of this tool is to have a lite script for browser usage where you can authenticate and sign/send transactions on the MultiversX blockchain and do this without any additional build steps.
 
 The purpose is to simplify the usage for primary use cases and open the doors for many frontend tools and approaches.
 
-It is a script for browsers incorporates ES6 modules. If you need fully functional JavaScript/Typescript SDK (also in Nodejs), please use [erdjs](https://github.com/ElrondNetwork/elrond-sdk-erdjs), an official Typescriot Elrond SDK. And if you are React developer, please check the [Nextjs dapp](https://github.com/ElrondDevGuild/nextjs-dapp-template).
+It is a script for browsers incorporates ES6 modules. If you need fully functional JavaScript/Typescript SDK (also in Nodejs), please use [sdk-js](https://docs.multiversx.com/sdk-and-tools/sdk-js/), an official Typescript MultiversX SDK. And if you are React developer, please check the [Nextjs dapp](https://github.com/xdevguild/nextjs-dapp-template).
 
 **You can use it already, but it is under active development, and the API might change, and there could be breaking changes without changing major versions.**
 
@@ -60,7 +60,7 @@ or from CDN:
     ContractCallPayloadBuilder,
     ContractFunction,
     U32Value,
-  } from 'https://unpkg.com/elven.js@0.5.0/build/elven.js';
+  } from 'https://unpkg.com/elven.js@0.7.0/build/elven.js';
 
   // Your code here
 </script>
@@ -84,13 +84,13 @@ The types should also be exported.
 
 Check out the example file: [example/index.html](/example/index.html)
 
-You will find the whole demo there. The same that is deployed here: [elvenjs.netlify.app](https://elvenjs.netlify.app)
+You will find the whole demo there. The same is deployed here: [elvenjs.netlify.app](https://elvenjs.netlify.app)
 
 ### What can it do?
 
 The API is limited for now, this will change, but even now, it can do most of the core operations:
 
-- authenticate using the Maiar mobile, Maiar browser extension or Elrond Web Wallet
+- authenticate using the xPortal mobile, MultiversX browser extension or MultiversX Web Wallet
 - handle expiration of the auth state
 - handle login with tokens to be able to get the signature
 - sign transactions
@@ -138,17 +138,17 @@ Check for more complete examples in the [example/index.html](/example/index.html
 
 ### Articles
 
-- [How to Interact With the Elrond Blockchain in a Simple Static Website](https://hackernoon.com/how-to-interact-with-the-elrond-blockchain-in-a-simple-static-website)
-- [How to enable donations on any website using the Elrond blockchain and EGLD tokens](https://dev.to/juliancwirko/how-to-enable-donations-on-any-website-using-the-elrond-blockchain-and-egld-tokens-3fkf)
+- [How to Interact With the MultiversX Blockchain in a Simple Static Website](https://hackernoon.com/how-to-interact-with-the-elrond-blockchain-in-a-simple-static-website)
+- [How to enable donations on any website using the MultiversX blockchain and EGLD tokens](https://dev.to/juliancwirko/how-to-enable-donations-on-any-website-using-the-elrond-blockchain-and-egld-tokens-3fkf)
 
 ### TODO
 - [Kanban board](https://github.com/juliancwirko/elven.js/projects/1)
 
 ### Other tools
 
-If you need to use Elrond SDK with React-based projects, you can try these tools:
+If you need to use MultiversX SDK with React-based projects, you can try these tools:
 
-- [dapp-core](https://github.com/ElrondNetwork/dapp-core) - for standard React based SPA
+- [sdk-dapp](https://github.com/multiversx/mx-sdk-dapp) - for standard React-based SPA
 - [nextjs-dapp-template](https://github.com/ElrondDevGuild/nextjs-dapp-template) - or Nextjs apps
 
 If you are interested in creating and managing your own PFP NFT collection, you might be interested in:
@@ -158,4 +158,4 @@ If you are interested in creating and managing your own PFP NFT collection, you 
 
 Other tools:
 
-- [Buildo Begins](https://github.com/ElrondDevGuild/buildo-begins) - all Elrond blockchain CLI interactions with erdjs SDK still in progress
+- [Buildo Begins](https://github.com/xdevguild/buildo-begins) - all MultiversX blockchain CLI interactions with sdk-js, still in progress, but usable

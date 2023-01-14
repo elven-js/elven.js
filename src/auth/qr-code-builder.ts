@@ -16,7 +16,7 @@ const buildDeepLink = (walletConnectUri: string) => {
   aElem.setAttribute('href', hrefVal);
   aElem.setAttribute('rel', 'noopener noreferrer nofollow');
   aElem.setAttribute('target', '_blank');
-  aElem.textContent = 'Maiar login';
+  aElem.textContent = 'xPortal mobile login';
   aElem.classList.add('elven-qr-code-deep-link');
 
   return aElem;

@@ -1,5 +1,5 @@
-import { Address } from '@elrondnetwork/erdjs/out/address';
-import { Account } from '@elrondnetwork/erdjs/out/account';
+import { Address } from '@multiversx/sdk-core/out/address';
+import { Account } from '@multiversx/sdk-core/out/account';
 
 import { errorParse } from '../utils/error-parse';
 import { ls } from '../utils/ls-helpers';

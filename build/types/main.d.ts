@@ -1,4 +1,4 @@
-import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
+import { Transaction } from '@multiversx/sdk-core/out/transaction';
 import { ApiNetworkProvider, SmartContractQueryArgs } from './network-provider';
 import { DappProvider, LoginMethodsEnum, LoginOptions, InitOptions } from './types';
 export declare class ElvenJS {
@@ -24,7 +24,7 @@ export declare class ElvenJS {
     /**
      * Query Smart Contracts
      */
-    static queryContract({ address, func, args, value, caller, }: SmartContractQueryArgs): Promise<import("@elrondnetwork/erdjs-network-providers/out/contractQueryResponse").ContractQueryResponse | undefined>;
+    static queryContract({ address, func, args, value, caller, }: SmartContractQueryArgs): Promise<import("@multiversx/sdk-network-providers/out/contractQueryResponse").ContractQueryResponse | undefined>;
     /**
      * Main storage
      */

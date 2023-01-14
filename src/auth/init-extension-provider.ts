@@ -1,4 +1,4 @@
-import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider';
+import { ExtensionProvider } from '@multiversx/sdk-extension-provider';
 import { ls } from '../utils/ls-helpers';
 
 export const initExtensionProvider = async () => {

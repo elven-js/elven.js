@@ -1,4 +1,4 @@
-import { WalletConnectProvider } from '@elrondnetwork/erdjs-wallet-connect-provider';
+import { WalletConnectProvider } from '@multiversx/sdk-wallet-connect-provider';
 import { logout } from './logout';
 import { accountSync } from './account-sync';
 import { EventsStore } from '../events-store';
@@ -9,7 +9,7 @@ export function getBridgeAddressFromNetwork(wcBridgeAddresses: string[]) {
   ];
 }
 
-export const initMaiarMobileProvider = async (elven: any) => {
+export const initMobileProvider = async (elven: any) => {
   const providerHandlers = {
     onClientLogin: () => {
       accountSync(elven), EventsStore.run('onLoggedIn');
