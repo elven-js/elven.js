@@ -2,7 +2,7 @@ import QRCode from 'qrcode';
 import {
   WalletConnectV2Provider,
   PairingTypes,
-} from '@elrondnetwork/erdjs-wallet-connect-provider/out/walletConnectV2Provider';
+} from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { walletConnectDeepLink } from '../utils/constants';
 import { DappProvider } from '../types';
 

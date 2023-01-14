@@ -1,6 +1,13 @@
-### [0.7.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.7.0) (2023-01-...)
-- WalletConnect 2 integration through a new version of `@elrondnetwork/erdjs-wallet-connect-provider` - lets you use 'Maiar Login 2.0'. No fallback for the old method. The Maiar app for Android sometimes shows a message that the connection is taking too much time, but it will connect finally, and hopefully, there will be some improvements for that on the walletconnect side soon.
-- two new callbacks: `onQrPending` and `onQrLoaded` - usedull when waiting for the QR and WalletConnect Pairings list
+### [0.8.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.8.0) (2023-01-...)
+- WalletConnect 2 integration through a new version of `@elrondnetwork/erdjs-wallet-connect-provider` - lets you use 'xPortal Login 2.0'. No fallback for the old method. The Maiar app for Android sometimes shows a message that the connection is taking too much time, but it will connect finally, and hopefully, there will be some improvements for that on the walletconnect side soon.
+- two new callbacks: `onQrPending` and `onQrLoaded` - usefull when waiting for the QR and WalletConnect Pairings list
+
+### [0.7.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.7.0) (2023-01-14)
+- rebrand to multiversx (continuation)
+    - npm packages are replaced
+    - public api/explorer endpoints are replaced
+- update dependencies
+- **Breaking:** `ElvenJS.login('maiar-mobile')` is now `ElvenJS.login('mobile')` and `ElvenJS.login('maiar-browser-extension')` is now `ElvenJS.login('browser-extension')`
 
 ### [0.6.2](https://github.com/juliancwirko/elven.js/releases/tag/v0.6.2) (2022-11-19)
 - added new callbacks for transactions `onTxSent` and `onTxError`. With `onTxSent`, you can get the transaction data before it is finalized on the chain and after signing it. Then you can use `onTxFinalized`. Check the source code of the demo example.

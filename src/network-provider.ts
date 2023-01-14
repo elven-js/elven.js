@@ -1,13 +1,13 @@
 import BigNumber from 'bn.js';
-import { Address } from '@elrondnetwork/erdjs/out/address';
-import { TransactionStatus } from '@elrondnetwork/erdjs-network-providers/out/transactionStatus';
-import { TransactionReceipt } from '@elrondnetwork/erdjs-network-providers/out/transactionReceipt';
-import { TransactionLogs } from '@elrondnetwork/erdjs-network-providers/out/transactionLogs';
-import { ContractResults } from '@elrondnetwork/erdjs-network-providers/out/contractResults';
-import { ContractQueryResponse } from '@elrondnetwork/erdjs-network-providers/out/contractQueryResponse';
-import { ContractQueryRequest } from '@elrondnetwork/erdjs-network-providers/out/contractQueryRequest';
-import { Query } from '@elrondnetwork/erdjs/out/smartcontracts/query';
-import { QueryArguments } from '@elrondnetwork/erdjs/out/smartcontracts/interface';
+import { Address } from '@multiversx/sdk-core/out/address';
+import { TransactionStatus } from '@multiversx/sdk-network-providers/out/transactionStatus';
+import { TransactionReceipt } from '@multiversx/sdk-network-providers/out/transactionReceipt';
+import { TransactionLogs } from '@multiversx/sdk-network-providers/out/transactionLogs';
+import { ContractResults } from '@multiversx/sdk-network-providers/out/contractResults';
+import { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/contractQueryResponse';
+import { ContractQueryRequest } from '@multiversx/sdk-network-providers/out/contractQueryRequest';
+import { Query } from '@multiversx/sdk-core/out/smartcontracts/query';
+import { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts/interface';
 import { networkConfig, defaultChainTypeConfig } from './utils/constants';
 import { InitOptions } from './types';
 

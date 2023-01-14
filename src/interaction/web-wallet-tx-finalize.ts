@@ -1,8 +1,8 @@
 import {
   WALLET_PROVIDER_CALLBACK_PARAM,
   WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED,
-} from '@elrondnetwork/erdjs-web-wallet-provider/out';
-import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
+} from '@multiversx/sdk-web-wallet-provider/out';
+import { Transaction } from '@multiversx/sdk-core/out/transaction';
 import { getParamFromUrl } from '../utils/get-param-from-url';
 import { DappProvider, EventStoreEvents } from '../types';
 import { ApiNetworkProvider } from '../network-provider';

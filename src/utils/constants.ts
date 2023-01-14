@@ -14,7 +14,7 @@ interface NetworkType {
 
 export const LOCAL_STORAGE_KEY = 'elvenjs_state';
 
-export const defaultApiEndpoint = 'https://devnet-api.elrond.com';
+export const defaultApiEndpoint = 'https://devnet-api.multiversx.com';
 
 export const DEFAULT_MIN_GAS_LIMIT = 50_000;
 
@@ -24,7 +24,7 @@ export const DAPP_INIT_ROUTE = '/dapp/init';
 export const defaultChainTypeConfig = 'devnet';
 
 export const walletConnectDeepLink =
-  'https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link=https://maiar.com/';
+  'https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link=https://xportal.com/';
 
 export const defaultWalletConnectV2RelayAddresses = [
   'wss://relay.walletconnect.com',
@@ -39,9 +39,9 @@ export const networkConfig: Record<string, NetworkType> = {
     egldDenomination: '18',
     decimals: '4',
     gasPerDataByte: '1500',
-    walletAddress: 'https://devnet-wallet.elrond.com',
-    apiAddress: 'https://devnet-api.elrond.com',
-    explorerAddress: 'https://devnet-explorer.elrond.com',
+    walletAddress: 'https://devnet-wallet.multiversx.com',
+    apiAddress: 'https://devnet-api.multiversx.com',
+    explorerAddress: 'https://devnet-explorer.multiversx.com',
     apiTimeout: 10000,
   },
   testnet: {
@@ -52,9 +52,9 @@ export const networkConfig: Record<string, NetworkType> = {
     egldDenomination: '18',
     decimals: '4',
     gasPerDataByte: '1500',
-    walletAddress: 'https://testnet-wallet.elrond.com',
-    apiAddress: 'https://testnet-api.elrond.com',
-    explorerAddress: 'https://testnet-explorer.elrond.com',
+    walletAddress: 'https://testnet-wallet.multiversx.com',
+    apiAddress: 'https://testnet-api.multiversx.com',
+    explorerAddress: 'https://testnet-explorer.multiversx.com',
     apiTimeout: 10000,
   },
   mainnet: {
@@ -65,9 +65,9 @@ export const networkConfig: Record<string, NetworkType> = {
     egldDenomination: '18',
     decimals: '4',
     gasPerDataByte: '1500',
-    walletAddress: 'https://wallet.elrond.com',
-    apiAddress: 'https://api.elrond.com',
-    explorerAddress: 'https://explorer.elrond.com',
+    walletAddress: 'https://wallet.multiversx.com',
+    apiAddress: 'https://api.multiversx.com',
+    explorerAddress: 'https://explorer.multiversx.com',
     apiTimeout: 10000,
   },
 };

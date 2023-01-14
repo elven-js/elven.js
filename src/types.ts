@@ -1,7 +1,7 @@
-import { ExtensionProvider } from '@elrondnetwork/erdjs-extension-provider/out/extensionProvider';
-import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
-import { WalletConnectV2Provider } from '@elrondnetwork/erdjs-wallet-connect-provider/out/walletConnectV2Provider';
-import { WalletProvider } from '@elrondnetwork/erdjs-web-wallet-provider/out/walletProvider';
+import { ExtensionProvider } from '@multiversx/sdk-extension-provider/out/extensionProvider';
+import { Transaction } from '@multiversx/sdk-core/out/transaction';
+import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
+import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
 
 export interface InitOptions {
   apiUrl?: string;
@@ -22,9 +22,9 @@ export interface InitOptions {
 
 export enum LoginMethodsEnum {
   ledger = 'ledger',
-  maiarMobile = 'maiar-mobile',
+  mobile = 'mobile',
   webWallet = 'web-wallet',
-  maiarBrowserExtension = 'maiar-browser-extension',
+  browserExtension = 'browser-extension',
 }
 
 export type DappProvider =

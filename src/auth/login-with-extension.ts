@@ -43,7 +43,7 @@ export const loginWithExtension = async (elven: any, token?: string) => {
       EventsStore.run(EventStoreEvents.onLoginPending);
 
       ls.set('address', address);
-      ls.set('loginMethod', LoginMethodsEnum.maiarBrowserExtension);
+      ls.set('loginMethod', LoginMethodsEnum.browserExtension);
       ls.set('expires', getNewLoginExpiresTimestamp());
 
       await accountSync(elven);

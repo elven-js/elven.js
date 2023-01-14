@@ -5,7 +5,7 @@ import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-ne
 import {
   WalletConnectV2Provider,
   SessionEventTypes,
-} from '@elrondnetwork/erdjs-wallet-connect-provider/out/walletConnectV2Provider';
+} from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { EventStoreEvents, LoginMethodsEnum } from '../types';
 import { ls } from '../utils/ls-helpers';
 import { logout } from './logout';
@@ -55,7 +55,7 @@ export const loginWithMobile = async (
         const signature = await elven.dappProvider.getSignature();
 
         ls.set('address', address);
-        ls.set('loginMethod', LoginMethodsEnum.maiarMobile);
+        ls.set('loginMethod', LoginMethodsEnum.mobile);
         ls.set('expires', getNewLoginExpiresTimestamp());
 
         await accountSync(elven);

@@ -1,7 +1,7 @@
 import {
   SessionEventTypes,
   WalletConnectV2Provider,
-} from '@elrondnetwork/erdjs-wallet-connect-provider/out/walletConnectV2Provider';
+} from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { networkConfig } from '../utils/constants';
 import { logout } from './logout';
 import { accountSync } from './account-sync';
@@ -9,7 +9,7 @@ import { EventsStore } from '../events-store';
 import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-network';
 import { EventStoreEvents } from '../types';
 
-export const initMaiarMobileProvider = async (elven: any) => {
+export const initMobileProvider = async (elven: any) => {
   if (
     !elven.initOptions.walletConnectV2ProjectId ||
     !elven.initOptions.chainType

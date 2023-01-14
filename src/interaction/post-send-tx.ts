@@ -1,6 +1,6 @@
-import { Transaction } from '@elrondnetwork/erdjs/out/transaction';
-import { Account } from '@elrondnetwork/erdjs/out/account';
-import { TransactionWatcher } from '@elrondnetwork/erdjs/out/transactionWatcher';
+import { Transaction } from '@multiversx/sdk-core/out/transaction';
+import { Account } from '@multiversx/sdk-core/out/account';
+import { TransactionWatcher } from '@multiversx/sdk-core/out/transactionWatcher';
 import { ApiNetworkProvider } from '../network-provider';
 import { ls } from '../utils/ls-helpers';
 import { EventsStore } from '../events-store';
