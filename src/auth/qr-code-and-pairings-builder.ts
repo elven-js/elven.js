@@ -60,7 +60,7 @@ const buildPairingItem = (pairing: PairingTypes.Struct) => {
   const itemElem = document.createElement('div');
   itemElem.classList.add('elven-wc-pairing-item');
   itemElem.setAttribute('id', 'elven-wc-pairing-item');
-  itemElem.textContent = `${pairing.peerMetadata.description}\n(${pairing.peerMetadata.url})`;
+  itemElem.textContent = `${pairing.peerMetadata?.description}\n(${pairing.peerMetadata?.url})`;
 
   const button = buildPairingsRemoveButton(pairing);
   itemElem.appendChild(button);
