@@ -44,13 +44,13 @@ export enum DappCoreWCV2CustomMethodsEnum {
 }
 
 export enum EventStoreEvents {
-  onLoginPending,
-  onLoggedIn,
-  onQrPending,
-  onQrLoaded,
-  onLogout,
-  onTxStarted,
-  onTxSent,
-  onTxFinalized,
-  onTxError,
+  onLoginPending = 'onLoginPending',
+  onLoggedIn = 'onLoggedIn',
+  onQrPending = 'onQrPending',
+  onQrLoaded = 'onQrLoaded',
+  onLogout = 'onLogout',
+  onTxStarted = 'onTxStarted',
+  onTxSent = 'onTxSent',
+  onTxFinalized = 'onTxFinalized',
+  onTxError = 'onTxError',
 }

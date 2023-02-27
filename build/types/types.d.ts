@@ -34,13 +34,13 @@ export declare enum DappCoreWCV2CustomMethodsEnum {
     erd_cancelAction = "erd_cancelAction"
 }
 export declare enum EventStoreEvents {
-    onLoginPending = 0,
-    onLoggedIn = 1,
-    onQrPending = 2,
-    onQrLoaded = 3,
-    onLogout = 4,
-    onTxStarted = 5,
-    onTxSent = 6,
-    onTxFinalized = 7,
-    onTxError = 8
+    onLoginPending = "onLoginPending",
+    onLoggedIn = "onLoggedIn",
+    onQrPending = "onQrPending",
+    onQrLoaded = "onQrLoaded",
+    onLogout = "onLogout",
+    onTxStarted = "onTxStarted",
+    onTxSent = "onTxSent",
+    onTxFinalized = "onTxFinalized",
+    onTxError = "onTxError"
 }
