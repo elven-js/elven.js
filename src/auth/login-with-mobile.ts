@@ -107,7 +107,8 @@ export const loginWithMobile = async (
         qrCodeElement = await qrCodeAndPairingsBuilder(
           qrCodeContainer,
           wCUri,
-          dappProvider
+          dappProvider,
+          token
         );
 
         EventsStore.run(EventStoreEvents.onQrLoaded);

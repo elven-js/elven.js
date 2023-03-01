@@ -4,7 +4,8 @@ import {
   PairingTypes,
 } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { walletConnectDeepLink } from '../utils/constants';
-import { DappProvider } from '../types';
+import { errorParse } from '../utils/error-parse';
+import { DappProvider, DappCoreWCV2CustomMethodsEnum } from '../types';
 
 const htmlStringToElement = (htmlString: string) => {
   const template = document.createElement('template');
@@ -30,7 +31,6 @@ const buildDeepLink = (walletConnectUri: string) => {
 const buildPairingsContainer = () => {
   const container = document.createElement('div');
   container.classList.add('elven-wc-pairings');
-  container.setAttribute('id', 'elven-wc-pairings');
 
   return container;
 };
@@ -39,33 +39,71 @@ const buildPairingsHeader = () => {
   const headerElem = document.createElement('div');
   headerElem.textContent = 'Existing WalletConnect pairings:';
   headerElem.classList.add('elven-wc-pairings-header');
-  headerElem.setAttribute('id', 'elven-wc-pairings-header');
 
   return headerElem;
 };
 
-const buildPairingsRemoveButton = (pairing: PairingTypes.Struct) => {
+const pairingRemoveControllers: Record<string, AbortController> = {};
+
+const buildPairingsRemoveButton = (
+  pairing: PairingTypes.Struct,
+  removeExistingPairing: (topic: string) => Promise<void>
+) => {
   const btn = document.createElement('button');
   btn.classList.add('elven-wc-pairings-remove-btn');
-  btn.setAttribute('id', 'elven-wc-pairings-remove-btn');
   btn.textContent = '✖';
 
-  // TODO: connect and login logic
-  btn.addEventListener('click', () => console.log('Click, ', pairing));
+  pairingRemoveControllers[pairing.topic] = new AbortController();
+
+  btn.addEventListener('click', () => removeExistingPairing(pairing.topic), {
+    signal: pairingRemoveControllers[pairing.topic].signal,
+  });
 
   return btn;
 };
 
-const buildPairingItem = (pairing: PairingTypes.Struct) => {
-  const itemElem = document.createElement('div');
-  itemElem.classList.add('elven-wc-pairing-item');
-  itemElem.setAttribute('id', 'elven-wc-pairing-item');
-  itemElem.textContent = `${pairing.peerMetadata?.description}\n(${pairing.peerMetadata?.url})`;
+const pairingLoginControllers: Record<string, AbortController> = {};
 
-  const button = buildPairingsRemoveButton(pairing);
+const buildPairingItem = (
+  pairing: PairingTypes.Struct,
+  removeExistingPairing: (topic: string) => Promise<void>,
+  loginThroughExistingPairing: (topic: string) => Promise<void>
+) => {
+  const itemElem = document.createElement('div');
+  const itemTextWrapper = document.createElement('div');
+  itemElem.classList.add('elven-wc-pairing-item');
+  itemElem.setAttribute('id', pairing.topic);
+  itemTextWrapper.classList.add('elven-wc-pairing-item-description');
+  itemTextWrapper.textContent = `${pairing.peerMetadata?.description} (${pairing.peerMetadata?.url})`;
+
+  itemElem.appendChild(itemTextWrapper);
+
+  const button = buildPairingsRemoveButton(pairing, removeExistingPairing);
   itemElem.appendChild(button);
 
+  pairingLoginControllers[pairing.topic] = new AbortController();
+
+  itemElem.addEventListener(
+    'click',
+    () => loginThroughExistingPairing(pairing.topic),
+    { signal: pairingLoginControllers[pairing.topic].signal }
+  );
+
   return itemElem;
+};
+
+const buildPairingItemConfirmMessage = () => {
+  const itemElem = document.createElement('div');
+  itemElem.classList.add('elven-wc-pairing-item-confirm-msessage');
+  itemElem.innerText = 'Confirm on xPortal app!';
+
+  return itemElem;
+};
+
+const removePairingItem = (topic: string) => {
+  if (!topic) return;
+  const pairingElement = document.getElementById(topic);
+  pairingElement?.remove();
 };
 
 const isMobile = () =>
@@ -88,7 +126,8 @@ const generateQRCode = async (walletConnectUri: string) => {
 export const qrCodeAndPairingsBuilder = async (
   qrCodeContainer: string | HTMLElement,
   walletConnectUri: string,
-  dappProvider: DappProvider
+  dappProvider: DappProvider,
+  token?: string
 ) => {
   if (!qrCodeContainer)
     throw new Error(
@@ -126,7 +165,52 @@ export const qrCodeAndPairingsBuilder = async (
   if (containerElem && dappProvider instanceof WalletConnectV2Provider) {
     const wcPairings = dappProvider.pairings;
 
-    if (wcPairings) {
+    const removeExistingPairing = async (topic: string) => {
+      try {
+        if (topic) {
+          await dappProvider.logout({
+            topic,
+          });
+          removePairingItem(topic);
+        }
+      } catch (e) {
+        const err = errorParse(e);
+        console.warn(
+          `Something went wrong trying to remove the existing pairing: ${err}`
+        );
+      } finally {
+        pairingLoginControllers[topic].abort();
+      }
+    };
+
+    const loginThroughExistingPairing = async (topic: string) => {
+      try {
+        const { approval } = await dappProvider.connect({
+          topic,
+          methods: [DappCoreWCV2CustomMethodsEnum.erd_cancelAction],
+        });
+
+        const pairingItemElement = document.getElementById(topic);
+        pairingItemElement?.after(buildPairingItemConfirmMessage());
+
+        await dappProvider.login({
+          approval,
+          token,
+        });
+      } catch (e) {
+        const err = errorParse(e);
+        console.warn(`Something went wrong trying to login the user: ${err}`);
+      } finally {
+        for (const abortController of Object.values(pairingLoginControllers)) {
+          abortController?.abort();
+        }
+        for (const abortController of Object.values(pairingRemoveControllers)) {
+          abortController?.abort();
+        }
+      }
+    };
+
+    if (wcPairings && wcPairings.length > 0) {
       const container = buildPairingsContainer();
       containerElem.appendChild(container);
 
@@ -134,7 +218,11 @@ export const qrCodeAndPairingsBuilder = async (
       container.appendChild(headerElem);
 
       for (const pairing of wcPairings) {
-        const itemElem = buildPairingItem(pairing);
+        const itemElem = buildPairingItem(
+          pairing,
+          removeExistingPairing,
+          loginThroughExistingPairing
+        );
         container.appendChild(itemElem);
       }
     }

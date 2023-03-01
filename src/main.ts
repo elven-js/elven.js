@@ -193,9 +193,14 @@ export class ElvenJS {
    * Logout function
    */
   static async logout() {
-    const isLoggedOut = await logout(this);
-    this.dappProvider = undefined;
-    return isLoggedOut;
+    try {
+      const isLoggedOut = await logout(this);
+      this.dappProvider = undefined;
+      return isLoggedOut;
+    } catch(e) {
+      const err = errorParse(e);
+      console.warn('Something went wrong when logging out: ', err);
+    }
   }
 
   /**

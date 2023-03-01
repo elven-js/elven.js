@@ -1,6 +1,6 @@
 ### [0.8.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.8.0) (2023-03-...)
-- WalletConnect 2 integration through a new version of `@elrondnetwork/erdjs-wallet-connect-provider` - lets you use 'xPortal Login 2.0'. No fallback for the old method. The Maiar app for Android sometimes shows a message that the connection is taking too much time, but it will connect finally, and hopefully, there will be some improvements for that on the walletconnect side soon.
-- two new callbacks: `onQrPending` and `onQrLoaded` - usefull when waiting for the QR and WalletConnect Pairings list
+- WalletConnect 2 integration through a new version of `@elrondnetwork/erdjs-wallet-connect-provider` - lets you use 'xPortal Login'.
+- two new callbacks: `onQrPending` and `onQrLoaded` - usefull when waiting for the QR and WalletConnect Pairings list, but it shouldn't take much time to load
 
 ### [0.7.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.7.0) (2023-01-14)
 - rebrand to multiversx (continuation)

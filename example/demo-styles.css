@@ -51,25 +51,6 @@ a {
   word-break: break-all;
 }
 
-.qr-code-container {
-  max-width: 400px;
-  width: 100%;
-  box-shadow: 0px 0px 26px -8px rgba(66, 68, 90, 0.43);
-  margin: 0 auto;
-  text-align: center;
-}
-
-.qr-code-container .elven-qr-code-deep-link {
-  margin-bottom: 24px;
-  font-size: 16px;
-  display: inline-block;
-  background-color: #000;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-}
-
 @media screen and (max-width: 680px) {
   .header {
     flex-direction: column;
@@ -108,47 +89,6 @@ a {
 
 .overlay.visible {
   display: flex;
-}
-
-/* Elven.js pairings styles - by default it isn't styled */
-
-.elven-wc-pairings {
-  padding-bottom: 20px;
-}
-
-.elven-wc-pairings-header {
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.elven-wc-pairing-item {
-  padding: 20px 10px;
-  border: 1px dashed black;
-  margin-bottom: 10px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  max-width: 90%;
-  cursor: pointer;
-  border-radius: 6px;
-}
-
-.elven-wc-pairings-remove-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  background-color: #0f172a;
-  color: white;
-  float: right;
-  border: 0;
-  border-radius: 100%;
-  cursor: pointer;
-  line-height: 1;
-  font-size: 14px;
 }
 
 /* SPINNER */
@@ -198,4 +138,72 @@ a {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+}
+
+/* Elven.js QR code styles - by default it isn't styled, but you can use these styles or custom ones in your app */
+
+.qr-code-container {
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0px 0px 26px -8px rgba(66, 68, 90, 0.43);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.qr-code-container .elven-qr-code-deep-link {
+  margin-bottom: 24px;
+  font-size: 16px;
+  display: inline-block;
+  background-color: #000;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+}
+
+/* Elven.js pairings styles - by default it isn't styled, but you can use these styles or custom ones in your app */
+
+.elven-wc-pairings {
+  padding-bottom: 20px;
+}
+
+.elven-wc-pairings-header {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.elven-wc-pairing-item {
+  padding: 20px 10px;
+  border: 1px dashed black;
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 90%;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.elven-wc-pairings-remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-color: #0f172a;
+  color: white;
+  float: right;
+  border: 0;
+  border-radius: 100%;
+  cursor: pointer;
+  line-height: 1;
+  font-size: 14px;
+}
+
+.elven-wc-pairing-item-description {
+  text-align: left;
 }
