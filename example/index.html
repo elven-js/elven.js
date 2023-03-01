@@ -65,6 +65,8 @@
     <h5>For styling elements like QR code container and Wallet Connect pairings check <a
         href="https://github.com/juliancwirko/elven.js/blob/main/example/demo-styles.css">demo styles</a>. Each element
       should have a class name.</h5>
+    <h5>Remember to change <i>walletConnectV2ProjectId</i>. You can get yours here <a
+        href="https://cloud.walletconnect.com/sign-in">https://cloud.walletconnect.com/sign-in</a> </h5>
     <p>Authenticate, sign and send transactions and messages on the MultiversX blockchain in the browser. No need for
       bundlers, frameworks, etc. Just attach the script source, and you are ready to go. You can incorporate it into
       your preferred CMS framework like WordPress or an e-commerce system. Plus, it will also work on a standard static
@@ -168,6 +170,7 @@
           apiUrl: 'https://devnet-api.multiversx.com',
           chainType: 'devnet',
           apiTimeout: 10000,
+          // Remember to change it. Get yours here: https://cloud.walletconnect.com/sign-in
           walletConnectV2ProjectId: 'f502675c63610bfe4454080ac86d70e6',
           WalletConnectV2RelayAddresses: ['wss://relay.walletconnect.com'],
           onLoginPending: () => { uiPending(true) },

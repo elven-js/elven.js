@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const esbuild = require('esbuild');
+
 // Bring back if needed
 // const plugin = require('node-stdlib-browser/helpers/esbuild/plugin');
 // const stdLibBrowser = require('node-stdlib-browser');
+
 const fs = require('fs');
 
 esbuild
