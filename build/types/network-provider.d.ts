@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import BigNumber from 'big.js';
+import BigNumber from 'bn.js';
 import { Address } from '@multiversx/sdk-core/out/address';
 import { TransactionStatus } from '@multiversx/sdk-network-providers/out/transactionStatus';
 import { TransactionReceipt } from '@multiversx/sdk-network-providers/out/transactionReceipt';
@@ -7,7 +7,6 @@ import { TransactionLogs } from '@multiversx/sdk-network-providers/out/transacti
 import { ContractResults } from '@multiversx/sdk-network-providers/out/contractResults';
 import { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/contractQueryResponse';
 import { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts/interface';
-import { Buffer } from 'buffer';
 import { InitOptions } from './types';
 export interface IAddress {
     bech32: () => string;

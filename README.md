@@ -149,7 +149,7 @@ Check for more complete examples in the [example/index.html](/example/index.html
 If you need to use MultiversX SDK with React-based projects, you can try these tools:
 
 - [sdk-dapp](https://github.com/multiversx/mx-sdk-dapp) - for standard React-based SPA
-- [nextjs-dapp-template](https://github.com/ElrondDevGuild/nextjs-dapp-template) - or Nextjs apps
+- [nextjs-dapp-template](https://github.com/xdevguild/nextjs-dapp-template) - or Nextjs apps
 
 If you are interested in creating and managing your own PFP NFT collection, you might be interested in:
 

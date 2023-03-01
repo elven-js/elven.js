@@ -1,5 +1,5 @@
-import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out';
-import { LoginMethodsEnum } from '../types';
+import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
+import { EventStoreEvents, LoginMethodsEnum } from '../types';
 import { DAPP_INIT_ROUTE } from '../utils/constants';
 import { errorParse } from '../utils/error-parse';
 import { ls } from '../utils/ls-helpers';
@@ -25,7 +25,7 @@ export const loginWithWebWallet = async (
   };
 
   try {
-    EventsStore.run('onLoginPending');
+    EventsStore.run(EventStoreEvents.onLoginPending);
     ls.set('loginMethod', LoginMethodsEnum.webWallet);
     await dappProvider.login(providerLoginData);
     ls.set('expires', getNewLoginExpiresTimestamp());

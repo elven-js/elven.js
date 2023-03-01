@@ -1,3 +1,2 @@
-import { WalletConnectProvider } from '@multiversx/sdk-wallet-connect-provider';
-export declare function getBridgeAddressFromNetwork(wcBridgeAddresses: string[]): string;
-export declare const initMobileProvider: (elven: any) => Promise<WalletConnectProvider | undefined>;
+import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
+export declare const initMobileProvider: (elven: any) => Promise<WalletConnectV2Provider | undefined>;

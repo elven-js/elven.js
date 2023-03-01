@@ -1,29 +1,41 @@
-import { WalletConnectProvider } from '@multiversx/sdk-wallet-connect-provider';
+import {
+  SessionEventTypes,
+  WalletConnectV2Provider,
+} from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
+import { networkConfig } from '../utils/constants';
 import { logout } from './logout';
 import { accountSync } from './account-sync';
 import { EventsStore } from '../events-store';
-
-export function getBridgeAddressFromNetwork(wcBridgeAddresses: string[]) {
-  return wcBridgeAddresses[
-    Math.floor(Math.random() * wcBridgeAddresses.length)
-  ];
-}
+import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-network';
+import { EventStoreEvents } from '../types';
 
 export const initMobileProvider = async (elven: any) => {
+  if (
+    !elven.initOptions.walletConnectV2ProjectId ||
+    !elven.initOptions.chainType
+  ) {
+    return undefined;
+  }
+
   const providerHandlers = {
     onClientLogin: () => {
-      accountSync(elven), EventsStore.run('onLoggedIn');
+      accountSync(elven), EventsStore.run(EventStoreEvents.onLoggedIn);
     },
     onClientLogout: () => logout(elven),
+    onClientEvent: (event: SessionEventTypes['event']) => {
+      console.log('wc2 session event: ', event);
+    },
   };
 
-  const bridgeAddress = getBridgeAddressFromNetwork(
-    elven.initOptions.walletConnectBridgeAddresses
+  const relayAddress = getRandomAddressFromNetwork(
+    elven.initOptions.walletConnectV2RelayAddresses
   );
 
-  const dappProviderInstance = new WalletConnectProvider(
-    bridgeAddress,
-    providerHandlers
+  const dappProviderInstance = new WalletConnectV2Provider(
+    providerHandlers,
+    networkConfig[elven.initOptions.chainType].shortId,
+    relayAddress,
+    elven.initOptions.walletConnectV2ProjectId
   );
 
   try {

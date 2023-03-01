@@ -1,4 +1,4 @@
-import { ExtensionProvider } from '@multiversx/sdk-extension-provider';
+import { ExtensionProvider } from '@multiversx/sdk-extension-provider/out/extensionProvider';
 import { ls } from '../utils/ls-helpers';
 
 export const initExtensionProvider = async () => {

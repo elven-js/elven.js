@@ -1,5 +1,4 @@
-import BigNumber from 'big.js';
-import { networkConfig, defaultChainTypeConfig } from './utils/constants';
+import BigNumber from 'bn.js';
 import { Address } from '@multiversx/sdk-core/out/address';
 import { TransactionStatus } from '@multiversx/sdk-network-providers/out/transactionStatus';
 import { TransactionReceipt } from '@multiversx/sdk-network-providers/out/transactionReceipt';
@@ -9,7 +8,7 @@ import { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/con
 import { ContractQueryRequest } from '@multiversx/sdk-network-providers/out/contractQueryRequest';
 import { Query } from '@multiversx/sdk-core/out/smartcontracts/query';
 import { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts/interface';
-import { Buffer } from 'buffer';
+import { networkConfig, defaultChainTypeConfig } from './utils/constants';
 import { InitOptions } from './types';
 
 export interface IAddress {
