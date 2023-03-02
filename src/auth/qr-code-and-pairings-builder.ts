@@ -22,7 +22,7 @@ const buildDeepLink = (walletConnectUri: string) => {
   aElem.setAttribute('href', hrefVal);
   aElem.setAttribute('rel', 'noopener noreferrer nofollow');
   aElem.setAttribute('target', '_blank');
-  aElem.textContent = 'Maiar login';
+  aElem.textContent = 'xPortal login';
   aElem.classList.add('elven-qr-code-deep-link');
 
   return aElem;
@@ -55,9 +55,16 @@ const buildPairingsRemoveButton = (
 
   pairingRemoveControllers[pairing.topic] = new AbortController();
 
-  btn.addEventListener('click', () => removeExistingPairing(pairing.topic), {
-    signal: pairingRemoveControllers[pairing.topic].signal,
-  });
+  btn.addEventListener(
+    'click',
+    (e) => {
+      e.stopImmediatePropagation();
+      removeExistingPairing(pairing.topic);
+    },
+    {
+      signal: pairingRemoveControllers[pairing.topic].signal,
+    }
+  );
 
   return btn;
 };

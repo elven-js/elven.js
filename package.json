@@ -1,6 +1,6 @@
 {
   "name": "elven.js",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Authenticate, sign and send transactions on the MultiversX blockchain in the browser.",
   "browser": {
     ".": "./build/elven.js"

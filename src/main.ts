@@ -197,7 +197,7 @@ export class ElvenJS {
       const isLoggedOut = await logout(this);
       this.dappProvider = undefined;
       return isLoggedOut;
-    } catch(e) {
+    } catch (e) {
       const err = errorParse(e);
       console.warn('Something went wrong when logging out: ', err);
     }

@@ -191,7 +191,10 @@
     document.getElementById('button-login-extension').addEventListener('click', async () => {
       try {
         clearQrCodeContainer();
-        await ElvenJS.login('browser-extension');
+        await ElvenJS.login('browser-extension', {
+          // The token is optional, but without it you won't get the signature back, if you don't need it you can omit passing it
+          token: 'your_token_here' 
+        });
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);
       }
@@ -204,6 +207,8 @@
           // You can also use the DOM element here: 
           // qrCodeContainer: document.querySelector('#qr-code-container')
           qrCodeContainer: 'qr-code-container',
+          // The token is optional, but without it you won't get the signature back, if you don't need it you can omit passing it
+          token: 'your_token_here' 
         });
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);
@@ -213,7 +218,11 @@
     document.getElementById('button-login-web').addEventListener('click', async () => {
       try {
         clearQrCodeContainer();
-        await ElvenJS.login('web-wallet', { callbackRoute: '/' });
+        await ElvenJS.login('web-wallet', {
+          callbackRoute: '/',
+          // The token is optional, but without it you won't get the signature back, if you don't need it you can omit passing it
+          token: 'your_token_here' 
+        });
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);
       }
