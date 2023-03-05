@@ -47,13 +47,14 @@ export const loginWithExtension = async (elven: any, token?: string) => {
 
       await accountSync(elven);
 
+      EventsStore.run(EventStoreEvents.onLoggedIn);
+
       return dappProvider;
     } catch (e: any) {
       console.warn(
         `Something went wrong trying to synchronize the user account: ${e?.message}`
       );
-    } finally {
-      EventsStore.run(EventStoreEvents.onLoggedIn);
+      EventsStore.run(EventStoreEvents.onLogout);
     }
   }
 };

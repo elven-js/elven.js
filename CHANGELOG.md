@@ -1,3 +1,6 @@
+### [0.8.2](https://github.com/juliancwirko/elven.js/releases/tag/v0.8.2) (2023-03-05)
+- fix browser extension signing states
+
 ### [0.8.1](https://github.com/juliancwirko/elven.js/releases/tag/v0.8.1) (2023-03-02)
 - minor improvements in the code and demo
 
