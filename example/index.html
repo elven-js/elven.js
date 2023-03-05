@@ -172,7 +172,7 @@
           apiTimeout: 10000,
           // Remember to change it. Get yours here: https://cloud.walletconnect.com/sign-in
           walletConnectV2ProjectId: 'f502675c63610bfe4454080ac86d70e6',
-          WalletConnectV2RelayAddresses: ['wss://relay.walletconnect.com'],
+          walletConnectV2RelayAddresses: ['wss://relay.walletconnect.com'],
           onLoginPending: () => { uiPending(true) },
           onLoggedIn: () => { uiLoggedInState(true); uiPending(false); },
           onLogout: () => { uiLoggedInState(false); },
