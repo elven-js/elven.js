@@ -1,3 +1,11 @@
+### [0.9.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.9.0) (2023-04-08)
+- migrate to MultiversX JS SDK 12.1.0 **(breaking changes):**
+  - `TokenPayment` is now `TokenTransfer`
+  - `ESDTNFTTransferPayloadBuilder` and `ESDTTransferPayloadBuilder` are deprecated and removed, instead please use `TransferTransactionsFactory`
+  - `ContractCallPayloadBuilder` is removed, please use `SmartContract.call` instead
+  - See all changes in the [example](example/index.html), also please check [MultiversX SDK JS Cookbook](https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook/#signing-objects) for how to  build payload structures
+- update dependecies
+
 ### [0.8.2](https://github.com/juliancwirko/elven.js/releases/tag/v0.8.2) (2023-03-05)
 - fix browser extension signing states
 
