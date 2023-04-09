@@ -102,6 +102,7 @@ const buildPairingItem = (
 const buildPairingItemConfirmMessage = () => {
   const itemElem = document.createElement('div');
   itemElem.classList.add('elven-wc-pairing-item-confirm-msessage');
+  itemElem.setAttribute('id', 'elven-wc-pairing-item-confirm-msessage');
   itemElem.innerText = 'Confirm on xPortal app!';
 
   return itemElem;
@@ -194,11 +195,17 @@ export const qrCodeAndPairingsBuilder = async (
       try {
         const { approval } = await dappProvider.connect({
           topic,
-          methods: [DappCoreWCV2CustomMethodsEnum.erd_cancelAction],
+          methods: [DappCoreWCV2CustomMethodsEnum.mvx_cancelAction],
         });
 
-        const pairingItemElement = document.getElementById(topic);
-        pairingItemElement?.after(buildPairingItemConfirmMessage());
+        const pairingItemConfirmation = document.getElementById(
+          'elven-wc-pairing-item-confirm-msessage'
+        );
+
+        if (!pairingItemConfirmation) {
+          const pairingItemElement = document.getElementById(topic);
+          pairingItemElement?.after(buildPairingItemConfirmMessage());
+        }
 
         await dappProvider.login({
           approval,

@@ -40,7 +40,7 @@ export interface LoginOptions {
 }
 
 export enum DappCoreWCV2CustomMethodsEnum {
-  erd_cancelAction = 'erd_cancelAction',
+  mvx_cancelAction = 'mvx_cancelAction',
 }
 
 export enum EventStoreEvents {
