@@ -38,8 +38,7 @@ Just copy and include the `elven.js` script from the `build` directory (in this 
     Transaction,
     Address,
     TransactionPayload,
-    TokenPayment,
-    ContractCallPayloadBuilder,
+    TokenTransfer,
     ContractFunction,
     U32Value,
   } from './elven.js';
@@ -56,15 +55,30 @@ or from CDN:
     Transaction,
     Address,
     TransactionPayload,
-    TokenPayment,
-    ContractCallPayloadBuilder,
+    TokenTransfer,
     ContractFunction,
     U32Value,
-  } from 'https://unpkg.com/elven.js@0.7.0/build/elven.js';
+  } from 'https://unpkg.com/elven.js@0.9.0/build/elven.js';
 
   // Your code here
 </script>
 ```
+
+### SDK reference
+
+Please check the docs here: [www.elvenjs.com/docs/sdk-reference.html](https://www.elvenjs.com/docs/sdk-reference.html)
+
+### Recipes
+
+Please check how to use it with a couple of recipes here: [www.elvenjs.com/docs/recipes.html](https://www.elvenjs.com/docs/recipes.html)
+
+Check for more complete examples in the [example/index.html](/example/index.html)
+
+### Usage example with static website (base demo): 
+
+Check out the example file: [example/index.html](/example/index.html)
+
+You will find the whole demo there. The same is deployed here: [elvenjs.netlify.app](https://elvenjs.netlify.app)
 
 ### Usage in frontend frameworks
 
@@ -79,12 +93,6 @@ import { ElvenJS } from 'elven.js';
 ```
 
 The types should also be exported.
-
-### Usage example with static website (base demo): 
-
-Check out the example file: [example/index.html](/example/index.html)
-
-You will find the whole demo there. The same is deployed here: [elvenjs.netlify.app](https://elvenjs.netlify.app)
 
 ### What can it do?
 
@@ -117,16 +125,6 @@ The API is limited for now, this will change, but even now, it can do most of th
 
 Why? Because it is supposed to be a browser script, it should be as small as possible. All that functionality can be replaced if needed by a custom implementation or other libraries. There will be docs with examples for that. And in the future, there may be more similar libraries, but optional and separated.
 
-### SDK reference
-
-Please check the docs here: [www.elvenjs.com/docs/sdk-reference.html](https://www.elvenjs.com/docs/sdk-reference.html)
-
-### Recipes
-
-Please check how to use it with a couple of recipes here: [www.elvenjs.com/docs/recipes.html](https://www.elvenjs.com/docs/recipes.html)
-
-Check for more complete examples in the [example/index.html](/example/index.html)
-
 ### Development
 
 1. clone the repo
@@ -134,7 +132,6 @@ Check for more complete examples in the [example/index.html](/example/index.html
 3. `npm run build`
 4. test on example -> `npm run dev:server`
 5. rebuild with every change in the script
-
 
 ### Articles
 
@@ -150,6 +147,7 @@ If you need to use MultiversX SDK with React-based projects, you can try these t
 
 - [sdk-dapp](https://github.com/multiversx/mx-sdk-dapp) - for standard React-based SPA
 - [nextjs-dapp-template](https://github.com/xdevguild/nextjs-dapp-template) - or Nextjs apps
+- [useElven](https://www.useelven.com) - React Hooks for interacting with MultiversX blockchain
 
 If you are interested in creating and managing your own PFP NFT collection, you might be interested in:
 
