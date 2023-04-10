@@ -153,12 +153,13 @@
       Transaction,
       Address,
       TransactionPayload,
-      TokenPayment,
-      ContractCallPayloadBuilder,
-      ContractFunction,
+      TokenTransfer,
+      TransferTransactionsFactory,
       U32Value,
-      ESDTTransferPayloadBuilder,
       AddressValue,
+      SmartContract,
+      GasEstimator,
+      ContractFunction
     } from './elven.js';
 
     // Options are the defaults and here only to show all of them
@@ -249,7 +250,7 @@
         gasLimit: 50000 + 1500 * demoMessage.length,
         chainID: 'D',
         data: new TransactionPayload(demoMessage),
-        value: TokenPayment.egldFromAmount(0.001),
+        value: TokenTransfer.egldFromAmount(0.001),
         sender: new Address(ElvenJS.storage.get('address')),
       });
 
@@ -270,16 +271,16 @@
       // You need to know its ticker and how many decimals places it has
       // In this case, the token has 18 decimal places. You can check it in the MultiversX devnet explorer
       // You can use the community-based faucet to get the BUILDO-890d14 token: https://r3d4.fr/faucet
-      const payment = TokenPayment.fungibleFromAmount(
+      const transfer = TokenTransfer.fungibleFromAmount(
         'BUILDO-890d14',
         '1',
         18
       );
-      const data = new ESDTTransferPayloadBuilder().setPayment(payment).build();
 
-      const tx = new Transaction({
-        data,
-        gasLimit: 50000 + 1500 * data.length() + 300000,
+      const factory = new TransferTransactionsFactory(new GasEstimator());
+
+      const tx = factory.createESDTTransfer({
+        tokenTransfer: transfer,
         receiver: new Address(esdtTransferAddress),
         sender: new Address(ElvenJS.storage.get('address')),
         chainID: 'D',
@@ -296,21 +297,20 @@
     // It mints on the smart contract from: https://dapp-demo.elven.tools/
     const nftMinterSmartContract = 'erd1qqqqqqqqqqqqqpgqztp5vpqrxe2tha224jwsa3sv2800a88zgtksar2kc8';
     document.getElementById('button-mint').addEventListener('click', async () => {
+
       updateTxHashContainer(false);
-      const data = new ContractCallPayloadBuilder()
-        .setFunction(new ContractFunction('mint'))
-        .setArgs([new U32Value(1)])
-        .build();
 
-      const tx = new Transaction({
-        data,
+      const contractAddress = new Address(nftMinterSmartContract);
+      const contract = new SmartContract({ address: contractAddress });
+
+      const tx = contract.call({
+        caller: new Address(ElvenJS.storage.get('address')),
+        value: TokenTransfer.egldFromAmount(0.01),
+        func: new ContractFunction("mint"),
         gasLimit: 14000000,
-        value: TokenPayment.egldFromAmount(0.01),
-        chainID: 'D',
-        receiver: new Address(nftMinterSmartContract),
-        sender: new Address(ElvenJS.storage.get('address')),
-      });
-
+        args: [new U32Value(1)],
+        chainID: "D"
+      })
       try {
         await ElvenJS.signAndSendTransaction(tx);
       } catch (e) {
@@ -328,6 +328,7 @@
       try {
         updateQueryResultContainer();
         uiPending(true);
+
         const results = await ElvenJS.queryContract({
           address: new Address(nftMinterSmartContract),
           func: new ContractFunction('getMintedPerAddressTotal'),
@@ -337,8 +338,14 @@
         uiPending(false);
 
         // Manual decoding of a simple type (number here), there will be additional tools for that
+        // For more possibilities, for now please check data converter in Buildo CLI: 
+        // https://github.com/xdevguild/buildo-begins/blob/main/src/converters.ts
         const hexVal = base64ToDecimalHex(results?.returnData?.[0]);
-        updateQueryResultContainer(`➡️ The result of the query is: ${parseInt(hexVal, 16)}`);
+        let intVal = 0;
+        if (hexVal) {
+          intVal = parseInt(hexVal, 16);
+        }
+        updateQueryResultContainer(`➡️ The result of the query is: ${intVal}`);
       } catch (e) {
         uiPending(false);
         throw new Error(e?.message);

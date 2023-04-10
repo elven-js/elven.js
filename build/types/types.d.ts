@@ -31,7 +31,7 @@ export interface LoginOptions {
     callbackRoute?: string;
 }
 export declare enum DappCoreWCV2CustomMethodsEnum {
-    erd_cancelAction = "erd_cancelAction"
+    mvx_cancelAction = "mvx_cancelAction"
 }
 export declare enum EventStoreEvents {
     onLoginPending = "onLoginPending",

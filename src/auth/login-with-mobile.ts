@@ -95,8 +95,10 @@ export const loginWithMobile = async (
 
       EventsStore.run(EventStoreEvents.onQrPending);
 
+      await dappProvider.init();
+
       const { uri: walletConnectUri, approval } = await dappProvider.connect({
-        methods: [DappCoreWCV2CustomMethodsEnum.erd_cancelAction],
+        methods: [DappCoreWCV2CustomMethodsEnum.mvx_cancelAction],
       });
 
       const wCUri = token
@@ -124,5 +126,6 @@ export const loginWithMobile = async (
   } catch (e) {
     const err = errorParse(e);
     console.warn(`Something went wrong trying to login the user: ${err}`);
+    EventsStore.run(EventStoreEvents.onLogout);
   }
 };
