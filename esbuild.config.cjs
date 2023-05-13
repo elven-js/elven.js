@@ -10,7 +10,7 @@ esbuild
       global: 'global',
       process: 'process',
       Buffer: 'Buffer',
-      'process.env.NODE_ENV': 'production',
+      'process.env.NODE_ENV': '"production"',
     },
     format: 'esm',
     entryPoints: ['./src/elven.ts'],

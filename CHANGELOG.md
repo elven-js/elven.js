@@ -1,3 +1,6 @@
+### [0.9.1](https://github.com/juliancwirko/elven.js/releases/tag/v0.9.1) (2023-05-13)
+- update dependencies: sdk-core, sdk-web-wallet-provider and others
+
 ### [0.9.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.9.0) (2023-04-10)
 - migrate to MultiversX JS SDK 12.1.0 **(breaking changes):**
   - `TokenPayment` is now `TokenTransfer`
