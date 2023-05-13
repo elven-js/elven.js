@@ -1,18 +1,16 @@
 {
   "name": "elven.js",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Authenticate, sign and send transactions on the MultiversX blockchain in the browser.",
-  "browser": {
-    ".": "./build/elven.js"
-  },
-  "main": "build/elven.js",
+  "type": "module",
   "module": "build/elven.js",
   "types": "build/types/elven.d.ts",
   "exports": {
     ".": {
       "types": "./build/types/elven.d.ts",
       "import": "./build/elven.js",
-      "default": "./build/elven.js"
+      "default": "./build/elven.js",
+      "browser": "./build/elven.js"
     },
     "./package.json": "./package.json"
   },

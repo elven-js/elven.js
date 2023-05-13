@@ -1,3 +1,6 @@
+### [0.9.2](https://github.com/juliancwirko/elven.js/releases/tag/v0.9.2) (2023-05-13)
+- changes in package.json configuration
+
 ### [0.9.1](https://github.com/juliancwirko/elven.js/releases/tag/v0.9.1) (2023-05-13)
 - update dependencies: sdk-core, sdk-web-wallet-provider and others
 
