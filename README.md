@@ -10,9 +10,8 @@
 
 ## Demos
 - [elvenjs.netlify.app](https://elvenjs.netlify.app/) - EGLD, ESDT transactions, smart contract queries and transactions
-- [elrond-donate-widget-demo.netlify.app](https://multiversx-donate-widget-demo.netlify.app/) - donation-like widget demo on Astro based blog example
+- [elrond-donate-widget-demo.netlify.app](https://multiversx-donate-widget-demo.netlify.app/) - donation-like widget demo
 - [StackBlitz vanilla html demo](https://stackblitz.com/edit/web-platform-d4rx5v?file=index.html)
-- [StackBlitz Astro demo](https://stackblitz.com/edit/withastro-astro-pwareu?file=src%2Fpages%2Findex.astro)
 - [StackBlitz Solid.js demo](https://stackblitz.com/edit/vitejs-vite-rbo6du?file=src/App.tsx)
 - [StackBlitz React demo](https://stackblitz.com/edit/vitejs-vite-qr2u7l?file=src/App.tsx)
 - [StackBlitz Vue demo](https://stackblitz.com/edit/vue-zrb8y5?file=src/App.vue)
