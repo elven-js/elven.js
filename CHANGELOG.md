@@ -1,3 +1,6 @@
+### [0.10.1](https://github.com/juliancwirko/elven.js/releases/tag/v0.10.1) (2023-05-23)
+- fix native auth when used with web wallet provider
+
 ### [0.10.0](https://github.com/juliancwirko/elven.js/releases/tag/v0.10.0) (2023-05-23)
 - **Breaking** switch to using `sdk-native-auth-client` instead passing string-based login tokens, there is no fallback or other option, so it is a breaking change. Native Auth is recommended. The old way of doing that will be deprecated. Please freeze the previous version if you are not ready to switch yet
 

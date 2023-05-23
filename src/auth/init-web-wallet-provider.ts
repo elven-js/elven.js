@@ -25,12 +25,12 @@ export const initWebWalletProvider = async (
       `${webWalletAddress}${DAPP_INIT_ROUTE}`
     );
 
-    if (signature && apiUrl && lsAddress) {
+    if (signature && apiUrl && urlAddress) {
       const nativeAuthClient = new NativeAuthClient({
         apiUrl,
       });
       const accessToken = nativeAuthClient.getToken(
-        lsAddress,
+        urlAddress,
         loginToken,
         signature
       );
