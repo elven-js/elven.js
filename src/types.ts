@@ -35,7 +35,6 @@ export type DappProvider =
 
 export interface LoginOptions {
   qrCodeContainer?: string | HTMLElement;
-  token?: string;
   callbackRoute?: string;
 }
 

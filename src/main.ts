@@ -3,6 +3,7 @@ import { initExtensionProvider } from './auth/init-extension-provider';
 import { ExtensionProvider } from '@multiversx/sdk-extension-provider/out/extensionProvider';
 import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
+import { NativeAuthClient } from '@multiversx/sdk-native-auth-client/lib/src/native.auth.client';
 import { initMobileProvider } from './auth/init-mobile-provider';
 import { ls } from './utils/ls-helpers';
 import { ApiNetworkProvider, SmartContractQueryArgs } from './network-provider';
@@ -119,7 +120,8 @@ export class ElvenJS {
         this.initOptions.chainType
       ) {
         this.dappProvider = await initWebWalletProvider(
-          networkConfig[this.initOptions.chainType].walletAddress
+          networkConfig[this.initOptions.chainType].walletAddress,
+          this.initOptions.apiUrl
         );
       }
 
@@ -154,10 +156,20 @@ export class ElvenJS {
       throw new Error('Error: Login failed: Use ElvenJs.init() first!');
     }
 
+    // Native auth login token initialization
+    const nativeAuthClient = new NativeAuthClient({
+      apiUrl: this.initOptions?.apiUrl,
+    });
+    const loginToken = await nativeAuthClient.initialize();
+
     try {
       // Login with browser extension
       if (loginMethod === LoginMethodsEnum.browserExtension) {
-        const dappProvider = await loginWithExtension(this, options?.token);
+        const dappProvider = await loginWithExtension(
+          this,
+          loginToken,
+          nativeAuthClient
+        );
         this.dappProvider = dappProvider;
       }
 
@@ -165,8 +177,9 @@ export class ElvenJS {
       if (loginMethod === LoginMethodsEnum.mobile) {
         const dappProvider = await loginWithMobile(
           this,
-          options?.qrCodeContainer,
-          options?.token
+          loginToken,
+          nativeAuthClient,
+          options?.qrCodeContainer
         );
         this.dappProvider = dappProvider;
       }
@@ -178,8 +191,8 @@ export class ElvenJS {
       ) {
         const dappProvider = await loginWithWebWallet(
           networkConfig[this.initOptions.chainType].walletAddress,
-          options?.callbackRoute,
-          options?.token
+          loginToken,
+          options?.callbackRoute
         );
         this.dappProvider = dappProvider;
       }

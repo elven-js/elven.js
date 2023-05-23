@@ -5,8 +5,13 @@ import { EventStoreEvents, LoginMethodsEnum } from '../types';
 import { getNewLoginExpiresTimestamp } from './expires-at';
 import { accountSync } from './account-sync';
 import { EventsStore } from '../events-store';
+import { NativeAuthClient } from '@multiversx/sdk-native-auth-client/lib/src/native.auth.client';
 
-export const loginWithExtension = async (elven: any, token?: string) => {
+export const loginWithExtension = async (
+  elven: any,
+  loginToken: string,
+  nativeAuthClient: NativeAuthClient
+) => {
   const dappProvider = await initExtensionProvider();
 
   try {
@@ -25,15 +30,13 @@ export const loginWithExtension = async (elven: any, token?: string) => {
 
   const { signature } = dappProvider.account;
 
-  if (token) {
-    ls.set('loginToken', token);
-  }
+  ls.set('loginToken', loginToken);
 
   if (signature) {
     ls.set('signature', signature);
   }
 
-  if (elven.networkProvider) {
+  if (elven.networkProvider && signature) {
     try {
       const address = await dappProvider.getAddress();
 
@@ -48,6 +51,13 @@ export const loginWithExtension = async (elven: any, token?: string) => {
       await accountSync(elven);
 
       EventsStore.run(EventStoreEvents.onLoggedIn);
+
+      const accessToken = nativeAuthClient.getToken(
+        address,
+        loginToken,
+        signature
+      );
+      ls.set('accessToken', accessToken);
 
       return dappProvider;
     } catch (e: any) {

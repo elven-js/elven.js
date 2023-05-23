@@ -13,11 +13,13 @@ import { getNewLoginExpiresTimestamp } from './expires-at';
 import { accountSync } from './account-sync';
 import { EventsStore } from '../events-store';
 import { DappCoreWCV2CustomMethodsEnum } from '../types';
+import { NativeAuthClient } from '@multiversx/sdk-native-auth-client/lib/src/native.auth.client';
 
 export const loginWithMobile = async (
   elven: any,
-  qrCodeContainer?: string | HTMLElement,
-  token?: string
+  loginToken: string,
+  nativeAuthClient: NativeAuthClient,
+  qrCodeContainer?: string | HTMLElement
 ) => {
   if (!qrCodeContainer) {
     throw new Error(
@@ -63,9 +65,15 @@ export const loginWithMobile = async (
         if (signature) {
           ls.set('signature', signature);
         }
-        if (token) {
-          ls.set('loginToken', token);
-        }
+
+        ls.set('loginToken', loginToken);
+
+        const accessToken = nativeAuthClient.getToken(
+          address,
+          loginToken,
+          signature
+        );
+        ls.set('accessToken', accessToken);
 
         EventsStore.run(EventStoreEvents.onLoggedIn);
         qrCodeElement?.replaceChildren();
@@ -101,8 +109,8 @@ export const loginWithMobile = async (
         methods: [DappCoreWCV2CustomMethodsEnum.mvx_cancelAction],
       });
 
-      const wCUri = token
-        ? `${walletConnectUri}&token=${token}`
+      const wCUri = loginToken
+        ? `${walletConnectUri}&token=${loginToken}`
         : walletConnectUri;
 
       if (qrCodeContainer && wCUri) {
@@ -110,7 +118,7 @@ export const loginWithMobile = async (
           qrCodeContainer,
           wCUri,
           dappProvider,
-          token
+          loginToken
         );
 
         EventsStore.run(EventStoreEvents.onQrLoaded);
@@ -118,7 +126,7 @@ export const loginWithMobile = async (
 
       await dappProvider.login({
         approval,
-        token,
+        token: loginToken,
       });
 
       return dappProvider;

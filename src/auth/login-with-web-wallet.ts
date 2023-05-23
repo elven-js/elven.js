@@ -8,8 +8,8 @@ import { EventsStore } from '../events-store';
 
 export const loginWithWebWallet = async (
   webWalletAddress: string,
-  callbackRoute?: string,
-  token?: string
+  loginToken: string,
+  callbackRoute?: string
 ) => {
   const dappProvider = new WalletProvider(
     `${webWalletAddress}${DAPP_INIT_ROUTE}`
@@ -21,7 +21,7 @@ export const loginWithWebWallet = async (
       : '/';
   const providerLoginData = {
     callbackUrl,
-    ...(token ? { token } : {}),
+    token: loginToken,
   };
 
   try {
@@ -29,9 +29,7 @@ export const loginWithWebWallet = async (
     ls.set('loginMethod', LoginMethodsEnum.webWallet);
     await dappProvider.login(providerLoginData);
     ls.set('expires', getNewLoginExpiresTimestamp());
-    if (token) {
-      ls.set('loginToken', token);
-    }
+    ls.set('loginToken', loginToken);
     return dappProvider;
   } catch (e) {
     const err = errorParse(e);

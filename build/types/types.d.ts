@@ -27,7 +27,6 @@ export declare enum LoginMethodsEnum {
 export type DappProvider = ExtensionProvider | WalletConnectV2Provider | WalletProvider | undefined;
 export interface LoginOptions {
     qrCodeContainer?: string | HTMLElement;
-    token?: string;
     callbackRoute?: string;
 }
 export declare enum DappCoreWCV2CustomMethodsEnum {
