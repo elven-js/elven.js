@@ -138,7 +138,7 @@ Why? Because it is supposed to be a browser script, it should be as small as pos
 - [How to enable donations on any website using the MultiversX blockchain and EGLD tokens](https://dev.to/juliancwirko/how-to-enable-donations-on-any-website-using-the-elrond-blockchain-and-egld-tokens-3fkf)
 
 ### TODO
-- [Kanban board](https://github.com/juliancwirko/elven.js/projects/1)
+- [Kanban board](https://github.com/elven-js/projects/1)
 
 ### Other tools
 
