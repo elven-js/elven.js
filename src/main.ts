@@ -168,7 +168,8 @@ export class ElvenJS {
         const dappProvider = await loginWithExtension(
           this,
           loginToken,
-          nativeAuthClient
+          nativeAuthClient,
+          options?.callbackRoute
         );
         this.dappProvider = dappProvider;
       }

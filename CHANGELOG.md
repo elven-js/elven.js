@@ -1,3 +1,6 @@
+### [0.10.2](https://github.com/juliancwirko/elven.js/releases/tag/v0.10.2) (2023-05-29)
+- fix native auth when signing using browser extension
+
 ### [0.10.1](https://github.com/juliancwirko/elven.js/releases/tag/v0.10.1) (2023-05-23)
 - fix native auth when used with web wallet provider
 

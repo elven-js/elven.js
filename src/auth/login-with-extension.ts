@@ -10,12 +10,21 @@ import { NativeAuthClient } from '@multiversx/sdk-native-auth-client/lib/src/nat
 export const loginWithExtension = async (
   elven: any,
   loginToken: string,
-  nativeAuthClient: NativeAuthClient
+  nativeAuthClient: NativeAuthClient,
+  callbackRoute = '/'
 ) => {
   const dappProvider = await initExtensionProvider();
 
+  const callbackUrl: string = encodeURIComponent(
+    `${window.location.origin}${callbackRoute}`
+  );
+  const providerLoginData = {
+    callbackUrl,
+    token: loginToken,
+  };
+
   try {
-    if (dappProvider) await dappProvider.login();
+    if (dappProvider) await dappProvider.login(providerLoginData);
     EventsStore.run(EventStoreEvents.onLoginPending);
   } catch (e) {
     const err = errorParse(e);
