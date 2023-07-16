@@ -40,6 +40,7 @@ export interface LoginOptions {
 
 export enum DappCoreWCV2CustomMethodsEnum {
   mvx_cancelAction = 'mvx_cancelAction',
+  mvx_signNativeAuthToken = 'mvx_signNativeAuthToken',
 }
 
 export enum EventStoreEvents {

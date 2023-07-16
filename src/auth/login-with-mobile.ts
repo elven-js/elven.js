@@ -106,7 +106,10 @@ export const loginWithMobile = async (
       await dappProvider.init();
 
       const { uri: walletConnectUri, approval } = await dappProvider.connect({
-        methods: [DappCoreWCV2CustomMethodsEnum.mvx_cancelAction],
+        methods: [
+          DappCoreWCV2CustomMethodsEnum.mvx_cancelAction,
+          DappCoreWCV2CustomMethodsEnum.mvx_signNativeAuthToken,
+        ],
       });
 
       const wCUri = loginToken

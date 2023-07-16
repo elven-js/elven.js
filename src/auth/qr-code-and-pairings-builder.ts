@@ -195,7 +195,10 @@ export const qrCodeAndPairingsBuilder = async (
       try {
         const { approval } = await dappProvider.connect({
           topic,
-          methods: [DappCoreWCV2CustomMethodsEnum.mvx_cancelAction],
+          methods: [
+            DappCoreWCV2CustomMethodsEnum.mvx_cancelAction,
+            DappCoreWCV2CustomMethodsEnum.mvx_signNativeAuthToken,
+          ],
         });
 
         const pairingItemConfirmation = document.getElementById(

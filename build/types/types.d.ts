@@ -30,7 +30,8 @@ export interface LoginOptions {
     callbackRoute?: string;
 }
 export declare enum DappCoreWCV2CustomMethodsEnum {
-    mvx_cancelAction = "mvx_cancelAction"
+    mvx_cancelAction = "mvx_cancelAction",
+    mvx_signNativeAuthToken = "mvx_signNativeAuthToken"
 }
 export declare enum EventStoreEvents {
     onLoginPending = "onLoginPending",

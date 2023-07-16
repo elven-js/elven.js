@@ -26,9 +26,6 @@
 </head>
 
 <body>
-  <div class="overlay">
-    <div class="loader">Loading...</div>
-  </div>
   <div class="container">
     <div class="header" id="header">
       <button class="button" id="button-tx" style="display: none;">EGLD transaction</button>
@@ -40,7 +37,11 @@
         with xPortal</button>
       <button class="button" id="button-login-web" style="display: block;">Login
         with Web Wallet</button>
+
       <button class="button" id="button-logout" style="display: none;">Logout</button>
+      <div class="overlay">
+        <div class="loader">Loading...</div>
+      </div>
       <a class="button right" href="https://github.com/elven-js/elven.js" target="_blank"
         rel="noopener noreferrer">GitHub</a>
     </div>
@@ -175,7 +176,7 @@
           onLoginPending: () => { uiPending(true) },
           onLoggedIn: () => { uiLoggedInState(true); uiPending(false); },
           onLogout: () => { uiLoggedInState(false); },
-          onTxStarted: () => { uiPending(true); },
+          onTxStarted: (tx) => { uiPending(true); },
           onTxSent: (tx) => { console.log('Tx sent, not finalized on chain yet! ', tx.getHash().toString()) },
           onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
           onTxError: (tx, error) => { console.log('Tx error: ', error); uiPending(false); },

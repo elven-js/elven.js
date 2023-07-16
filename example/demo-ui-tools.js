@@ -45,17 +45,14 @@ export const uiLoggedInState = (loggedIn) => {
 };
 
 export const updateTxHashContainer = (txHash) => {
-  const txHashContainer = document.getElementById('tx-hash-or-query-result');
   if (txHash) {
-    txHashContainer?.replaceChildren();
+    const txHashContainer = document.getElementById('tx-hash-or-query-result');
     const url = `https://devnet-explorer.multiversx.com/transactions/${txHash}`;
     const link = document.createElement('a');
     link.setAttribute('href', url);
     link.classList.add('transaction-link');
     link.innerText = `➡️ ${url}`;
     txHashContainer?.appendChild(link);
-  } else {
-    txHashContainer?.replaceChildren();
   }
 };
 

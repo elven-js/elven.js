@@ -80,9 +80,6 @@ a {
 
 .overlay {
   display: none;
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, .6);
   justify-content: center;
   align-items: center;
 }
@@ -91,24 +88,30 @@ a {
   display: flex;
 }
 
+.transaction-link {
+  display: inline-block;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
 /* SPINNER */
 /* https://projects.lukehaas.me/css-loaders/ */
 
 .loader,
 .loader:after {
   border-radius: 50%;
-  width: 10em;
-  height: 10em;
+  width: 3em;
+  height: 3em;
 }
 
 .loader {
   font-size: 10px;
   position: relative;
   text-indent: -9999em;
-  border-top: 1.1em solid rgba(255, 255, 255, 0.2);
-  border-right: 1.1em solid rgba(255, 255, 255, 0.2);
-  border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);
-  border-left: 1.1em solid #ffffff;
+  border-top: 0.5em solid rgba(0, 0, 0, 0.2);
+  border-right: 0.5em solid rgba(0, 0, 0, 0.2);
+  border-bottom: 0.5em solid rgba(0, 0, 0, 0.2);
+  border-left: 0.5em solid #000;
   -webkit-transform: translateZ(0);
   -ms-transform: translateZ(0);
   transform: translateZ(0);

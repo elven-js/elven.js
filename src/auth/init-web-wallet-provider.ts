@@ -28,6 +28,7 @@ export const initWebWalletProvider = async (
     if (signature && apiUrl && urlAddress) {
       const nativeAuthClient = new NativeAuthClient({
         apiUrl,
+        origin: window.location.origin,
       });
       const accessToken = nativeAuthClient.getToken(
         urlAddress,

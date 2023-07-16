@@ -1,3 +1,9 @@
+### [0.11.0](https://github.com/elven-js/elven.js/releases/tag/v0.11.0) (2023-07-16)
+- allow triggering transactions before the previous ones are finished
+- updated dependencies
+- adjust the code for newest versions of Multiversx tools
+- run login pending state when native auth is fetching
+
 ### [0.10.2](https://github.com/elven-js/elven.js/releases/tag/v0.10.2) (2023-05-29)
 - fix native auth when signing using browser extension
 

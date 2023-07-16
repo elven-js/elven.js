@@ -32,6 +32,7 @@ import { getParamFromUrl } from './utils/get-param-from-url';
 import { initWebWalletProvider } from './auth/init-web-wallet-provider';
 import { postSendTx } from './interaction/post-send-tx';
 import { webWalletTxFinalize } from './interaction/web-wallet-tx-finalize';
+import { Account } from '@multiversx/sdk-core/out/account';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
@@ -156,13 +157,16 @@ export class ElvenJS {
       throw new Error('Error: Login failed: Use ElvenJs.init() first!');
     }
 
-    // Native auth login token initialization
-    const nativeAuthClient = new NativeAuthClient({
-      apiUrl: this.initOptions?.apiUrl,
-    });
-    const loginToken = await nativeAuthClient.initialize();
-
     try {
+      EventsStore.run(EventStoreEvents.onLoginPending);
+
+      // Native auth login token initialization
+      const nativeAuthClient = new NativeAuthClient({
+        apiUrl: this.initOptions?.apiUrl,
+        origin: window.location.origin,
+      });
+      const loginToken = await nativeAuthClient.initialize();
+
       // Login with browser extension
       if (loginMethod === LoginMethodsEnum.browserExtension) {
         const dappProvider = await loginWithExtension(
@@ -240,7 +244,11 @@ export class ElvenJS {
       transaction.setNonce(currentState.nonce);
 
       if (this.dappProvider instanceof ExtensionProvider) {
-        await this.dappProvider.signTransaction(transaction);
+        const plainSignedTransaction = await this.dappProvider.signTransaction(
+          transaction
+        );
+        const signature = plainSignedTransaction.getSignature();
+        transaction.applySignature(signature);
       }
       if (this.dappProvider instanceof WalletConnectV2Provider) {
         await this.dappProvider.signTransaction(transaction);
@@ -250,6 +258,11 @@ export class ElvenJS {
       }
 
       if (currentState.loginMethod !== LoginMethodsEnum.webWallet) {
+        const sender = transaction.getSender();
+        const senderAccount = new Account(sender);
+        const currentNonce = transaction.getNonce().valueOf();
+        senderAccount.incrementNonce();
+        ls.set('nonce', currentNonce + 1);
         await this.networkProvider.sendTransaction(transaction);
         await postSendTx(transaction, this.networkProvider);
       }

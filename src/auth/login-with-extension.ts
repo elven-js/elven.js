@@ -24,8 +24,14 @@ export const loginWithExtension = async (
   };
 
   try {
-    if (dappProvider) await dappProvider.login(providerLoginData);
-    EventsStore.run(EventStoreEvents.onLoginPending);
+    if (dappProvider) {
+      const address = await dappProvider.login(providerLoginData);
+      if (address) {
+        EventsStore.run(EventStoreEvents.onLoginPending);
+      } else {
+        EventsStore.run(EventStoreEvents.onLogout);
+      }
+    }
   } catch (e) {
     const err = errorParse(e);
     console.warn(`Something went wrong trying to login the user: ${err}`);

@@ -18,7 +18,6 @@ export const postSendTx = async (
   const userAccountOnNetwork = await networkProvider.getAccount(sender);
   senderAccount.update(userAccountOnNetwork);
   ls.set('address', senderAccount.address.bech32());
-  ls.set('nonce', senderAccount.getNonceThenIncrement().valueOf());
   ls.set('balance', senderAccount.balance.toString());
   EventsStore.run(EventStoreEvents.onTxFinalized, transaction);
 };

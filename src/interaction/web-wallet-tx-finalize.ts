@@ -2,6 +2,7 @@ import {
   WALLET_PROVIDER_CALLBACK_PARAM,
   WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED,
 } from '@multiversx/sdk-web-wallet-provider/out';
+import { Account } from '@multiversx/sdk-core/out/account';
 import { Transaction } from '@multiversx/sdk-core/out/transaction';
 import { getParamFromUrl } from '../utils/get-param-from-url';
 import { DappProvider, EventStoreEvents } from '../types';
@@ -9,6 +10,7 @@ import { ApiNetworkProvider } from '../network-provider';
 import { postSendTx } from './post-send-tx';
 import { errorParse } from '../utils/error-parse';
 import { EventsStore } from '../events-store';
+import { ls } from '../utils/ls-helpers';
 
 export const webWalletTxFinalize = async (
   dappProvider: DappProvider,
@@ -31,6 +33,13 @@ export const webWalletTxFinalize = async (
       const transaction = Transaction.fromPlainObject(transactionObj);
 
       transaction.setNonce(nonce);
+
+      const sender = transaction.getSender();
+      const senderAccount = new Account(sender);
+      const currentNonce = transaction.getNonce().valueOf();
+      senderAccount.incrementNonce();
+      ls.set('nonce', currentNonce + 1);
+
       try {
         EventsStore.run(EventStoreEvents.onTxStarted, transaction);
         await networkProvider.sendTransaction(transaction);
