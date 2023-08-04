@@ -17,7 +17,19 @@ export const accountSync = async (elven: any) => {
       const userAccountOnNetwork = await elven.networkProvider.getAccount(
         userAddressInstance
       );
+
+      const userGuardianOnNetwork = await elven.networkProvider.getGuardianData(
+        userAddressInstance
+      );
+
       ls.set('address', address);
+      ls.set(
+        'activeGuardian',
+        userGuardianOnNetwork.guarded &&
+          userGuardianOnNetwork.activeGuardian?.address
+          ? userGuardianOnNetwork.activeGuardian.address
+          : ''
+      );
       ls.set('nonce', userAccountOnNetwork.nonce.valueOf());
       ls.set('balance', userAccountOnNetwork.balance.toString());
       userAccountInstance.update(userAccountOnNetwork);

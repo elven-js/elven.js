@@ -22,6 +22,16 @@ export interface AccountOnNetwork {
     code: string;
     userName: string;
 }
+export interface Guardian {
+    activationEpoch: number;
+    address: IAddress;
+    serviceUID: string;
+}
+export interface GuardianData {
+    guarded: boolean;
+    activeGuardian?: Guardian;
+    pendingGuardian?: Guardian;
+}
 export interface ITransaction {
     toSendable(): any;
 }
@@ -35,6 +45,7 @@ export declare class ApiNetworkProvider {
     private handleApiError;
     sendTransaction(tx: ITransaction): Promise<string>;
     getAccount(address: IAddress): Promise<AccountOnNetwork>;
+    getGuardianData(address: IAddress): Promise<GuardianData>;
     getTransaction(txHash: string): Promise<{
         hash: string;
         type: any;

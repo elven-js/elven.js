@@ -20,7 +20,7 @@ export declare class ElvenJS {
     /**
      * Sign and send function
      */
-    static signAndSendTransaction(transaction: Transaction): Promise<Transaction>;
+    static signAndSendTransaction(transaction: Transaction): Promise<Transaction | undefined>;
     /**
      * Query Smart Contracts
      */

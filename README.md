@@ -24,11 +24,13 @@ The purpose is to simplify the usage for primary use cases and open the doors fo
 
 It is a script for browsers incorporates ES6 modules. If you need fully functional JavaScript/Typescript SDK (also in Nodejs), please use [sdk-js](https://docs.multiversx.com/sdk-and-tools/sdk-js/), an official Typescript MultiversX SDK. And if you are React developer, please check the [Nextjs dapp](https://github.com/xdevguild/nextjs-dapp-template).
 
-**You can use it already, but it is under active development, and the API might change, and there could be breaking changes without changing major versions.**
+**You can use it already, but it is under active development, and the API might change, there could be breaking changes without changing major versions.**
 
 ### How to use it
 
-Just copy and include the `elven.js` script from the `build` directory (in this repository) or CDN (https://unpkg.com/elven.js/build/elven.js). Use module type, like:
+Copy and include the `elven.js` script from the `build` directory or the best would be to use CDN (https://unpkg.com/elven.js/build/elven.js). Please don't link the script using the [demo](https://elvenjs.netlify.app/) domain.
+
+Use module type, like:
 
 ```html
 <script type="module">
@@ -106,6 +108,7 @@ The API is limited for now, this will change, but even now, it can do most of th
 - basic structures for transaction payload
 - sync the network on page load
 - querying the smart contracts (without tools for result parsing yet)
+- support for guarded transactions using MultiversX 2FA solutions
 
 ### What will it do soon? (TODO):
 

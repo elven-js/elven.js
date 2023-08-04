@@ -54,3 +54,7 @@ export enum EventStoreEvents {
   onTxFinalized = 'onTxFinalized',
   onTxError = 'onTxError',
 }
+
+export enum WebWalletUrlParamsEnum {
+  hasWebWalletGuardianSign = 'hasWebWalletGuardianSign',
+}
