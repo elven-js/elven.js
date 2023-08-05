@@ -32,6 +32,18 @@ export interface AccountOnNetwork {
   userName: string;
 }
 
+export interface Guardian {
+  activationEpoch: number;
+  address: IAddress;
+  serviceUID: string;
+}
+
+export interface GuardianData {
+  guarded: boolean;
+  activeGuardian?: Guardian;
+  pendingGuardian?: Guardian;
+}
+
 export interface ITransaction {
   toSendable(): any;
 }
@@ -157,6 +169,20 @@ export class ApiNetworkProvider {
     };
 
     return account;
+  }
+
+  async getGuardianData(address: IAddress): Promise<GuardianData> {
+    const response = await this.apiGet(
+      `address/${address.bech32()}/guardian-data`
+    );
+
+    const accountGuardian = {
+      guarded: response?.data?.guardianData?.guarded || false,
+      activeGuardian: response?.data?.guardianData?.activeGuardian,
+      pendingGuardian: response?.data?.guardianData?.pendingGuardian,
+    };
+
+    return accountGuardian;
   }
 
   async getTransaction(txHash: string) {

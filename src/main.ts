@@ -32,7 +32,12 @@ import { getParamFromUrl } from './utils/get-param-from-url';
 import { initWebWalletProvider } from './auth/init-web-wallet-provider';
 import { postSendTx } from './interaction/post-send-tx';
 import { webWalletTxFinalize } from './interaction/web-wallet-tx-finalize';
-import { Account } from '@multiversx/sdk-core/out/account';
+import {
+  checkNeedsGuardianSigning,
+  guardianPreSignTxOperations,
+  sendTxToGuardian,
+} from './interaction/guardian-operations';
+import { preSendTx } from './interaction/pre-send-tx';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
@@ -130,13 +135,14 @@ export class ElvenJS {
 
       EventsStore.run(EventStoreEvents.onLoggedIn);
 
-      if (state.loginMethod === LoginMethodsEnum.webWallet) {
-        // After successful web wallet transaction we will land back on our website
-        // We need to get params from callback url and finalize the transaction
-        // It will only trigger when there is a WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED in url params
+      // After successful web wallet transaction (or guarded transaction that use web wallet 2FA hook) we will land back on our website
+      // We need to get params from callback url and finalize the transaction
+      // It will only trigger when there is a WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED in url params
+      if (this.initOptions?.chainType) {
         await webWalletTxFinalize(
           this.dappProvider,
           this.networkProvider,
+          networkConfig[this.initOptions.chainType].walletAddress,
           state.nonce
         );
       }
@@ -236,6 +242,8 @@ export class ElvenJS {
       );
     }
 
+    let signedTx = guardianPreSignTxOperations(transaction);
+
     try {
       EventsStore.run(EventStoreEvents.onTxStarted, transaction);
 
@@ -244,35 +252,41 @@ export class ElvenJS {
       transaction.setNonce(currentState.nonce);
 
       if (this.dappProvider instanceof ExtensionProvider) {
-        const plainSignedTransaction = await this.dappProvider.signTransaction(
-          transaction
-        );
-        const signature = plainSignedTransaction.getSignature();
-        transaction.applySignature(signature);
+        signedTx = await this.dappProvider.signTransaction(transaction);
       }
       if (this.dappProvider instanceof WalletConnectV2Provider) {
-        await this.dappProvider.signTransaction(transaction);
+        signedTx = await this.dappProvider.signTransaction(transaction);
       }
       if (this.dappProvider instanceof WalletProvider) {
         await this.dappProvider.signTransaction(transaction);
       }
 
       if (currentState.loginMethod !== LoginMethodsEnum.webWallet) {
-        const sender = transaction.getSender();
-        const senderAccount = new Account(sender);
-        const currentNonce = transaction.getNonce().valueOf();
-        senderAccount.incrementNonce();
-        ls.set('nonce', currentNonce + 1);
-        await this.networkProvider.sendTransaction(transaction);
-        await postSendTx(transaction, this.networkProvider);
+        const needsGuardianSign = checkNeedsGuardianSigning(signedTx);
+
+        if (!needsGuardianSign) {
+          preSendTx(signedTx);
+        }
+
+        if (needsGuardianSign && this.initOptions?.chainType) {
+          await sendTxToGuardian(
+            signedTx,
+            networkConfig[this.initOptions.chainType].walletAddress
+          );
+
+          return;
+        }
+
+        await this.networkProvider.sendTransaction(signedTx);
+        await postSendTx(signedTx, this.networkProvider);
       }
     } catch (e) {
       const err = errorParse(e);
-      EventsStore.run(EventStoreEvents.onTxError, transaction, err);
+      EventsStore.run(EventStoreEvents.onTxError, signedTx, err);
       throw new Error(`Error: Transaction signing failed! ${err}`);
     }
 
-    return transaction;
+    return signedTx;
   }
 
   /**

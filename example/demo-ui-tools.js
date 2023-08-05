@@ -3,11 +3,11 @@
 // UI manipulation for demo purposes
 // ==============================================================
 export const uiPending = (isPending) => {
-  const overlay = document.querySelector('.overlay');
+  const wrapper = document.querySelector('.loader-wrapper');
   if (isPending) {
-    overlay.classList.add('visible');
+    wrapper.classList.add('visible');
   } else {
-    overlay.classList.remove('visible');
+    wrapper.classList.remove('visible');
   }
 };
 

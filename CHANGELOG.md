@@ -1,3 +1,7 @@
+### [0.12.0](https://github.com/elven-js/elven.js/releases/tag/v0.12.0) (2023-08-05)
+- improve guardian support (all providers)
+- update dependencies
+
 ### [0.11.0](https://github.com/elven-js/elven.js/releases/tag/v0.11.0) (2023-07-16)
 - allow triggering transactions before the previous ones are finished
 - updated dependencies
