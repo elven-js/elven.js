@@ -14,13 +14,11 @@ export const accountSync = async (elven: any) => {
     const userAddressInstance = new Address(address);
     const userAccountInstance = new Account(userAddressInstance);
     try {
-      const userAccountOnNetwork = await elven.networkProvider.getAccount(
-        userAddressInstance
-      );
+      const userAccountOnNetwork =
+        await elven.networkProvider.getAccount(userAddressInstance);
 
-      const userGuardianOnNetwork = await elven.networkProvider.getGuardianData(
-        userAddressInstance
-      );
+      const userGuardianOnNetwork =
+        await elven.networkProvider.getGuardianData(userAddressInstance);
 
       ls.set('address', address);
       ls.set(

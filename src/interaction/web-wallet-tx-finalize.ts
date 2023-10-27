@@ -23,7 +23,7 @@ import { preSendTx } from './pre-send-tx';
 export const webWalletTxFinalize = async (
   dappProvider: DappProvider,
   networkProvider: ApiNetworkProvider,
-  walletUrlAddress: string,
+  urlAddress: string,
   nonce: number
 ) => {
   const walletProviderStatus = getParamFromUrl(WALLET_PROVIDER_CALLBACK_PARAM);
@@ -47,14 +47,22 @@ export const webWalletTxFinalize = async (
       // For now it is prepared for handling one transaction at a time
       transactionObj = txs?.[0];
       if (!transactionObj) return;
-      transactionObj.data = Buffer.from(transactionObj.data).toString('base64');
+      // Something is broken here, the line below is required for web wallet but not for xAlias
+      // getTransactionsFromWalletUrl should return the same data for both cases
+      // and then it should be consumed in the same way on the web wallet and xAlias sides
+      if (loginMethod === LoginMethodsEnum.webWallet) {
+        transactionObj.data = Buffer.from(transactionObj.data).toString(
+          'base64'
+        );
+      }
     } else if (
       guardian &&
       loginMethod !== LoginMethodsEnum.webWallet &&
+      loginMethod !== LoginMethodsEnum.xAlias &&
       hasWebWalletGuardianSign
     ) {
       const webWalletProvider = new WalletProvider(
-        `${walletUrlAddress}${DAPP_INIT_ROUTE}`
+        `${urlAddress}${DAPP_INIT_ROUTE}`
       );
       const txs = webWalletProvider.getTransactionsFromWalletUrl();
       transactionObj = txs?.[0];

@@ -25,6 +25,7 @@ export enum LoginMethodsEnum {
   mobile = 'mobile',
   webWallet = 'web-wallet',
   browserExtension = 'browser-extension',
+  xAlias = 'x-alias',
 }
 
 export type DappProvider =

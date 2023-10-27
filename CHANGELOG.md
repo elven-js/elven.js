@@ -1,3 +1,7 @@
+### [0.13.0](https://github.com/elven-js/elven.js/releases/tag/v0.13.0) (2023-10-27)
+ - add xAlias login support `ElvenJS.login('x-alias')` (check the [docs](https://www.elvenjs.com) and [demo example](/example/index.html))
+ - update dependencies
+
 ### [0.12.0](https://github.com/elven-js/elven.js/releases/tag/v0.12.0) (2023-08-05)
 - improve guardian support (all providers)
 - update dependencies

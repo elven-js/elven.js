@@ -7,6 +7,7 @@ interface NetworkType {
   decimals: string;
   gasPerDataByte: string;
   walletAddress: string;
+  xAliasAddress: string;
   apiAddress: string;
   explorerAddress: string;
   apiTimeout: number;
@@ -40,6 +41,7 @@ export const networkConfig: Record<string, NetworkType> = {
     decimals: '4',
     gasPerDataByte: '1500',
     walletAddress: 'https://devnet-wallet.multiversx.com',
+    xAliasAddress: 'https://devnet.xalias.com',
     apiAddress: 'https://devnet-api.multiversx.com',
     explorerAddress: 'https://devnet-explorer.multiversx.com',
     apiTimeout: 10000,
@@ -53,6 +55,7 @@ export const networkConfig: Record<string, NetworkType> = {
     decimals: '4',
     gasPerDataByte: '1500',
     walletAddress: 'https://testnet-wallet.multiversx.com',
+    xAliasAddress: 'https://testnet.xalias.com',
     apiAddress: 'https://testnet-api.multiversx.com',
     explorerAddress: 'https://testnet-explorer.multiversx.com',
     apiTimeout: 10000,
@@ -66,6 +69,7 @@ export const networkConfig: Record<string, NetworkType> = {
     decimals: '4',
     gasPerDataByte: '1500',
     walletAddress: 'https://wallet.multiversx.com',
+    xAliasAddress: 'https://xalias.com',
     apiAddress: 'https://api.multiversx.com',
     explorerAddress: 'https://explorer.multiversx.com',
     apiTimeout: 10000,

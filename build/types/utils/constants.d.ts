@@ -7,6 +7,7 @@ interface NetworkType {
     decimals: string;
     gasPerDataByte: string;
     walletAddress: string;
+    xAliasAddress: string;
     apiAddress: string;
     explorerAddress: string;
     apiTimeout: number;

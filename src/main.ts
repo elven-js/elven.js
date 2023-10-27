@@ -109,7 +109,8 @@ export class ElvenJS {
 
     const isAddress =
       state?.address ||
-      (state.loginMethod === LoginMethodsEnum.webWallet &&
+      ((state.loginMethod === LoginMethodsEnum.webWallet ||
+        state.loginMethod === LoginMethodsEnum.xAlias) &&
         getParamFromUrl('address'));
 
     if (isAddress && state?.loginMethod) {
@@ -130,6 +131,15 @@ export class ElvenJS {
           this.initOptions.apiUrl
         );
       }
+      if (
+        state.loginMethod === LoginMethodsEnum.xAlias &&
+        this.initOptions.chainType
+      ) {
+        this.dappProvider = await initWebWalletProvider(
+          networkConfig[this.initOptions.chainType].xAliasAddress,
+          this.initOptions.apiUrl
+        );
+      }
 
       await accountSync(this);
 
@@ -142,7 +152,11 @@ export class ElvenJS {
         await webWalletTxFinalize(
           this.dappProvider,
           this.networkProvider,
-          networkConfig[this.initOptions.chainType].walletAddress,
+          networkConfig[this.initOptions.chainType][
+            state.loginMethod === LoginMethodsEnum.xAlias
+              ? 'xAliasAddress'
+              : 'walletAddress'
+          ],
           state.nonce
         );
       }
@@ -203,6 +217,22 @@ export class ElvenJS {
         const dappProvider = await loginWithWebWallet(
           networkConfig[this.initOptions.chainType].walletAddress,
           loginToken,
+          this.initOptions?.chainType,
+          options?.callbackRoute
+        );
+        this.dappProvider = dappProvider;
+      }
+
+      // Login with xAlias
+      if (
+        loginMethod === LoginMethodsEnum.xAlias &&
+        this.initOptions?.chainType
+      ) {
+        // Login with xAlias is almost the same as with the web wallet, only endpoints are different
+        const dappProvider = await loginWithWebWallet(
+          networkConfig[this.initOptions.chainType].xAliasAddress,
+          loginToken,
+          this.initOptions?.chainType,
           options?.callbackRoute
         );
         this.dappProvider = dappProvider;
@@ -261,7 +291,10 @@ export class ElvenJS {
         await this.dappProvider.signTransaction(transaction);
       }
 
-      if (currentState.loginMethod !== LoginMethodsEnum.webWallet) {
+      if (
+        currentState.loginMethod !== LoginMethodsEnum.webWallet &&
+        currentState.loginMethod !== LoginMethodsEnum.xAlias
+      ) {
         const needsGuardianSign = checkNeedsGuardianSigning(signedTx);
 
         if (!needsGuardianSign) {

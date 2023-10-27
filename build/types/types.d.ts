@@ -22,7 +22,8 @@ export declare enum LoginMethodsEnum {
     ledger = "ledger",
     mobile = "mobile",
     webWallet = "web-wallet",
-    browserExtension = "browser-extension"
+    browserExtension = "browser-extension",
+    xAlias = "x-alias"
 }
 export type DappProvider = ExtensionProvider | WalletConnectV2Provider | WalletProvider | undefined;
 export interface LoginOptions {

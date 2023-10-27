@@ -37,6 +37,8 @@
         with xPortal</button>
       <button class="button" id="button-login-web" style="display: block;">Login
         with Web Wallet</button>
+      <button class="button" id="button-login-x-alias" style="display: block;">Login
+        with xAlias</button>
 
       <button class="button" id="button-logout" style="display: none;">Logout</button>
       <a class="button right" href="https://github.com/elven-js/elven.js" target="_blank"
@@ -221,6 +223,17 @@
       }
     });
 
+    document.getElementById('button-login-x-alias').addEventListener('click', async () => {
+      try {
+        clearQrCodeContainer();
+        await ElvenJS.login('x-alias', {
+          callbackRoute: '/',
+        });
+      } catch (e) {
+        console.log('Login: Something went wrong, try again!', e?.message);
+      }
+    });
+
     document.getElementById('button-logout').addEventListener('click', async () => {
       try {
         const isLoggedOut = await ElvenJS.logout();
@@ -237,9 +250,10 @@
       const demoMessage = 'Transaction demo from Elven.js!';
 
       const isGuardian = ElvenJS.storage.get('activeGuardian');
+      const isXalias = ElvenJS.storage.get('loginMethod') === 'x-alias';
       // Additional 50000 when there is an active guardian
       // See more about gas limit calculation here: https://docs.multiversx.com/developers/gas-and-fees/overview/
-      const gasLimit = (isGuardian ? 100000 : 50000) + 1500 * demoMessage.length; 
+      const gasLimit = ((isGuardian || isXalias) ? 100000 : 50000) + 1500 * demoMessage.length; 
 
       const tx = new Transaction({
         nonce: ElvenJS.storage.get('nonce'),
