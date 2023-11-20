@@ -48,8 +48,8 @@
       <div class="loader">Loading...</div>
     </div>
     <div class="esdt-info">* For the ESDT transfer you will need to get the <a
-        href="https://devnet-explorer.multiversx.com/tokens/BUILDO-890d14" target="_blank"
-        rel="noopener noreferrer">BUILDO-890d14</a> token from the faucet: <a
+        href="https://devnet-explorer.multiversx.com/tokens/BUILDO-22c0a5" target="_blank"
+        rel="noopener noreferrer">BUILDO-22c0a5</a> token from the faucet: <a
         href="https://devnet-multiversx-esdt-faucet.netlify.app/" target="_blank"
         rel="noopener noreferrer">https://devnet-multiversx-esdt-faucet.netlify.app</a> (you can also modify the
       hardcoded
@@ -105,7 +105,7 @@
     <ul>
       <li>simple ESDT transfer on the devnet chain</li>
       <li>it will go to a predefined wallet</li>
-      <li>it will be 1 BUILDO-890d14 token</li>
+      <li>it will be 1 BUILDO-22c0a5 token</li>
       <li>after the transaction is finished below, you will find the transaction hash</li>
     </ul>
 
@@ -278,12 +278,12 @@
     document.getElementById('button-tx-esdt').addEventListener('click', async () => {
       updateTxHashContainer(false);
 
-      // The preconfigured transaction is for the 1 'BUILDO-890d14' ESDT token on the devnet
+      // The preconfigured transaction is for the 1 'BUILDO-22c0a5' ESDT token on the devnet
       // You need to know its ticker and how many decimals places it has
       // In this case, the token has 18 decimal places. You can check it in the MultiversX devnet explorer
-      // You can use the community-based faucet to get the BUILDO-890d14 token: https://r3d4.fr/faucet
+      // You can use the community-based faucet to get the BUILDO-22c0a5 token: https://r3d4.fr/faucet
       const transfer = TokenTransfer.fungibleFromAmount(
-        'BUILDO-890d14',
+        'BUILDO-22c0a5',
         '1',
         18
       );
@@ -354,8 +354,8 @@
         uiPending(false);
 
         // Manual decoding of a simple type (number here), there will be additional tools for that
-        // For more possibilities, for now please check data converter in Buildo CLI: 
-        // https://github.com/xdevguild/buildo-begins/blob/main/src/converters.ts
+        // For more possibilities, for now please check data converter in Buildo.dev: 
+        // https://github.com/xdevguild/buildo.dev/blob/main/components/operations/utils-operations/data-converters.tsx#L103
         const hexVal = base64ToDecimalHex(results?.returnData?.[0]);
         let intVal = 0;
         if (hexVal) {

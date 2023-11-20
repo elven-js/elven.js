@@ -159,3 +159,4 @@ If you are interested in creating and managing your own PFP NFT collection, you 
 Other tools:
 
 - [Buildo Begins](https://github.com/xdevguild/buildo-begins) - all MultiversX blockchain CLI interactions with sdk-js, still in progress, but usable
+- [Buildo.dev](https://www.buildo.dev) - Buildo.dev is a MultiversX app that helps with blockchain interactions, like issuing tokens and querying smart contracts.
