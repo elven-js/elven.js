@@ -4,6 +4,7 @@ import { ExtensionProvider } from '@multiversx/sdk-extension-provider/out/extens
 import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
 import { NativeAuthClient } from '@multiversx/sdk-native-auth-client/lib/src/native.auth.client';
+import { SignableMessage } from '@multiversx/sdk-core/out/signableMessage';
 import { initMobileProvider } from './auth/init-mobile-provider';
 import { ls } from './utils/ls-helpers';
 import { ApiNetworkProvider, SmartContractQueryArgs } from './network-provider';
@@ -38,6 +39,7 @@ import {
   sendTxToGuardian,
 } from './interaction/guardian-operations';
 import { preSendTx } from './interaction/pre-send-tx';
+import { webWalletSignMessageFinalize } from './interaction/web-wallet-sign-message-finalize';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
@@ -106,6 +108,24 @@ export class ElvenJS {
     if (this.initOptions.onTxError) {
       EventsStore.set(EventStoreEvents.onTxError, this.initOptions.onTxError);
     }
+    if (this.initOptions.onSignMsgStarted) {
+      EventsStore.set(
+        EventStoreEvents.onSignMsgStarted,
+        this.initOptions.onSignMsgStarted
+      );
+    }
+    if (this.initOptions.onSignMsgFinalized) {
+      EventsStore.set(
+        EventStoreEvents.onSignMsgFinalized,
+        this.initOptions.onSignMsgFinalized
+      );
+    }
+    if (this.initOptions.onSignMsgError) {
+      EventsStore.set(
+        EventStoreEvents.onSignMsgError,
+        this.initOptions.onSignMsgError
+      );
+    }
 
     const isAddress =
       state?.address ||
@@ -146,9 +166,9 @@ export class ElvenJS {
       EventsStore.run(EventStoreEvents.onLoggedIn);
 
       // After successful web wallet transaction (or guarded transaction that use web wallet 2FA hook) we will land back on our website
-      // We need to get params from callback url and finalize the transaction
-      // It will only trigger when there is a WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED in url params
       if (this.initOptions?.chainType) {
+        // We need to get params from callback url and finalize the transaction
+        // It will only trigger when there is a WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED in url params
         await webWalletTxFinalize(
           this.dappProvider,
           this.networkProvider,
@@ -159,6 +179,9 @@ export class ElvenJS {
           ],
           state.nonce
         );
+
+        // We need to get the signature in case of signing a message with web wallet or guardians 2FA hook
+        webWalletSignMessageFinalize();
       }
     }
   }
@@ -320,6 +343,77 @@ export class ElvenJS {
     }
 
     return signedTx;
+  }
+
+  /**
+   * Sign a single message
+   */
+  static async signMessage(
+    message: string,
+    options?: { callbackUrl?: string }
+  ) {
+    if (!this.dappProvider) {
+      throw new Error(
+        'Error: Message signing failed: There is no active session!'
+      );
+    }
+    if (!this.networkProvider) {
+      throw new Error(
+        'Error: Message signing failed: There is no active network provider!'
+      );
+    }
+
+    let messageSignature = '';
+
+    try {
+      EventsStore.run(EventStoreEvents.onSignMsgStarted, message);
+
+      if (this.dappProvider instanceof ExtensionProvider) {
+        const signedMessage = await this.dappProvider.signMessage(
+          new SignableMessage({ message: Buffer.from(message) })
+        );
+
+        messageSignature = signedMessage.getSignature().toString('hex');
+      }
+      if (this.dappProvider instanceof WalletConnectV2Provider) {
+        const signedMessage = await this.dappProvider.signMessage(
+          new SignableMessage({ message: Buffer.from(message) })
+        );
+
+        messageSignature = signedMessage.getSignature().toString('hex');
+      }
+      if (this.dappProvider instanceof WalletProvider) {
+        const encodeRFC3986URIComponent = (str: string) => {
+          return encodeURIComponent(str).replace(
+            /[!'()*]/g,
+            (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
+          );
+        };
+
+        const url = options?.callbackUrl || window.location.origin;
+        await this.dappProvider.signMessage(
+          new SignableMessage({ message: Buffer.from(message) }),
+          {
+            callbackUrl: encodeURIComponent(
+              `${url}${
+                url.includes('?') ? '&' : '?'
+              }message=${encodeRFC3986URIComponent(message)}`
+            ),
+          }
+        );
+      }
+
+      EventsStore.run(
+        EventStoreEvents.onSignMsgFinalized,
+        message,
+        messageSignature
+      );
+      return { message, messageSignature };
+    } catch (e) {
+      const err = errorParse(e);
+      EventsStore.run(EventStoreEvents.onSignMsgError, message, err);
+      throw new Error(`Error: Message signing failed! ${err}`);
+    }
   }
 
   /**

@@ -22,6 +22,15 @@ export declare class ElvenJS {
      */
     static signAndSendTransaction(transaction: Transaction): Promise<Transaction | undefined>;
     /**
+     * Sign a single message
+     */
+    static signMessage(message: string, options?: {
+        callbackUrl?: string;
+    }): Promise<{
+        message: string;
+        messageSignature: string;
+    }>;
+    /**
      * Query Smart Contracts
      */
     static queryContract({ address, func, args, value, caller, }: SmartContractQueryArgs): Promise<import("@multiversx/sdk-network-providers/out/contractQueryResponse").ContractQueryResponse | undefined>;

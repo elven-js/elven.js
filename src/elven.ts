@@ -8,6 +8,7 @@ export { TransactionPayload } from '@multiversx/sdk-core/out/transactionPayload'
 export { TransactionWatcher } from '@multiversx/sdk-core/out/transactionWatcher';
 export { SmartContract } from '@multiversx/sdk-core/out/smartcontracts/smartContract';
 export { ContractFunction } from '@multiversx/sdk-core/out/smartcontracts/function';
+export { SignableMessage } from '@multiversx/sdk-core/out/signableMessage';
 export {
   BytesType,
   BytesValue,

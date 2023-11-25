@@ -23,6 +23,8 @@ export const uiLoggedInState = (loggedIn) => {
   const txEsdtButton = document.getElementById('button-tx-esdt');
   const mintButton = document.getElementById('button-mint');
   const queryButton = document.getElementById('button-query');
+  const signMessageButton = document.getElementById('button-sign-message');
+
   if (loggedIn) {
     loginExtensionButton.style.display = 'none';
     loginButton.style.display = 'none';
@@ -33,6 +35,7 @@ export const uiLoggedInState = (loggedIn) => {
     txEsdtButton.style.display = 'block';
     mintButton.style.display = 'block';
     queryButton.style.display = 'block';
+    signMessageButton.style.display = 'block';
   } else {
     loginExtensionButton.style.display = 'block';
     loginButton.style.display = 'block';
@@ -43,13 +46,14 @@ export const uiLoggedInState = (loggedIn) => {
     txEsdtButton.style.display = 'none';
     mintButton.style.display = 'none';
     queryButton.style.display = 'none';
+    signMessageButton.style.display = 'none';
   }
   uiPending(false);
 };
 
 export const updateTxHashContainer = (txHash) => {
   if (txHash) {
-    const txHashContainer = document.getElementById('tx-hash-or-query-result');
+    const txHashContainer = document.getElementById('operation-result');
     const url = `https://devnet-explorer.multiversx.com/transactions/${txHash}`;
     const link = document.createElement('a');
     link.setAttribute('href', url);
@@ -59,8 +63,8 @@ export const updateTxHashContainer = (txHash) => {
   }
 };
 
-export const updateQueryResultContainer = (result) => {
-  const queryContainer = document.getElementById('tx-hash-or-query-result');
+export const updateOperationResultContainer = (result) => {
+  const queryContainer = document.getElementById('operation-result');
   if (result) {
     queryContainer?.replaceChildren();
     const divElem = document.createElement('div');

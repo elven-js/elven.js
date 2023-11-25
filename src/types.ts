@@ -18,6 +18,9 @@ export interface InitOptions {
   onTxSent?: (transaction: Transaction) => void;
   onTxFinalized?: (transaction: Transaction) => void;
   onTxError?: (transaction: Transaction, error: string) => void;
+  onSignMsgStarted?: (message: string) => void;
+  onSignMsgFinalized?: (messageSignature: string) => void;
+  onSignMsgError?: (message: string, error: string) => void;
 }
 
 export enum LoginMethodsEnum {
@@ -54,6 +57,9 @@ export enum EventStoreEvents {
   onTxSent = 'onTxSent',
   onTxFinalized = 'onTxFinalized',
   onTxError = 'onTxError',
+  onSignMsgStarted = 'onSignMsgStarted',
+  onSignMsgFinalized = 'onSignMsgFinalized',
+  onSignMsgError = 'onSignMsgError',
 }
 
 export enum WebWalletUrlParamsEnum {

@@ -24,6 +24,7 @@ body * {
   border-radius: 8px;
   font-weight: bold;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .button.right {
@@ -36,6 +37,7 @@ body * {
   border-bottom: 1px dashed #000;
   padding-bottom: 20px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 a {
@@ -46,10 +48,11 @@ a {
   display: inline-block;
 }
 
-.tx-hash-or-query-result {
+.operation-result {
   font-size: 16px;
   font-weight: bold;
   word-break: break-all;
+  margin-bottom: 30px;
 }
 
 @media screen and (max-width: 680px) {
@@ -66,16 +69,16 @@ a {
   }
 }
 
-.esdt-info {
+.operation-info {
   margin-top: 10px;
 }
 
-.esdt-info:nth-child(3) {
+.operation-info.mb {
   margin-bottom: 30px;
 }
 
-.esdt-info,
-.esdt-info a {
+.operation-info,
+.operation-info a {
   font-size: 13px;
 }
 

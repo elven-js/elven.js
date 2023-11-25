@@ -32,6 +32,7 @@
       <button class="button" id="button-tx-esdt" style="display: none;">ESDT transaction*</button>
       <button class="button" id="button-mint" style="display: none;">Mint NFT</button>
       <button class="button" id="button-query" style="display: none;">Query SC**</button>
+      <button class="button" id="button-sign-message" style="display: none;">Sign a message***</button>
       <button class="button" id="button-login-extension" style="display: block;">Login with Extension</button>
       <button class="button" id="button-login-mobile" style="display: block;">Login
         with xPortal</button>
@@ -39,26 +40,31 @@
         with Web Wallet</button>
       <button class="button" id="button-login-x-alias" style="display: block;">Login
         with xAlias</button>
-
       <button class="button" id="button-logout" style="display: none;">Logout</button>
-      <a class="button right" href="https://github.com/elven-js/elven.js" target="_blank"
-        rel="noopener noreferrer">GitHub</a>
+      <a class="button" href="https://github.com/elven-js/elven.js" target="_blank" rel="noopener noreferrer">GitHub</a>
     </div>
     <div class="loader-wrapper">
       <div class="loader">Loading...</div>
     </div>
-    <div class="esdt-info">* For the ESDT transfer you will need to get the <a
+
+    <div id="operation-result" class="operation-result"></div>
+
+    <div class="operation-info">* For the ESDT transfer you will need to get the <a
         href="https://devnet-explorer.multiversx.com/tokens/BUILDO-22c0a5" target="_blank"
         rel="noopener noreferrer">BUILDO-22c0a5</a> token from the faucet: <a
         href="https://devnet-multiversx-esdt-faucet.netlify.app/" target="_blank"
         rel="noopener noreferrer">https://devnet-multiversx-esdt-faucet.netlify.app</a> (you can also modify the
       hardcoded
       token and test it with yours locally, check the sourcecode of this website for more info).</div>
-    <div class="esdt-info">** The query will trigger a 'getMintedPerAddressTotal' with currently logged in user's
+    <div class="operation-info">** The query will trigger a 'getMintedPerAddressTotal' with currently logged in user's
       address using
       the <a href="https://www.elven.tools">Elven Tools</a> Smart Contract.</div>
 
-    <div id="tx-hash-or-query-result" class="tx-hash-or-query-result"></div>
+    <div class="operation-info mb">*** The signing message example will sign the: '<a href="https://www.elven.family"
+        target="_blank" title="MultiversX indie developer tools">Elven Family</a> is awesome!' message.
+      You can
+      check the source code of this page and how to use it.</div>
+
     <div id="qr-code-container" class="qr-code-container"></div>
 
     <h1>ElvenJS (demo)</h1>
@@ -116,6 +122,12 @@
       <li>after the transaction is finished below, you will find the transaction hash</li>
     </ul>
 
+    <div>Sign a message</div>
+    <ul>
+      <li>Signing a hardcoded message</li>
+      <li>After signing you will see the message onece again and signature for it</li>
+    </ul>
+
     <div>Query the smart contract:</div>
     <ul>
       <li>Smart Contract query. The Elven Tools smart contract has the 'getMintedPerAddressTotal' function</li>
@@ -144,7 +156,7 @@
       uiPending,
       updateTxHashContainer,
       base64ToDecimalHex,
-      updateQueryResultContainer,
+      updateOperationResultContainer,
       clearQrCodeContainer
     } from './demo-ui-tools.js'
 
@@ -184,6 +196,9 @@
           onTxError: (tx, error) => { console.log('Tx error: ', error); uiPending(false); },
           onQrPending: () => { uiPending(true); },
           onQrLoaded: () => { uiPending(false); },
+          onSignMsgStarted: () => { uiPending(true); },
+          onSignMsgFinalized: (message, messageSignature) => { messageSignature && updateOperationResultContainer(`➡️ The signature for "${message}" message:\n${messageSignature}`); uiPending(false); },
+          onSignMsgError: (message, error) => { console.log('Signing message error: ', error); uiPending(false); },
         }
       );
     }
@@ -253,7 +268,7 @@
       const isXalias = ElvenJS.storage.get('loginMethod') === 'x-alias';
       // Additional 50000 when there is an active guardian
       // See more about gas limit calculation here: https://docs.multiversx.com/developers/gas-and-fees/overview/
-      const gasLimit = ((isGuardian || isXalias) ? 100000 : 50000) + 1500 * demoMessage.length; 
+      const gasLimit = ((isGuardian || isXalias) ? 100000 : 50000) + 1500 * demoMessage.length;
 
       const tx = new Transaction({
         nonce: ElvenJS.storage.get('nonce'),
@@ -317,7 +332,7 @@
       const isGuardian = ElvenJS.storage.get('activeGuardian');
       // Additional 50000 when there is an active guardian
       // See more about gas limit calculation here: https://docs.multiversx.com/developers/gas-and-fees/overview/
-      const gasLimit = isGuardian ? 14050000 : 14000000; 
+      const gasLimit = isGuardian ? 14050000 : 14000000;
 
       const tx = contract.call({
         caller: new Address(ElvenJS.storage.get('address')),
@@ -342,7 +357,7 @@
     // Read more about the Elven Tools Smart Contract here: https://www.elven.tools/docs/sc-endpoints.html
     document.getElementById('button-query').addEventListener('click', async () => {
       try {
-        updateQueryResultContainer();
+        updateOperationResultContainer();
         uiPending(true);
 
         const results = await ElvenJS.queryContract({
@@ -353,15 +368,27 @@
 
         uiPending(false);
 
-        // Manual decoding of a simple type (number here), there will be additional tools for that
-        // For more possibilities, for now please check data converter in Buildo.dev: 
+        // Manual decoding of a simple type (number here), there will be additional tools for that using ABI
+        // For now please check data converter in Buildo.dev: 
         // https://github.com/xdevguild/buildo.dev/blob/main/components/operations/utils-operations/data-converters.tsx#L103
         const hexVal = base64ToDecimalHex(results?.returnData?.[0]);
         let intVal = 0;
         if (hexVal) {
           intVal = parseInt(hexVal, 16);
         }
-        updateQueryResultContainer(`➡️ The result of the query is: ${intVal}`);
+        updateOperationResultContainer(`➡️ The result of the query is: ${intVal}`);
+      } catch (e) {
+        uiPending(false);
+        throw new Error(e?.message);
+      }
+    });
+
+    // You can sign a single message, use 
+    // You will get a message and signature back in the ElvenJS callback function 'onSignMsgFinalized'
+    // In case of browser extension provider and xPortal you can also get it from ElvenJS.signMessage return
+    document.getElementById('button-sign-message').addEventListener('click', async () => {
+      try {
+        await ElvenJS.signMessage('Elven Family is awesome!');
       } catch (e) {
         uiPending(false);
         throw new Error(e?.message);

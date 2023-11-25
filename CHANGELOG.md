@@ -1,3 +1,7 @@
+### [0.14.0](https://github.com/elven-js/elven.js/releases/tag/v0.14.0) (2023-11-25)
+- add tools for signing messages with all supported providers (`ElvenJS.signMessage`). Find more details in the [demo example]((/example/index.html)) and [documentation]((https://www.elvenjs.com)).
+- update dependencies
+
 ### [0.13.0](https://github.com/elven-js/elven.js/releases/tag/v0.13.0) (2023-10-27)
  - add xAlias login support `ElvenJS.login('x-alias')` (check the [docs](https://www.elvenjs.com) and [demo example](/example/index.html))
  - update dependencies
