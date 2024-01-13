@@ -21,6 +21,10 @@ esbuild
     platform: 'browser',
   })
   .then((result) => {
+    fs.writeFileSync('./build/meta.json', JSON.stringify(result.metafile));
+    return result;
+  })
+  .then((result) => {
     return esbuild.analyzeMetafile(result.metafile);
   })
   .then((result) => {

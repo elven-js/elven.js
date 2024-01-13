@@ -8,3 +8,4 @@ dev-server.mjs
 esbuild.config.cjs
 tsconfig.json
 meta.txt
+meta.json

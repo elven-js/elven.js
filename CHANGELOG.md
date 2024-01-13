@@ -1,3 +1,7 @@
+### [0.15.0](https://github.com/elven-js/elven.js/releases/tag/v0.15.0) (2024-01-13)
+- add webview provider (based on sdk-dapp), required for xPortal Hub integration (experimental, need more tests and rewrites, it will probably land in a separate package in the following updates)
+- update dependencies
+
 ### [0.14.0](https://github.com/elven-js/elven.js/releases/tag/v0.14.0) (2023-11-25)
 - add tools for signing messages with all supported providers (`ElvenJS.signMessage`). Find more details in the [demo example]((/example/index.html)) and [documentation]((https://www.elvenjs.com)).
 - update dependencies

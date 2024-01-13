@@ -59,7 +59,7 @@ or from CDN:
     TokenTransfer,
     ContractFunction,
     U32Value,
-  } from 'https://unpkg.com/elven.js@0.9.0/build/elven.js';
+  } from 'https://unpkg.com/elven.js@<actual_version_here>/build/elven.js';
 
   // Your code here
 </script>
@@ -83,7 +83,7 @@ You will find the whole demo there. The same is deployed here: [elvenjs.netlify.
 
 ### Usage in frontend frameworks
 
-Elven.js from v0.3.0 can also be used in many different frameworks by importing it from node_modules (of course, it is a client-side library). When it comes to React/Nextjs, it is advised to use one of the ready templates, for example, the one mentioned above. But Elven.js can be helpful in other frameworks where there are no templates yet. Example:
+Elven.js can also be used in many different frameworks by importing it from node_modules (of course, it is a client-side library). When it comes to React/Nextjs, it is advised to use one of the ready templates, for example, the one mentioned above. But Elven.js can be helpful in other frameworks where there are no templates yet. Example:
 
 ```bash
 npm install elven.js
@@ -99,11 +99,13 @@ The types should also be exported.
 
 The API is limited for now, this will change, but even now, it can do most of the core operations:
 
-- authenticate using the xPortal mobile, MultiversX browser extension or MultiversX Web Wallet
+- authenticate using the xPortal mobile, MultiversX browser extension, MultiversX Web Wallet and xAlias
+- integrate with xPortal Hub
 - handle expiration of the auth state
 - handle login with tokens to be able to get the signature
 - sign transactions
 - send transactions (also custom smart contracts)
+- sign custom messages
 - basic global states handling (local storage)
 - basic structures for transaction payload
 - sync the network on page load
@@ -114,10 +116,9 @@ The API is limited for now, this will change, but even now, it can do most of th
 
 - authenticate with Ledger Nano
 - result parsing (separate library)
-- sign messages
 - more advanced global state handling and (real-time updates (if needed)?)
 - more structures and simplification for payload builders
-- rethink the structure and split it into more files (???)
+- split it into more files/libraries
 - make it as small as possible
 
 ### What it won't probably do:

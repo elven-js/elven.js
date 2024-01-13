@@ -40,6 +40,8 @@ import {
 } from './interaction/guardian-operations';
 import { preSendTx } from './interaction/pre-send-tx';
 import { webWalletSignMessageFinalize } from './interaction/web-wallet-sign-message-finalize';
+import { WebviewProvider } from './webview-provider/webview-provider';
+import { loginWithNativeAuthToken } from './auth/login-with-native-auth-token';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
@@ -127,6 +129,15 @@ export class ElvenJS {
       );
     }
 
+    // Catch the nativeAuthToken and login with it (for example within xPortal Hub)
+    const nativeAuthTokenFromUrl = getParamFromUrl('accessToken');
+    if (nativeAuthTokenFromUrl) {
+      EventsStore.run(EventStoreEvents.onLoginPending);
+      loginWithNativeAuthToken(nativeAuthTokenFromUrl, this);
+      await accountSync(this);
+      EventsStore.run(EventStoreEvents.onLoggedIn);
+    }
+
     const isAddress =
       state?.address ||
       ((state.loginMethod === LoginMethodsEnum.webWallet ||
@@ -141,6 +152,9 @@ export class ElvenJS {
       }
       if (state.loginMethod === LoginMethodsEnum.mobile) {
         this.dappProvider = await initMobileProvider(this);
+      }
+      if (state.loginMethod === LoginMethodsEnum.xPortalHub) {
+        this.dappProvider = new WebviewProvider();
       }
       if (
         state.loginMethod === LoginMethodsEnum.webWallet &&
@@ -310,6 +324,9 @@ export class ElvenJS {
       if (this.dappProvider instanceof WalletConnectV2Provider) {
         signedTx = await this.dappProvider.signTransaction(transaction);
       }
+      if (this.dappProvider instanceof WebviewProvider) {
+        signedTx = await this.dappProvider.signTransaction(transaction);
+      }
       if (this.dappProvider instanceof WalletProvider) {
         await this.dappProvider.signTransaction(transaction);
       }
@@ -381,6 +398,9 @@ export class ElvenJS {
         );
 
         messageSignature = signedMessage.getSignature().toString('hex');
+      }
+      if (this.dappProvider instanceof WebviewProvider) {
+        messageSignature = await this.dappProvider.signMessage(message);
       }
       if (this.dappProvider instanceof WalletProvider) {
         const encodeRFC3986URIComponent = (str: string) => {

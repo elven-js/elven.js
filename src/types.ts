@@ -2,6 +2,7 @@ import { ExtensionProvider } from '@multiversx/sdk-extension-provider/out/extens
 import { Transaction } from '@multiversx/sdk-core/out/transaction';
 import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
+import { WebviewProvider } from './webview-provider/webview-provider';
 
 export interface InitOptions {
   apiUrl?: string;
@@ -29,12 +30,14 @@ export enum LoginMethodsEnum {
   webWallet = 'web-wallet',
   browserExtension = 'browser-extension',
   xAlias = 'x-alias',
+  xPortalHub = 'x-portal-hub',
 }
 
 export type DappProvider =
   | ExtensionProvider
   | WalletConnectV2Provider
   | WalletProvider
+  | WebviewProvider
   | undefined;
 
 export interface LoginOptions {
