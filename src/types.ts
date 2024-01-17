@@ -10,18 +10,53 @@ export interface InitOptions {
   apiTimeout?: number;
   walletConnectV2ProjectId?: string;
   walletConnectV2RelayAddresses?: string[];
-  onLoginPending?: () => void;
-  onLoggedIn?: () => void;
-  onLogout?: () => void;
+  // Login
+  onLoginStart?: () => void;
+  onLoginEnd?: () => void;
+  onLoginSuccess?: () => void;
+  onLoginFailure?: () => void;
+  // Logout
+  onLogoutStart?: () => void;
+  onLogoutEnd?: () => void;
+  onLogoutSuccess?: () => void;
+  onLogoutFailure?: () => void;
+  // Qr
   onQrPending?: () => void;
   onQrLoaded?: () => void;
+  // Transaction
   onTxStarted?: (transaction: Transaction) => void;
   onTxSent?: (transaction: Transaction) => void;
   onTxFinalized?: (transaction: Transaction) => void;
   onTxError?: (transaction: Transaction, error: string) => void;
+  // Signing
   onSignMsgStarted?: (message: string) => void;
   onSignMsgFinalized?: (messageSignature: string) => void;
   onSignMsgError?: (message: string, error: string) => void;
+}
+
+export enum EventStoreEvents {
+  // Login
+  onLoginStart = 'onLoginStart',
+  onLoginEnd = 'onLoginEnd',
+  onLoginSuccess = 'onLoginSuccess',
+  onLoginFailure = 'onLoginFailure',
+  // Logout
+  onLogoutStart = 'onLogoutStart',
+  onLogoutEnd = 'onLogoutEnd',
+  onLogoutSuccess = 'onLogoutSuccess',
+  onLogoutFailure = 'onLogoutFailure',
+  // Qr
+  onQrPending = 'onQrPending',
+  onQrLoaded = 'onQrLoaded',
+  // Transaction
+  onTxStarted = 'onTxStarted',
+  onTxSent = 'onTxSent',
+  onTxFinalized = 'onTxFinalized',
+  onTxError = 'onTxError',
+  // Signing
+  onSignMsgStarted = 'onSignMsgStarted',
+  onSignMsgFinalized = 'onSignMsgFinalized',
+  onSignMsgError = 'onSignMsgError',
 }
 
 export enum LoginMethodsEnum {
@@ -48,21 +83,6 @@ export interface LoginOptions {
 export enum DappCoreWCV2CustomMethodsEnum {
   mvx_cancelAction = 'mvx_cancelAction',
   mvx_signNativeAuthToken = 'mvx_signNativeAuthToken',
-}
-
-export enum EventStoreEvents {
-  onLoginPending = 'onLoginPending',
-  onLoggedIn = 'onLoggedIn',
-  onQrPending = 'onQrPending',
-  onQrLoaded = 'onQrLoaded',
-  onLogout = 'onLogout',
-  onTxStarted = 'onTxStarted',
-  onTxSent = 'onTxSent',
-  onTxFinalized = 'onTxFinalized',
-  onTxError = 'onTxError',
-  onSignMsgStarted = 'onSignMsgStarted',
-  onSignMsgFinalized = 'onSignMsgFinalized',
-  onSignMsgError = 'onSignMsgError',
 }
 
 export enum WebWalletUrlParamsEnum {

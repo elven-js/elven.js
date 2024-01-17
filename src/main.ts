@@ -42,6 +42,8 @@ import { preSendTx } from './interaction/pre-send-tx';
 import { webWalletSignMessageFinalize } from './interaction/web-wallet-sign-message-finalize';
 import { WebviewProvider } from './webview-provider/webview-provider';
 import { loginWithNativeAuthToken } from './auth/login-with-native-auth-token';
+import { initializeEventsStore } from './initialize-events-store';
+import { withLoginEvents } from './utils/with-login-events';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
@@ -71,71 +73,15 @@ export class ElvenJS {
 
     this.networkProvider = new ApiNetworkProvider(this.initOptions);
 
-    if (this.initOptions.onLoginPending) {
-      EventsStore.set(
-        EventStoreEvents.onLoginPending,
-        this.initOptions.onLoginPending
-      );
-    }
-    if (this.initOptions.onLoggedIn) {
-      EventsStore.set(EventStoreEvents.onLoggedIn, this.initOptions.onLoggedIn);
-    }
-    if (this.initOptions.onQrPending) {
-      EventsStore.set(
-        EventStoreEvents.onQrPending,
-        this.initOptions.onQrPending
-      );
-    }
-    if (this.initOptions.onQrLoaded) {
-      EventsStore.set(EventStoreEvents.onQrLoaded, this.initOptions.onQrLoaded);
-    }
-    if (this.initOptions.onLogout) {
-      EventsStore.set(EventStoreEvents.onLogout, this.initOptions.onLogout);
-    }
-    if (this.initOptions.onTxStarted) {
-      EventsStore.set(
-        EventStoreEvents.onTxStarted,
-        this.initOptions.onTxStarted
-      );
-    }
-    if (this.initOptions.onTxSent) {
-      EventsStore.set(EventStoreEvents.onTxSent, this.initOptions.onTxSent);
-    }
-    if (this.initOptions.onTxFinalized) {
-      EventsStore.set(
-        EventStoreEvents.onTxFinalized,
-        this.initOptions.onTxFinalized
-      );
-    }
-    if (this.initOptions.onTxError) {
-      EventsStore.set(EventStoreEvents.onTxError, this.initOptions.onTxError);
-    }
-    if (this.initOptions.onSignMsgStarted) {
-      EventsStore.set(
-        EventStoreEvents.onSignMsgStarted,
-        this.initOptions.onSignMsgStarted
-      );
-    }
-    if (this.initOptions.onSignMsgFinalized) {
-      EventsStore.set(
-        EventStoreEvents.onSignMsgFinalized,
-        this.initOptions.onSignMsgFinalized
-      );
-    }
-    if (this.initOptions.onSignMsgError) {
-      EventsStore.set(
-        EventStoreEvents.onSignMsgError,
-        this.initOptions.onSignMsgError
-      );
-    }
+    initializeEventsStore(this.initOptions);
 
     // Catch the nativeAuthToken and login with it (for example within xPortal Hub)
     const nativeAuthTokenFromUrl = getParamFromUrl('accessToken');
     if (nativeAuthTokenFromUrl) {
-      EventsStore.run(EventStoreEvents.onLoginPending);
-      loginWithNativeAuthToken(nativeAuthTokenFromUrl, this);
-      await accountSync(this);
-      EventsStore.run(EventStoreEvents.onLoggedIn);
+      await withLoginEvents(async () => {
+        loginWithNativeAuthToken(nativeAuthTokenFromUrl, this);
+        await accountSync(this);
+      });
     }
 
     const isAddress =
@@ -145,39 +91,36 @@ export class ElvenJS {
         getParamFromUrl('address'));
 
     if (isAddress && state?.loginMethod) {
-      EventsStore.run(EventStoreEvents.onLoginPending);
-
-      if (state.loginMethod === LoginMethodsEnum.browserExtension) {
-        this.dappProvider = await initExtensionProvider();
-      }
-      if (state.loginMethod === LoginMethodsEnum.mobile) {
-        this.dappProvider = await initMobileProvider(this);
-      }
-      if (state.loginMethod === LoginMethodsEnum.xPortalHub) {
-        this.dappProvider = new WebviewProvider();
-      }
-      if (
-        state.loginMethod === LoginMethodsEnum.webWallet &&
-        this.initOptions.chainType
-      ) {
-        this.dappProvider = await initWebWalletProvider(
-          networkConfig[this.initOptions.chainType].walletAddress,
-          this.initOptions.apiUrl
-        );
-      }
-      if (
-        state.loginMethod === LoginMethodsEnum.xAlias &&
-        this.initOptions.chainType
-      ) {
-        this.dappProvider = await initWebWalletProvider(
-          networkConfig[this.initOptions.chainType].xAliasAddress,
-          this.initOptions.apiUrl
-        );
-      }
-
-      await accountSync(this);
-
-      EventsStore.run(EventStoreEvents.onLoggedIn);
+      await withLoginEvents(async () => {
+        if (state.loginMethod === LoginMethodsEnum.browserExtension) {
+          this.dappProvider = await initExtensionProvider();
+        }
+        if (state.loginMethod === LoginMethodsEnum.mobile) {
+          this.dappProvider = await initMobileProvider(this);
+        }
+        if (state.loginMethod === LoginMethodsEnum.xPortalHub) {
+          this.dappProvider = new WebviewProvider();
+        }
+        if (
+          state.loginMethod === LoginMethodsEnum.webWallet &&
+          this.initOptions?.chainType
+        ) {
+          this.dappProvider = await initWebWalletProvider(
+            networkConfig[this.initOptions.chainType].walletAddress,
+            this.initOptions.apiUrl
+          );
+        }
+        if (
+          state.loginMethod === LoginMethodsEnum.xAlias &&
+          this.initOptions?.chainType
+        ) {
+          this.dappProvider = await initWebWalletProvider(
+            networkConfig[this.initOptions.chainType].xAliasAddress,
+            this.initOptions.apiUrl
+          );
+        }
+        await accountSync(this);
+      });
 
       // After successful web wallet transaction (or guarded transaction that use web wallet 2FA hook) we will land back on our website
       if (this.initOptions?.chainType) {
@@ -214,9 +157,7 @@ export class ElvenJS {
       throw new Error('Error: Login failed: Use ElvenJs.init() first!');
     }
 
-    try {
-      EventsStore.run(EventStoreEvents.onLoginPending);
-
+    await withLoginEvents(async () => {
       // Native auth login token initialization
       const nativeAuthClient = new NativeAuthClient({
         apiUrl: this.initOptions?.apiUrl,
@@ -274,10 +215,7 @@ export class ElvenJS {
         );
         this.dappProvider = dappProvider;
       }
-    } catch (e) {
-      const err = errorParse(e);
-      throw new Error(`Error: ${err}`);
-    }
+    });
   }
 
   /**

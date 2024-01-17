@@ -9,9 +9,14 @@ export interface InitOptions {
     apiTimeout?: number;
     walletConnectV2ProjectId?: string;
     walletConnectV2RelayAddresses?: string[];
-    onLoginPending?: () => void;
-    onLoggedIn?: () => void;
-    onLogout?: () => void;
+    onLoginStart?: () => void;
+    onLoginEnd?: () => void;
+    onLoginSuccess?: () => void;
+    onLoginFailure?: () => void;
+    onLogoutStart?: () => void;
+    onLogoutEnd?: () => void;
+    onLogoutSuccess?: () => void;
+    onLogoutFailure?: () => void;
     onQrPending?: () => void;
     onQrLoaded?: () => void;
     onTxStarted?: (transaction: Transaction) => void;
@@ -21,6 +26,25 @@ export interface InitOptions {
     onSignMsgStarted?: (message: string) => void;
     onSignMsgFinalized?: (messageSignature: string) => void;
     onSignMsgError?: (message: string, error: string) => void;
+}
+export declare enum EventStoreEvents {
+    onLoginStart = "onLoginStart",
+    onLoginEnd = "onLoginEnd",
+    onLoginSuccess = "onLoginSuccess",
+    onLoginFailure = "onLoginFailure",
+    onLogoutStart = "onLogoutStart",
+    onLogoutEnd = "onLogoutEnd",
+    onLogoutSuccess = "onLogoutSuccess",
+    onLogoutFailure = "onLogoutFailure",
+    onQrPending = "onQrPending",
+    onQrLoaded = "onQrLoaded",
+    onTxStarted = "onTxStarted",
+    onTxSent = "onTxSent",
+    onTxFinalized = "onTxFinalized",
+    onTxError = "onTxError",
+    onSignMsgStarted = "onSignMsgStarted",
+    onSignMsgFinalized = "onSignMsgFinalized",
+    onSignMsgError = "onSignMsgError"
 }
 export declare enum LoginMethodsEnum {
     ledger = "ledger",
@@ -38,20 +62,6 @@ export interface LoginOptions {
 export declare enum DappCoreWCV2CustomMethodsEnum {
     mvx_cancelAction = "mvx_cancelAction",
     mvx_signNativeAuthToken = "mvx_signNativeAuthToken"
-}
-export declare enum EventStoreEvents {
-    onLoginPending = "onLoginPending",
-    onLoggedIn = "onLoggedIn",
-    onQrPending = "onQrPending",
-    onQrLoaded = "onQrLoaded",
-    onLogout = "onLogout",
-    onTxStarted = "onTxStarted",
-    onTxSent = "onTxSent",
-    onTxFinalized = "onTxFinalized",
-    onTxError = "onTxError",
-    onSignMsgStarted = "onSignMsgStarted",
-    onSignMsgFinalized = "onSignMsgFinalized",
-    onSignMsgError = "onSignMsgError"
 }
 export declare enum WebWalletUrlParamsEnum {
     hasWebWalletGuardianSign = "hasWebWalletGuardianSign"

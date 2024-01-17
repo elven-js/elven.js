@@ -52,7 +52,7 @@ export const loginWithMobile = async (
   const providerHandlers = {
     onClientLogin: async () => {
       if (elven.dappProvider instanceof WalletConnectV2Provider) {
-        EventsStore.run(EventStoreEvents.onLoginPending);
+        EventsStore.run(EventStoreEvents.onLoginStart);
         const address = await elven.dappProvider.getAddress();
         const signature = await elven.dappProvider.getSignature();
 
@@ -75,14 +75,13 @@ export const loginWithMobile = async (
         );
         ls.set('accessToken', accessToken);
 
-        EventsStore.run(EventStoreEvents.onLoggedIn);
+        EventsStore.run(EventStoreEvents.onLoginSuccess);
         qrCodeElement?.replaceChildren();
       }
     },
     onClientLogout: async () => {
       if (elven.dappProvider instanceof WalletConnectV2Provider) {
         await logout(elven);
-        EventsStore.run(EventStoreEvents.onLogout);
       }
     },
     onClientEvent: (event: SessionEventTypes['event']) => {
@@ -137,6 +136,6 @@ export const loginWithMobile = async (
   } catch (e) {
     const err = errorParse(e);
     console.warn(`Something went wrong trying to login the user: ${err}`);
-    EventsStore.run(EventStoreEvents.onLogout);
+    EventsStore.run(EventStoreEvents.onLoginFailure);
   }
 };

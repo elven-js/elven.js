@@ -19,7 +19,7 @@ export const initMobileProvider = async (elven: any) => {
 
   const providerHandlers = {
     onClientLogin: () => {
-      accountSync(elven), EventsStore.run(EventStoreEvents.onLoggedIn);
+      accountSync(elven), EventsStore.run(EventStoreEvents.onLoginSuccess);
     },
     onClientLogout: () => logout(elven),
     onClientEvent: (event: SessionEventTypes['event']) => {

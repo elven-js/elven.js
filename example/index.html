@@ -187,15 +187,25 @@
           // Remember to change it. Get yours here: https://cloud.walletconnect.com/sign-in
           walletConnectV2ProjectId: 'f502675c63610bfe4454080ac86d70e6',
           walletConnectV2RelayAddresses: ['wss://relay.walletconnect.com'],
-          onLoginPending: () => { uiPending(true) },
-          onLoggedIn: () => { uiLoggedInState(true); uiPending(false); },
-          onLogout: () => { uiLoggedInState(false); },
+          // Login callbacks
+          onLoginStart: () => { uiPending(true) },
+          onLoginEnd: () => { uiPending(false) },
+          onLoginSuccess: () => { uiLoggedInState(true); },
+          onLoginFailure: () => { uiLoggedInState(false); },
+          // Logout callbacks
+          onLogoutStart: () => { uiPending(true) },
+          onLogoutEnd: () => { uiPending(false) },
+          onLogoutSuccess: () => { uiLoggedInState(false); },
+          onLogoutFailure: () => { uiLoggedInState(true); },
+          // Transaction callbacks
           onTxStarted: (tx) => { uiPending(true); },
           onTxSent: (tx) => { console.log('Tx sent, not finalized on chain yet! ', tx.getHash().toString()) },
           onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
           onTxError: (tx, error) => { console.log('Tx error: ', error); uiPending(false); },
+          // Qr callbacks
           onQrPending: () => { uiPending(true); },
           onQrLoaded: () => { uiPending(false); },
+          // Signing callbacks
           onSignMsgStarted: () => { uiPending(true); },
           onSignMsgFinalized: (message, messageSignature) => { messageSignature && updateOperationResultContainer(`➡️ The signature for "${message}" message:\n${messageSignature}`); uiPending(false); },
           onSignMsgError: (message, error) => { console.log('Signing message error: ', error); uiPending(false); },

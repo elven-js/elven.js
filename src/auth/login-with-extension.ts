@@ -27,9 +27,9 @@ export const loginWithExtension = async (
     if (dappProvider) {
       const address = await dappProvider.login(providerLoginData);
       if (address) {
-        EventsStore.run(EventStoreEvents.onLoginPending);
+        EventsStore.run(EventStoreEvents.onLoginStart);
       } else {
-        EventsStore.run(EventStoreEvents.onLogout);
+        EventsStore.run(EventStoreEvents.onLoginFailure);
       }
     }
   } catch (e) {
@@ -65,7 +65,7 @@ export const loginWithExtension = async (
 
       await accountSync(elven);
 
-      EventsStore.run(EventStoreEvents.onLoggedIn);
+      EventsStore.run(EventStoreEvents.onLoginSuccess);
 
       const accessToken = nativeAuthClient.getToken(
         address,
@@ -79,7 +79,7 @@ export const loginWithExtension = async (
       console.warn(
         `Something went wrong trying to synchronize the user account: ${e?.message}`
       );
-      EventsStore.run(EventStoreEvents.onLogout);
+      EventsStore.run(EventStoreEvents.onLoginFailure);
     }
   }
 };
