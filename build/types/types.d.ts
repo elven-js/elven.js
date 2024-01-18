@@ -12,11 +12,11 @@ export interface InitOptions {
     onLoginStart?: () => void;
     onLoginEnd?: () => void;
     onLoginSuccess?: () => void;
-    onLoginFailure?: () => void;
+    onLoginFailure?: (error: string) => void;
     onLogoutStart?: () => void;
     onLogoutEnd?: () => void;
     onLogoutSuccess?: () => void;
-    onLogoutFailure?: () => void;
+    onLogoutFailure?: (error: string) => void;
     onQrPending?: () => void;
     onQrLoaded?: () => void;
     onTxStarted?: (transaction: Transaction) => void;

@@ -136,6 +136,6 @@ export const loginWithMobile = async (
   } catch (e) {
     const err = errorParse(e);
     console.warn(`Something went wrong trying to login the user: ${err}`);
-    EventsStore.run(EventStoreEvents.onLoginFailure);
+    EventsStore.run(EventStoreEvents.onLoginFailure, err);
   }
 };

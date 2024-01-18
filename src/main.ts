@@ -150,11 +150,15 @@ export class ElvenJS {
     const isProperLoginMethod =
       Object.values(LoginMethodsEnum).includes(loginMethod);
     if (!isProperLoginMethod) {
-      throw new Error('Error: Wrong login method!');
+      const error = 'Wrong login method!';
+      EventsStore.run(EventStoreEvents.onLoginFailure, error);
+      throw new Error(error);
     }
 
     if (!this.networkProvider) {
-      throw new Error('Error: Login failed: Use ElvenJs.init() first!');
+      const error = 'Login failed: Use ElvenJs.init() first!';
+      EventsStore.run(EventStoreEvents.onLoginFailure, error);
+      throw new Error(error);
     }
 
     await withLoginEvents(async () => {
@@ -237,14 +241,15 @@ export class ElvenJS {
    */
   static async signAndSendTransaction(transaction: Transaction) {
     if (!this.dappProvider) {
-      throw new Error(
-        'Error: Transaction signing failed: There is no active session!'
-      );
+      const error = 'Transaction signing failed: There is no active session!';
+      EventsStore.run(EventStoreEvents.onTxError, transaction, error);
+      throw new Error(error);
     }
     if (!this.networkProvider) {
-      throw new Error(
-        'Error: Transaction signing failed: There is no active network provider!'
-      );
+      const error =
+        'Transaction signing failed: There is no active network provider!';
+      EventsStore.run(EventStoreEvents.onTxError, transaction, error);
+      throw new Error(error);
     }
 
     let signedTx = guardianPreSignTxOperations(transaction);
@@ -293,8 +298,12 @@ export class ElvenJS {
       }
     } catch (e) {
       const err = errorParse(e);
-      EventsStore.run(EventStoreEvents.onTxError, signedTx, err);
-      throw new Error(`Error: Transaction signing failed! ${err}`);
+      EventsStore.run(
+        EventStoreEvents.onTxError,
+        signedTx,
+        `Getting transaction information failed! ${err}`
+      );
+      throw new Error(`Getting transaction information failed! ${err}`);
     }
 
     return signedTx;
@@ -308,14 +317,15 @@ export class ElvenJS {
     options?: { callbackUrl?: string }
   ) {
     if (!this.dappProvider) {
-      throw new Error(
-        'Error: Message signing failed: There is no active session!'
-      );
+      const error = 'Message signing failed: There is no active session!';
+      EventsStore.run(EventStoreEvents.onSignMsgError, message, error);
+      throw new Error(error);
     }
     if (!this.networkProvider) {
-      throw new Error(
-        'Error: Message signing failed: There is no active network provider!'
-      );
+      const error =
+        'Message signing failed: There is no active network provider!';
+      EventsStore.run(EventStoreEvents.onSignMsgError, message, error);
+      throw new Error(error);
     }
 
     let messageSignature = '';
@@ -370,7 +380,7 @@ export class ElvenJS {
     } catch (e) {
       const err = errorParse(e);
       EventsStore.run(EventStoreEvents.onSignMsgError, message, err);
-      throw new Error(`Error: Message signing failed! ${err}`);
+      throw new Error(`Message signing failed! ${err}`);
     }
   }
 
@@ -385,14 +395,12 @@ export class ElvenJS {
     caller,
   }: SmartContractQueryArgs) {
     if (!this.networkProvider) {
-      throw new Error(
-        'Error: Query failed: There is no active network provider!'
-      );
+      throw new Error('Query failed: There is no active network provider!');
     }
 
     if (!address || !func) {
       throw new Error(
-        'Error: Query failed: The Query arguments are not valid! Address and func required'
+        'Query failed: The Query arguments are not valid! Address and func required'
       );
     }
 
@@ -406,7 +414,7 @@ export class ElvenJS {
       });
     } catch (e) {
       const err = errorParse(e);
-      throw new Error(`Error: Smart contract query failed! ${err}`);
+      throw new Error(`Smart contract query failed! ${err}`);
     }
   }
 

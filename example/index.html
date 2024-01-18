@@ -157,7 +157,8 @@
       updateTxHashContainer,
       base64ToDecimalHex,
       updateOperationResultContainer,
-      clearQrCodeContainer
+      clearQrCodeContainer,
+      displayError
     } from './demo-ui-tools.js'
 
     // Elven.js tools
@@ -191,24 +192,30 @@
           onLoginStart: () => { uiPending(true) },
           onLoginEnd: () => { uiPending(false) },
           onLoginSuccess: () => { uiLoggedInState(true); },
-          onLoginFailure: () => { uiLoggedInState(false); },
+          onLoginFailure: (error) => { displayError(error); },
           // Logout callbacks
           onLogoutStart: () => { uiPending(true) },
           onLogoutEnd: () => { uiPending(false) },
           onLogoutSuccess: () => { uiLoggedInState(false); },
-          onLogoutFailure: () => { uiLoggedInState(true); },
+          onLogoutFailure: (error) => { displayError(error); },
+          // Query callbacks
+          // TODO:
+          // onQueryStart
+          // onQueryEnd
+          // onQuerySuccess
+          // onQueryFailure
           // Transaction callbacks
           onTxStarted: (tx) => { uiPending(true); },
-          onTxSent: (tx) => { console.log('Tx sent, not finalized on chain yet! ', tx.getHash().toString()) },
+          onTxSent: (tx) => { const hash = tx.getHash().toString(); hash && updateTxHashContainer(hash, true); },
           onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
-          onTxError: (tx, error) => { console.log('Tx error: ', error); uiPending(false); },
+          onTxError: (tx, error) => { displayError(error); uiPending(false); },
           // Qr callbacks
           onQrPending: () => { uiPending(true); },
           onQrLoaded: () => { uiPending(false); },
           // Signing callbacks
           onSignMsgStarted: () => { uiPending(true); },
           onSignMsgFinalized: (message, messageSignature) => { messageSignature && updateOperationResultContainer(`➡️ The signature for "${message}" message:\n${messageSignature}`); uiPending(false); },
-          onSignMsgError: (message, error) => { console.log('Signing message error: ', error); uiPending(false); },
+          onSignMsgError: (message, error) => { displayError(error); uiPending(false); },
         }
       );
     }
@@ -271,7 +278,6 @@
     const egldTransferAddress = 'erd17a4wydhhd6t3hhssvcp9g23ppn7lgkk4g2tww3eqzx4mlq95dukss0g50f';
 
     document.getElementById('button-tx').addEventListener('click', async () => {
-      updateTxHashContainer(false);
       const demoMessage = 'Transaction demo from Elven.js!';
 
       const isGuardian = ElvenJS.storage.get('activeGuardian');
@@ -301,8 +307,6 @@
     const esdtTransferAddress = 'erd17a4wydhhd6t3hhssvcp9g23ppn7lgkk4g2tww3eqzx4mlq95dukss0g50f';
 
     document.getElementById('button-tx-esdt').addEventListener('click', async () => {
-      updateTxHashContainer(false);
-
       // The preconfigured transaction is for the 1 'BUILDO-22c0a5' ESDT token on the devnet
       // You need to know its ticker and how many decimals places it has
       // In this case, the token has 18 decimal places. You can check it in the MultiversX devnet explorer
@@ -333,9 +337,6 @@
     // It mints on the smart contract from: https://dapp-demo.elven.tools/
     const nftMinterSmartContract = 'erd1qqqqqqqqqqqqqpgqufmyqvy3kvda2uywqgx809lglxftq9t667es3956pv';
     document.getElementById('button-mint').addEventListener('click', async () => {
-
-      updateTxHashContainer(false);
-
       const contractAddress = new Address(nftMinterSmartContract);
       const contract = new SmartContract({ address: contractAddress });
 

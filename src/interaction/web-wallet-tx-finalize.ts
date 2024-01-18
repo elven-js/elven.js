@@ -81,8 +81,9 @@ export const webWalletTxFinalize = async (
         await postSendTx(transaction, networkProvider);
       } catch (e) {
         const err = errorParse(e);
-        EventsStore.run(EventStoreEvents.onTxError, transaction, err);
-        throw new Error(`Error: Transaction signing failed! ${err}`);
+        const errMsg = `Getting transaction information failed! ${err}`;
+        EventsStore.run(EventStoreEvents.onTxError, transaction, errMsg);
+        throw new Error(errMsg);
       } finally {
         window.history.replaceState(null, '', window.location.pathname);
       }

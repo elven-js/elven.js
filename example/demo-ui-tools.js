@@ -51,14 +51,28 @@ export const uiLoggedInState = (loggedIn) => {
   uiPending(false);
 };
 
-export const updateTxHashContainer = (txHash) => {
+export const displayError = (error) => {
+  if (error) {
+    const txHashContainer = document.getElementById('operation-result');
+    txHashContainer.replaceChildren();
+    const container = document.createElement('div');
+    container.classList.add('operation-result');
+    container.innerText =
+      'There was an error: "' + error + '" Please try again!';
+    txHashContainer?.appendChild(container);
+  }
+};
+
+export const updateTxHashContainer = (txHash, isPending) => {
   if (txHash) {
     const txHashContainer = document.getElementById('operation-result');
+    txHashContainer.replaceChildren();
     const url = `https://devnet-explorer.multiversx.com/transactions/${txHash}`;
     const link = document.createElement('a');
     link.setAttribute('href', url);
+    link.setAttribute('target', '_blank');
     link.classList.add('transaction-link');
-    link.innerText = `➡️ ${url}`;
+    link.innerText = `Click to check your transaction on the Explorer.${isPending ? ' (Still pending...)' : ''}`;
     txHashContainer?.appendChild(link);
   }
 };

@@ -39,6 +39,6 @@ export const loginWithWebWallet = async (
     const err = errorParse(e);
     console.warn(`Something went wrong trying to login the user: ${err}`);
     ls.set('loginMethod', '');
-    EventsStore.run(EventStoreEvents.onLoginFailure);
+    EventsStore.run(EventStoreEvents.onLoginFailure, err);
   }
 };

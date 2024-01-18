@@ -5,7 +5,7 @@ import { errorParse } from '../utils/error-parse';
 
 export const logout = async (elven: any) => {
   if (!elven.dappProvider) {
-    throw new Error('Error: Logout failed: There is no active session!');
+    throw new Error('Logout failed: There is no active session!');
   }
 
   EventsStore.run(EventStoreEvents.onLogoutStart);
