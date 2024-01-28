@@ -5,7 +5,7 @@ import {
   TransactionOptions,
 } from '@multiversx/sdk-core/out/networkParams';
 import { Address } from '@multiversx/sdk-core/out/address';
-import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out';
+import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
 import { DAPP_INIT_ROUTE } from '../utils/constants';
 import { WebWalletUrlParamsEnum } from '../types';
 

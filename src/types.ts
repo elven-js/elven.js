@@ -3,6 +3,8 @@ import { Transaction } from '@multiversx/sdk-core/out/transaction';
 import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
 import { WebviewProvider } from './webview-provider/webview-provider';
+import { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts';
+import { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/contractQueryResponse';
 
 export interface InitOptions {
   apiUrl?: string;
@@ -24,14 +26,18 @@ export interface InitOptions {
   onQrPending?: () => void;
   onQrLoaded?: () => void;
   // Transaction
-  onTxStarted?: (transaction: Transaction) => void;
+  onTxStart?: (transaction: Transaction) => void;
   onTxSent?: (transaction: Transaction) => void;
   onTxFinalized?: (transaction: Transaction) => void;
-  onTxError?: (transaction: Transaction, error: string) => void;
+  onTxFailure?: (transaction: Transaction, error: string) => void;
   // Signing
-  onSignMsgStarted?: (message: string) => void;
+  onSignMsgStart?: (message: string) => void;
   onSignMsgFinalized?: (messageSignature: string) => void;
-  onSignMsgError?: (message: string, error: string) => void;
+  onSignMsgFailure?: (message: string, error: string) => void;
+  // Query
+  onQueryStart?: (queryArgs: QueryArguments) => void;
+  onQueryFinalized?: (queryResponse: ContractQueryResponse) => void;
+  onQueryFailure?: (queryArgs: QueryArguments, error: string) => void;
 }
 
 export enum EventStoreEvents {
@@ -49,14 +55,18 @@ export enum EventStoreEvents {
   onQrPending = 'onQrPending',
   onQrLoaded = 'onQrLoaded',
   // Transaction
-  onTxStarted = 'onTxStarted',
+  onTxStart = 'onTxStart',
   onTxSent = 'onTxSent',
   onTxFinalized = 'onTxFinalized',
-  onTxError = 'onTxError',
+  onTxFailure = 'onTxFailure',
   // Signing
-  onSignMsgStarted = 'onSignMsgStarted',
+  onSignMsgStart = 'onSignMsgStart',
   onSignMsgFinalized = 'onSignMsgFinalized',
-  onSignMsgError = 'onSignMsgError',
+  onSignMsgFailure = 'onSignMsgFailure',
+  // Query
+  onQueryStart = 'onQueryStart',
+  onQueryFinalized = 'onQueryFinalized',
+  onQueryFailure = 'onQueryFailure',
 }
 
 export enum LoginMethodsEnum {

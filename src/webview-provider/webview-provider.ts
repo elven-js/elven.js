@@ -4,7 +4,7 @@
  * It will probably be replaced with separate library in the future
  */
 
-import { Transaction } from '@multiversx/sdk-core';
+import { Transaction } from '@multiversx/sdk-core/out/transaction';
 import { PlatformsEnum, WebViewProviderResponseEnums } from './types';
 import { detectCurrentPlatform, getTargetOrigin } from './utils';
 import { requestMethods } from './request-methods';

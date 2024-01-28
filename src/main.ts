@@ -78,9 +78,10 @@ export class ElvenJS {
     // Catch the nativeAuthToken and login with it (for example within xPortal Hub)
     const nativeAuthTokenFromUrl = getParamFromUrl('accessToken');
     if (nativeAuthTokenFromUrl) {
-      await withLoginEvents(async () => {
+      await withLoginEvents(async (onLoginSuccess) => {
         loginWithNativeAuthToken(nativeAuthTokenFromUrl, this);
         await accountSync(this);
+        onLoginSuccess();
       });
     }
 
@@ -91,7 +92,7 @@ export class ElvenJS {
         getParamFromUrl('address'));
 
     if (isAddress && state?.loginMethod) {
-      await withLoginEvents(async () => {
+      await withLoginEvents(async (onLoginSyuccess) => {
         if (state.loginMethod === LoginMethodsEnum.browserExtension) {
           this.dappProvider = await initExtensionProvider();
         }
@@ -120,6 +121,7 @@ export class ElvenJS {
           );
         }
         await accountSync(this);
+        onLoginSyuccess();
       });
 
       // After successful web wallet transaction (or guarded transaction that use web wallet 2FA hook) we will land back on our website
@@ -161,7 +163,7 @@ export class ElvenJS {
       throw new Error(error);
     }
 
-    await withLoginEvents(async () => {
+    await withLoginEvents(async (onLoginSuccess) => {
       // Native auth login token initialization
       const nativeAuthClient = new NativeAuthClient({
         apiUrl: this.initOptions?.apiUrl,
@@ -178,6 +180,7 @@ export class ElvenJS {
           options?.callbackRoute
         );
         this.dappProvider = dappProvider;
+        onLoginSuccess();
       }
 
       // Login with mobile app
@@ -189,6 +192,7 @@ export class ElvenJS {
           options?.qrCodeContainer
         );
         this.dappProvider = dappProvider;
+        onLoginSuccess();
       }
 
       // Login with Web Wallet
@@ -242,20 +246,20 @@ export class ElvenJS {
   static async signAndSendTransaction(transaction: Transaction) {
     if (!this.dappProvider) {
       const error = 'Transaction signing failed: There is no active session!';
-      EventsStore.run(EventStoreEvents.onTxError, transaction, error);
+      EventsStore.run(EventStoreEvents.onTxFailure, transaction, error);
       throw new Error(error);
     }
     if (!this.networkProvider) {
       const error =
         'Transaction signing failed: There is no active network provider!';
-      EventsStore.run(EventStoreEvents.onTxError, transaction, error);
+      EventsStore.run(EventStoreEvents.onTxFailure, transaction, error);
       throw new Error(error);
     }
 
     let signedTx = guardianPreSignTxOperations(transaction);
 
     try {
-      EventsStore.run(EventStoreEvents.onTxStarted, transaction);
+      EventsStore.run(EventStoreEvents.onTxStart, transaction);
 
       const currentState = ls.get();
 
@@ -299,7 +303,7 @@ export class ElvenJS {
     } catch (e) {
       const err = errorParse(e);
       EventsStore.run(
-        EventStoreEvents.onTxError,
+        EventStoreEvents.onTxFailure,
         signedTx,
         `Getting transaction information failed! ${err}`
       );
@@ -318,20 +322,20 @@ export class ElvenJS {
   ) {
     if (!this.dappProvider) {
       const error = 'Message signing failed: There is no active session!';
-      EventsStore.run(EventStoreEvents.onSignMsgError, message, error);
+      EventsStore.run(EventStoreEvents.onSignMsgFailure, message, error);
       throw new Error(error);
     }
     if (!this.networkProvider) {
       const error =
         'Message signing failed: There is no active network provider!';
-      EventsStore.run(EventStoreEvents.onSignMsgError, message, error);
+      EventsStore.run(EventStoreEvents.onSignMsgFailure, message, error);
       throw new Error(error);
     }
 
     let messageSignature = '';
 
     try {
-      EventsStore.run(EventStoreEvents.onSignMsgStarted, message);
+      EventsStore.run(EventStoreEvents.onSignMsgStart, message);
 
       if (this.dappProvider instanceof ExtensionProvider) {
         const signedMessage = await this.dappProvider.signMessage(
@@ -379,7 +383,7 @@ export class ElvenJS {
       return { message, messageSignature };
     } catch (e) {
       const err = errorParse(e);
-      EventsStore.run(EventStoreEvents.onSignMsgError, message, err);
+      EventsStore.run(EventStoreEvents.onSignMsgFailure, message, err);
       throw new Error(`Message signing failed! ${err}`);
     }
   }
@@ -404,16 +408,22 @@ export class ElvenJS {
       );
     }
 
+    const queryArgs = {
+      address,
+      func,
+      args,
+      value,
+      caller,
+    };
+
     try {
-      return await this.networkProvider.queryContract({
-        address,
-        func,
-        args,
-        value,
-        caller,
-      });
+      EventsStore.run(EventStoreEvents.onQueryStart, queryArgs);
+      const response = await this.networkProvider.queryContract(queryArgs);
+      EventsStore.run(EventStoreEvents.onQueryFinalized, response);
+      return response;
     } catch (e) {
       const err = errorParse(e);
+      EventsStore.run(EventStoreEvents.onQueryFinalized, queryArgs, err);
       throw new Error(`Smart contract query failed! ${err}`);
     }
   }

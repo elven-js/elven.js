@@ -3,6 +3,8 @@ import { Transaction } from '@multiversx/sdk-core/out/transaction';
 import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
 import { WebviewProvider } from './webview-provider/webview-provider';
+import { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts';
+import { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/contractQueryResponse';
 export interface InitOptions {
     apiUrl?: string;
     chainType?: string;
@@ -19,13 +21,16 @@ export interface InitOptions {
     onLogoutFailure?: (error: string) => void;
     onQrPending?: () => void;
     onQrLoaded?: () => void;
-    onTxStarted?: (transaction: Transaction) => void;
+    onTxStart?: (transaction: Transaction) => void;
     onTxSent?: (transaction: Transaction) => void;
     onTxFinalized?: (transaction: Transaction) => void;
-    onTxError?: (transaction: Transaction, error: string) => void;
-    onSignMsgStarted?: (message: string) => void;
+    onTxFailure?: (transaction: Transaction, error: string) => void;
+    onSignMsgStart?: (message: string) => void;
     onSignMsgFinalized?: (messageSignature: string) => void;
-    onSignMsgError?: (message: string, error: string) => void;
+    onSignMsgFailure?: (message: string, error: string) => void;
+    onQueryStart?: (queryArgs: QueryArguments) => void;
+    onQueryFinalized?: (queryResponse: ContractQueryResponse) => void;
+    onQueryFailure?: (queryArgs: QueryArguments, error: string) => void;
 }
 export declare enum EventStoreEvents {
     onLoginStart = "onLoginStart",
@@ -38,13 +43,16 @@ export declare enum EventStoreEvents {
     onLogoutFailure = "onLogoutFailure",
     onQrPending = "onQrPending",
     onQrLoaded = "onQrLoaded",
-    onTxStarted = "onTxStarted",
+    onTxStart = "onTxStart",
     onTxSent = "onTxSent",
     onTxFinalized = "onTxFinalized",
-    onTxError = "onTxError",
-    onSignMsgStarted = "onSignMsgStarted",
+    onTxFailure = "onTxFailure",
+    onSignMsgStart = "onSignMsgStart",
     onSignMsgFinalized = "onSignMsgFinalized",
-    onSignMsgError = "onSignMsgError"
+    onSignMsgFailure = "onSignMsgFailure",
+    onQueryStart = "onQueryStart",
+    onQueryFinalized = "onQueryFinalized",
+    onQueryFailure = "onQueryFailure"
 }
 export declare enum LoginMethodsEnum {
     ledger = "ledger",

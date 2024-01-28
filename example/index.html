@@ -188,34 +188,45 @@
           // Remember to change it. Get yours here: https://cloud.walletconnect.com/sign-in
           walletConnectV2ProjectId: 'f502675c63610bfe4454080ac86d70e6',
           walletConnectV2RelayAddresses: ['wss://relay.walletconnect.com'],
-          // Login callbacks
+          // All callbacks are optional
+          // You could also rely on try catch to some extent, but callbacks in one place seems convenient
+          // Login callbacks:
           onLoginStart: () => { uiPending(true) },
           onLoginEnd: () => { uiPending(false) },
           onLoginSuccess: () => { uiLoggedInState(true); },
           onLoginFailure: (error) => { displayError(error); },
-          // Logout callbacks
+          // Logout callbacks:
           onLogoutStart: () => { uiPending(true) },
           onLogoutEnd: () => { uiPending(false) },
           onLogoutSuccess: () => { uiLoggedInState(false); },
           onLogoutFailure: (error) => { displayError(error); },
-          // Query callbacks
-          // TODO:
-          // onQueryStart
-          // onQueryEnd
-          // onQuerySuccess
-          // onQueryFailure
           // Transaction callbacks
-          onTxStarted: (tx) => { uiPending(true); },
+          onTxStart: (tx) => { uiPending(true); },
           onTxSent: (tx) => { const hash = tx.getHash().toString(); hash && updateTxHashContainer(hash, true); },
           onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
-          onTxError: (tx, error) => { displayError(error); uiPending(false); },
-          // Qr callbacks
+          onTxFailure: (tx, error) => { displayError(error); uiPending(false); },
+          // Qr code callbacks:
           onQrPending: () => { uiPending(true); },
           onQrLoaded: () => { uiPending(false); },
-          // Signing callbacks
-          onSignMsgStarted: () => { uiPending(true); },
+          // Signing callbacks:
+          onSignMsgStart: (message) => { uiPending(true); },
           onSignMsgFinalized: (message, messageSignature) => { messageSignature && updateOperationResultContainer(`➡️ The signature for "${message}" message:\n${messageSignature}`); uiPending(false); },
-          onSignMsgError: (message, error) => { displayError(error); uiPending(false); },
+          onSignMsgFailure: (message, error) => { displayError(error); uiPending(false); },
+          // Query callbacks:
+          onQueryStart: (queryArgs) => { uiPending(true); },
+          onQueryFinalized: (queryResponse) => {
+            // Manual decoding of a simple type (number here), there will be additional tools for that using ABI
+            // For now please check data converter in Buildo.dev: 
+            // https://github.com/xdevguild/buildo.dev/blob/main/components/operations/utils-operations/data-converters.tsx#L103
+            const hexVal = base64ToDecimalHex(queryResponse?.returnData?.[0]);
+            let intVal = 0;
+            if (hexVal) {
+              intVal = parseInt(hexVal, 16);
+            }
+            updateOperationResultContainer(`➡️ The result of the query is: ${intVal}`);
+            uiPending(false);
+          },
+          onQueryFailure: (queryArgs, error) => { displayError(error); uiPending(false); }
         }
       );
     }
@@ -368,28 +379,12 @@
     // Read more about the Elven Tools Smart Contract here: https://www.elven.tools/docs/sc-endpoints.html
     document.getElementById('button-query').addEventListener('click', async () => {
       try {
-        updateOperationResultContainer();
-        uiPending(true);
-
-        const results = await ElvenJS.queryContract({
+        await ElvenJS.queryContract({
           address: new Address(nftMinterSmartContract),
           func: new ContractFunction('getMintedPerAddressTotal'),
           args: [new AddressValue(new Address(ElvenJS.storage.get('address')))]
         });
-
-        uiPending(false);
-
-        // Manual decoding of a simple type (number here), there will be additional tools for that using ABI
-        // For now please check data converter in Buildo.dev: 
-        // https://github.com/xdevguild/buildo.dev/blob/main/components/operations/utils-operations/data-converters.tsx#L103
-        const hexVal = base64ToDecimalHex(results?.returnData?.[0]);
-        let intVal = 0;
-        if (hexVal) {
-          intVal = parseInt(hexVal, 16);
-        }
-        updateOperationResultContainer(`➡️ The result of the query is: ${intVal}`);
       } catch (e) {
-        uiPending(false);
         throw new Error(e?.message);
       }
     });
@@ -401,7 +396,6 @@
       try {
         await ElvenJS.signMessage('Elven Family is awesome!');
       } catch (e) {
-        uiPending(false);
         throw new Error(e?.message);
       }
     });

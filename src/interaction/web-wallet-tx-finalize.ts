@@ -76,13 +76,13 @@ export const webWalletTxFinalize = async (
       preSendTx(transaction);
 
       try {
-        EventsStore.run(EventStoreEvents.onTxStarted, transaction);
+        EventsStore.run(EventStoreEvents.onTxStart, transaction);
         await networkProvider.sendTransaction(transaction);
         await postSendTx(transaction, networkProvider);
       } catch (e) {
         const err = errorParse(e);
         const errMsg = `Getting transaction information failed! ${err}`;
-        EventsStore.run(EventStoreEvents.onTxError, transaction, errMsg);
+        EventsStore.run(EventStoreEvents.onTxFailure, transaction, errMsg);
         throw new Error(errMsg);
       } finally {
         window.history.replaceState(null, '', window.location.pathname);

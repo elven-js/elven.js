@@ -1,5 +1,4 @@
 /// <reference types="node" />
-import BigNumber from 'bignumber.js';
 import { Address } from '@multiversx/sdk-core/out/address';
 import { TransactionStatus } from '@multiversx/sdk-network-providers/out/transactionStatus';
 import { TransactionReceipt } from '@multiversx/sdk-network-providers/out/transactionReceipt';
@@ -18,7 +17,7 @@ export type NetworkProviderOptions = Pick<InitOptions, 'apiUrl' | 'chainType' | 
 export interface AccountOnNetwork {
     address: IAddress;
     nonce: number;
-    balance: BigNumber;
+    balance: bigint;
     code: string;
     userName: string;
 }

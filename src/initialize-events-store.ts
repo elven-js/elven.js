@@ -51,8 +51,8 @@ export const initializeEventsStore = (initOptions: InitOptions) => {
   }
 
   // Transactions initialization
-  if (initOptions.onTxStarted) {
-    EventsStore.set(EventStoreEvents.onTxStarted, initOptions.onTxStarted);
+  if (initOptions.onTxStart) {
+    EventsStore.set(EventStoreEvents.onTxStart, initOptions.onTxStart);
   }
   if (initOptions.onTxSent) {
     EventsStore.set(EventStoreEvents.onTxSent, initOptions.onTxSent);
@@ -60,15 +60,15 @@ export const initializeEventsStore = (initOptions: InitOptions) => {
   if (initOptions.onTxFinalized) {
     EventsStore.set(EventStoreEvents.onTxFinalized, initOptions.onTxFinalized);
   }
-  if (initOptions.onTxError) {
-    EventsStore.set(EventStoreEvents.onTxError, initOptions.onTxError);
+  if (initOptions.onTxFailure) {
+    EventsStore.set(EventStoreEvents.onTxFailure, initOptions.onTxFailure);
   }
 
   // Signing initialization
-  if (initOptions.onSignMsgStarted) {
+  if (initOptions.onSignMsgStart) {
     EventsStore.set(
-      EventStoreEvents.onSignMsgStarted,
-      initOptions.onSignMsgStarted
+      EventStoreEvents.onSignMsgStart,
+      initOptions.onSignMsgStart
     );
   }
   if (initOptions.onSignMsgFinalized) {
@@ -77,10 +77,27 @@ export const initializeEventsStore = (initOptions: InitOptions) => {
       initOptions.onSignMsgFinalized
     );
   }
-  if (initOptions.onSignMsgError) {
+  if (initOptions.onSignMsgFailure) {
     EventsStore.set(
-      EventStoreEvents.onSignMsgError,
-      initOptions.onSignMsgError
+      EventStoreEvents.onSignMsgFailure,
+      initOptions.onSignMsgFailure
+    );
+  }
+
+  // Queries initialization
+  if (initOptions.onQueryStart) {
+    EventsStore.set(EventStoreEvents.onQueryStart, initOptions.onQueryStart);
+  }
+  if (initOptions.onQueryFinalized) {
+    EventsStore.set(
+      EventStoreEvents.onQueryFinalized,
+      initOptions.onQueryFinalized
+    );
+  }
+  if (initOptions.onQueryFailure) {
+    EventsStore.set(
+      EventStoreEvents.onQueryFailure,
+      initOptions.onQueryFailure
     );
   }
 };
