@@ -33,7 +33,8 @@ export {
   AddressType,
   AddressValue,
 } from '@multiversx/sdk-core/out/smartcontracts/typesystem/address';
+export { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts/interface';
+export { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/contractQueryResponse';
 
 export { ElvenJS } from './main';
-
-export { LoginMethodsEnum } from './types';
+export * from './types';

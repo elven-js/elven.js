@@ -13,5 +13,7 @@ export { BytesType, BytesValue, } from '@multiversx/sdk-core/out/smartcontracts/
 export { U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, BigUIntType, BigUIntValue, } from '@multiversx/sdk-core/out/smartcontracts/typesystem/numerical';
 export { BooleanType, BooleanValue, } from '@multiversx/sdk-core/out/smartcontracts/typesystem/boolean';
 export { AddressType, AddressValue, } from '@multiversx/sdk-core/out/smartcontracts/typesystem/address';
+export { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts/interface';
+export { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/contractQueryResponse';
 export { ElvenJS } from './main';
-export { LoginMethodsEnum } from './types';
+export * from './types';
