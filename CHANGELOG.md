@@ -1,4 +1,4 @@
-### [0.16.0](https://github.com/elven-js/elven.js/releases/tag/v0.16.0) (2024-01-...)
+### [0.16.0](https://github.com/elven-js/elven.js/releases/tag/v0.16.0) (2024-01-28)
 - rename and add more login callbacks (breaking)
 - rename some of the transaction and message signing callbacks (breaking)
 - add callbacks for logout
