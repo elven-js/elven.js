@@ -27,20 +27,18 @@ export const loginWithExtension = async (
     if (dappProvider) {
       const address = await dappProvider.login(providerLoginData);
       if (address) {
-        EventsStore.run(EventStoreEvents.onLoginPending);
+        EventsStore.run(EventStoreEvents.onLoginStart);
       } else {
-        EventsStore.run(EventStoreEvents.onLogout);
+        throw new Error('There were problems while logging in!');
       }
     }
   } catch (e) {
     const err = errorParse(e);
-    console.warn(`Something went wrong trying to login the user: ${err}`);
+    throw new Error(err);
   }
 
   if (!dappProvider) {
-    throw new Error(
-      'Error: There were problems with auth provider initialization!'
-    );
+    throw new Error('There were problems with auth provider initialization!');
   }
 
   const { signature } = dappProvider.account;
@@ -65,7 +63,7 @@ export const loginWithExtension = async (
 
       await accountSync(elven);
 
-      EventsStore.run(EventStoreEvents.onLoggedIn);
+      EventsStore.run(EventStoreEvents.onLoginSuccess);
 
       const accessToken = nativeAuthClient.getToken(
         address,
@@ -76,10 +74,9 @@ export const loginWithExtension = async (
 
       return dappProvider;
     } catch (e: any) {
-      console.warn(
+      throw new Error(
         `Something went wrong trying to synchronize the user account: ${e?.message}`
       );
-      EventsStore.run(EventStoreEvents.onLogout);
     }
   }
 };

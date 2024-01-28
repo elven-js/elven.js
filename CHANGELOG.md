@@ -1,3 +1,10 @@
+### [0.16.0](https://github.com/elven-js/elven.js/releases/tag/v0.16.0) (2024-01-28)
+- rename and add more login callbacks (breaking)
+- rename some of the transaction and message signing callbacks (breaking)
+- add callbacks for logout
+- add callbacks for `queryContract`
+- check [docs](https://www.elvenjs.com/docs/sdk-reference.html#initialization) and [example demo](/example/index.html) for more information
+
 ### [0.15.0](https://github.com/elven-js/elven.js/releases/tag/v0.15.0) (2024-01-13)
 - add webview provider (based on sdk-dapp), required for xPortal Hub integration (experimental, need more tests and rewrites, it will probably land in a separate package in the following updates)
 - update dependencies

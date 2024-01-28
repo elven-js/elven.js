@@ -10,9 +10,7 @@
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "types": [
-      "node"
-    ],
-    "skipLibCheck": true
-  }
+    "types": ["node"],
+    "skipLibCheck": true,
+  },
 }

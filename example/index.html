@@ -157,7 +157,8 @@
       updateTxHashContainer,
       base64ToDecimalHex,
       updateOperationResultContainer,
-      clearQrCodeContainer
+      clearQrCodeContainer,
+      displayError
     } from './demo-ui-tools.js'
 
     // Elven.js tools
@@ -187,18 +188,45 @@
           // Remember to change it. Get yours here: https://cloud.walletconnect.com/sign-in
           walletConnectV2ProjectId: 'f502675c63610bfe4454080ac86d70e6',
           walletConnectV2RelayAddresses: ['wss://relay.walletconnect.com'],
-          onLoginPending: () => { uiPending(true) },
-          onLoggedIn: () => { uiLoggedInState(true); uiPending(false); },
-          onLogout: () => { uiLoggedInState(false); },
-          onTxStarted: (tx) => { uiPending(true); },
-          onTxSent: (tx) => { console.log('Tx sent, not finalized on chain yet! ', tx.getHash().toString()) },
+          // All callbacks are optional
+          // You could also rely on try catch to some extent, but callbacks in one place seems convenient
+          // Login callbacks:
+          onLoginStart: () => { uiPending(true) },
+          onLoginEnd: () => { uiPending(false) },
+          onLoginSuccess: () => { uiLoggedInState(true); },
+          onLoginFailure: (error) => { displayError(error); },
+          // Logout callbacks:
+          onLogoutStart: () => { uiPending(true) },
+          onLogoutEnd: () => { uiPending(false) },
+          onLogoutSuccess: () => { uiLoggedInState(false); },
+          onLogoutFailure: (error) => { displayError(error); },
+          // Transaction callbacks
+          onTxStart: (tx) => { uiPending(true); },
+          onTxSent: (tx) => { const hash = tx.getHash().toString(); hash && updateTxHashContainer(hash, true); },
           onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
-          onTxError: (tx, error) => { console.log('Tx error: ', error); uiPending(false); },
+          onTxFailure: (tx, error) => { displayError(error); uiPending(false); },
+          // Qr code callbacks:
           onQrPending: () => { uiPending(true); },
           onQrLoaded: () => { uiPending(false); },
-          onSignMsgStarted: () => { uiPending(true); },
+          // Signing callbacks:
+          onSignMsgStart: (message) => { uiPending(true); },
           onSignMsgFinalized: (message, messageSignature) => { messageSignature && updateOperationResultContainer(`➡️ The signature for "${message}" message:\n${messageSignature}`); uiPending(false); },
-          onSignMsgError: (message, error) => { console.log('Signing message error: ', error); uiPending(false); },
+          onSignMsgFailure: (message, error) => { displayError(error); uiPending(false); },
+          // Query callbacks:
+          onQueryStart: (queryArgs) => { uiPending(true); },
+          onQueryFinalized: (queryResponse) => {
+            // Manual decoding of a simple type (number here), there will be additional tools for that using ABI
+            // For now please check data converter in Buildo.dev: 
+            // https://github.com/xdevguild/buildo.dev/blob/main/components/operations/utils-operations/data-converters.tsx#L103
+            const hexVal = base64ToDecimalHex(queryResponse?.returnData?.[0]);
+            let intVal = 0;
+            if (hexVal) {
+              intVal = parseInt(hexVal, 16);
+            }
+            updateOperationResultContainer(`➡️ The result of the query is: ${intVal}`);
+            uiPending(false);
+          },
+          onQueryFailure: (queryArgs, error) => { displayError(error); uiPending(false); }
         }
       );
     }
@@ -261,7 +289,6 @@
     const egldTransferAddress = 'erd17a4wydhhd6t3hhssvcp9g23ppn7lgkk4g2tww3eqzx4mlq95dukss0g50f';
 
     document.getElementById('button-tx').addEventListener('click', async () => {
-      updateTxHashContainer(false);
       const demoMessage = 'Transaction demo from Elven.js!';
 
       const isGuardian = ElvenJS.storage.get('activeGuardian');
@@ -291,8 +318,6 @@
     const esdtTransferAddress = 'erd17a4wydhhd6t3hhssvcp9g23ppn7lgkk4g2tww3eqzx4mlq95dukss0g50f';
 
     document.getElementById('button-tx-esdt').addEventListener('click', async () => {
-      updateTxHashContainer(false);
-
       // The preconfigured transaction is for the 1 'BUILDO-22c0a5' ESDT token on the devnet
       // You need to know its ticker and how many decimals places it has
       // In this case, the token has 18 decimal places. You can check it in the MultiversX devnet explorer
@@ -323,9 +348,6 @@
     // It mints on the smart contract from: https://dapp-demo.elven.tools/
     const nftMinterSmartContract = 'erd1qqqqqqqqqqqqqpgqufmyqvy3kvda2uywqgx809lglxftq9t667es3956pv';
     document.getElementById('button-mint').addEventListener('click', async () => {
-
-      updateTxHashContainer(false);
-
       const contractAddress = new Address(nftMinterSmartContract);
       const contract = new SmartContract({ address: contractAddress });
 
@@ -357,28 +379,12 @@
     // Read more about the Elven Tools Smart Contract here: https://www.elven.tools/docs/sc-endpoints.html
     document.getElementById('button-query').addEventListener('click', async () => {
       try {
-        updateOperationResultContainer();
-        uiPending(true);
-
-        const results = await ElvenJS.queryContract({
+        await ElvenJS.queryContract({
           address: new Address(nftMinterSmartContract),
           func: new ContractFunction('getMintedPerAddressTotal'),
           args: [new AddressValue(new Address(ElvenJS.storage.get('address')))]
         });
-
-        uiPending(false);
-
-        // Manual decoding of a simple type (number here), there will be additional tools for that using ABI
-        // For now please check data converter in Buildo.dev: 
-        // https://github.com/xdevguild/buildo.dev/blob/main/components/operations/utils-operations/data-converters.tsx#L103
-        const hexVal = base64ToDecimalHex(results?.returnData?.[0]);
-        let intVal = 0;
-        if (hexVal) {
-          intVal = parseInt(hexVal, 16);
-        }
-        updateOperationResultContainer(`➡️ The result of the query is: ${intVal}`);
       } catch (e) {
-        uiPending(false);
         throw new Error(e?.message);
       }
     });
@@ -390,7 +396,6 @@
       try {
         await ElvenJS.signMessage('Elven Family is awesome!');
       } catch (e) {
-        uiPending(false);
         throw new Error(e?.message);
       }
     });

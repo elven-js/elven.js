@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js';
 import { Address } from '@multiversx/sdk-core/out/address';
 import { TransactionStatus } from '@multiversx/sdk-network-providers/out/transactionStatus';
 import { TransactionReceipt } from '@multiversx/sdk-network-providers/out/transactionReceipt';
@@ -27,7 +26,7 @@ export type NetworkProviderOptions = Pick<
 export interface AccountOnNetwork {
   address: IAddress;
   nonce: number;
-  balance: BigNumber;
+  balance: bigint;
   code: string;
   userName: string;
 }
@@ -163,7 +162,7 @@ export class ApiNetworkProvider {
     const account = {
       address: new Address(responsePayload?.address || ''),
       nonce: Number(responsePayload?.nonce || 0),
-      balance: new BigNumber(responsePayload?.balance || 0),
+      balance: BigInt(responsePayload?.balance || 0),
       code: responsePayload?.code || '',
       userName: responsePayload?.username || '',
     };

@@ -6,12 +6,6 @@ const fs = require('fs');
 esbuild
   .build({
     inject: [require.resolve('node-stdlib-browser/helpers/esbuild/shim')],
-    define: {
-      global: 'global',
-      process: 'process',
-      Buffer: 'Buffer',
-      'process.env.NODE_ENV': '"production"',
-    },
     format: 'esm',
     entryPoints: ['./src/elven.ts'],
     bundle: true,

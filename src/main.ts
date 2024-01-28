@@ -42,6 +42,8 @@ import { preSendTx } from './interaction/pre-send-tx';
 import { webWalletSignMessageFinalize } from './interaction/web-wallet-sign-message-finalize';
 import { WebviewProvider } from './webview-provider/webview-provider';
 import { loginWithNativeAuthToken } from './auth/login-with-native-auth-token';
+import { initializeEventsStore } from './initialize-events-store';
+import { withLoginEvents } from './utils/with-login-events';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
@@ -71,71 +73,16 @@ export class ElvenJS {
 
     this.networkProvider = new ApiNetworkProvider(this.initOptions);
 
-    if (this.initOptions.onLoginPending) {
-      EventsStore.set(
-        EventStoreEvents.onLoginPending,
-        this.initOptions.onLoginPending
-      );
-    }
-    if (this.initOptions.onLoggedIn) {
-      EventsStore.set(EventStoreEvents.onLoggedIn, this.initOptions.onLoggedIn);
-    }
-    if (this.initOptions.onQrPending) {
-      EventsStore.set(
-        EventStoreEvents.onQrPending,
-        this.initOptions.onQrPending
-      );
-    }
-    if (this.initOptions.onQrLoaded) {
-      EventsStore.set(EventStoreEvents.onQrLoaded, this.initOptions.onQrLoaded);
-    }
-    if (this.initOptions.onLogout) {
-      EventsStore.set(EventStoreEvents.onLogout, this.initOptions.onLogout);
-    }
-    if (this.initOptions.onTxStarted) {
-      EventsStore.set(
-        EventStoreEvents.onTxStarted,
-        this.initOptions.onTxStarted
-      );
-    }
-    if (this.initOptions.onTxSent) {
-      EventsStore.set(EventStoreEvents.onTxSent, this.initOptions.onTxSent);
-    }
-    if (this.initOptions.onTxFinalized) {
-      EventsStore.set(
-        EventStoreEvents.onTxFinalized,
-        this.initOptions.onTxFinalized
-      );
-    }
-    if (this.initOptions.onTxError) {
-      EventsStore.set(EventStoreEvents.onTxError, this.initOptions.onTxError);
-    }
-    if (this.initOptions.onSignMsgStarted) {
-      EventsStore.set(
-        EventStoreEvents.onSignMsgStarted,
-        this.initOptions.onSignMsgStarted
-      );
-    }
-    if (this.initOptions.onSignMsgFinalized) {
-      EventsStore.set(
-        EventStoreEvents.onSignMsgFinalized,
-        this.initOptions.onSignMsgFinalized
-      );
-    }
-    if (this.initOptions.onSignMsgError) {
-      EventsStore.set(
-        EventStoreEvents.onSignMsgError,
-        this.initOptions.onSignMsgError
-      );
-    }
+    initializeEventsStore(this.initOptions);
 
     // Catch the nativeAuthToken and login with it (for example within xPortal Hub)
     const nativeAuthTokenFromUrl = getParamFromUrl('accessToken');
     if (nativeAuthTokenFromUrl) {
-      EventsStore.run(EventStoreEvents.onLoginPending);
-      loginWithNativeAuthToken(nativeAuthTokenFromUrl, this);
-      await accountSync(this);
-      EventsStore.run(EventStoreEvents.onLoggedIn);
+      await withLoginEvents(async (onLoginSuccess) => {
+        loginWithNativeAuthToken(nativeAuthTokenFromUrl, this);
+        await accountSync(this);
+        onLoginSuccess();
+      });
     }
 
     const isAddress =
@@ -145,39 +92,37 @@ export class ElvenJS {
         getParamFromUrl('address'));
 
     if (isAddress && state?.loginMethod) {
-      EventsStore.run(EventStoreEvents.onLoginPending);
-
-      if (state.loginMethod === LoginMethodsEnum.browserExtension) {
-        this.dappProvider = await initExtensionProvider();
-      }
-      if (state.loginMethod === LoginMethodsEnum.mobile) {
-        this.dappProvider = await initMobileProvider(this);
-      }
-      if (state.loginMethod === LoginMethodsEnum.xPortalHub) {
-        this.dappProvider = new WebviewProvider();
-      }
-      if (
-        state.loginMethod === LoginMethodsEnum.webWallet &&
-        this.initOptions.chainType
-      ) {
-        this.dappProvider = await initWebWalletProvider(
-          networkConfig[this.initOptions.chainType].walletAddress,
-          this.initOptions.apiUrl
-        );
-      }
-      if (
-        state.loginMethod === LoginMethodsEnum.xAlias &&
-        this.initOptions.chainType
-      ) {
-        this.dappProvider = await initWebWalletProvider(
-          networkConfig[this.initOptions.chainType].xAliasAddress,
-          this.initOptions.apiUrl
-        );
-      }
-
-      await accountSync(this);
-
-      EventsStore.run(EventStoreEvents.onLoggedIn);
+      await withLoginEvents(async (onLoginSyuccess) => {
+        if (state.loginMethod === LoginMethodsEnum.browserExtension) {
+          this.dappProvider = await initExtensionProvider();
+        }
+        if (state.loginMethod === LoginMethodsEnum.mobile) {
+          this.dappProvider = await initMobileProvider(this);
+        }
+        if (state.loginMethod === LoginMethodsEnum.xPortalHub) {
+          this.dappProvider = new WebviewProvider();
+        }
+        if (
+          state.loginMethod === LoginMethodsEnum.webWallet &&
+          this.initOptions?.chainType
+        ) {
+          this.dappProvider = await initWebWalletProvider(
+            networkConfig[this.initOptions.chainType].walletAddress,
+            this.initOptions.apiUrl
+          );
+        }
+        if (
+          state.loginMethod === LoginMethodsEnum.xAlias &&
+          this.initOptions?.chainType
+        ) {
+          this.dappProvider = await initWebWalletProvider(
+            networkConfig[this.initOptions.chainType].xAliasAddress,
+            this.initOptions.apiUrl
+          );
+        }
+        await accountSync(this);
+        onLoginSyuccess();
+      });
 
       // After successful web wallet transaction (or guarded transaction that use web wallet 2FA hook) we will land back on our website
       if (this.initOptions?.chainType) {
@@ -207,16 +152,18 @@ export class ElvenJS {
     const isProperLoginMethod =
       Object.values(LoginMethodsEnum).includes(loginMethod);
     if (!isProperLoginMethod) {
-      throw new Error('Error: Wrong login method!');
+      const error = 'Wrong login method!';
+      EventsStore.run(EventStoreEvents.onLoginFailure, error);
+      throw new Error(error);
     }
 
     if (!this.networkProvider) {
-      throw new Error('Error: Login failed: Use ElvenJs.init() first!');
+      const error = 'Login failed: Use ElvenJs.init() first!';
+      EventsStore.run(EventStoreEvents.onLoginFailure, error);
+      throw new Error(error);
     }
 
-    try {
-      EventsStore.run(EventStoreEvents.onLoginPending);
-
+    await withLoginEvents(async (onLoginSuccess) => {
       // Native auth login token initialization
       const nativeAuthClient = new NativeAuthClient({
         apiUrl: this.initOptions?.apiUrl,
@@ -233,6 +180,7 @@ export class ElvenJS {
           options?.callbackRoute
         );
         this.dappProvider = dappProvider;
+        onLoginSuccess();
       }
 
       // Login with mobile app
@@ -244,6 +192,7 @@ export class ElvenJS {
           options?.qrCodeContainer
         );
         this.dappProvider = dappProvider;
+        onLoginSuccess();
       }
 
       // Login with Web Wallet
@@ -274,10 +223,7 @@ export class ElvenJS {
         );
         this.dappProvider = dappProvider;
       }
-    } catch (e) {
-      const err = errorParse(e);
-      throw new Error(`Error: ${err}`);
-    }
+    });
   }
 
   /**
@@ -299,20 +245,21 @@ export class ElvenJS {
    */
   static async signAndSendTransaction(transaction: Transaction) {
     if (!this.dappProvider) {
-      throw new Error(
-        'Error: Transaction signing failed: There is no active session!'
-      );
+      const error = 'Transaction signing failed: There is no active session!';
+      EventsStore.run(EventStoreEvents.onTxFailure, transaction, error);
+      throw new Error(error);
     }
     if (!this.networkProvider) {
-      throw new Error(
-        'Error: Transaction signing failed: There is no active network provider!'
-      );
+      const error =
+        'Transaction signing failed: There is no active network provider!';
+      EventsStore.run(EventStoreEvents.onTxFailure, transaction, error);
+      throw new Error(error);
     }
 
     let signedTx = guardianPreSignTxOperations(transaction);
 
     try {
-      EventsStore.run(EventStoreEvents.onTxStarted, transaction);
+      EventsStore.run(EventStoreEvents.onTxStart, transaction);
 
       const currentState = ls.get();
 
@@ -355,8 +302,12 @@ export class ElvenJS {
       }
     } catch (e) {
       const err = errorParse(e);
-      EventsStore.run(EventStoreEvents.onTxError, signedTx, err);
-      throw new Error(`Error: Transaction signing failed! ${err}`);
+      EventsStore.run(
+        EventStoreEvents.onTxFailure,
+        signedTx,
+        `Getting transaction information failed! ${err}`
+      );
+      throw new Error(`Getting transaction information failed! ${err}`);
     }
 
     return signedTx;
@@ -370,20 +321,21 @@ export class ElvenJS {
     options?: { callbackUrl?: string }
   ) {
     if (!this.dappProvider) {
-      throw new Error(
-        'Error: Message signing failed: There is no active session!'
-      );
+      const error = 'Message signing failed: There is no active session!';
+      EventsStore.run(EventStoreEvents.onSignMsgFailure, message, error);
+      throw new Error(error);
     }
     if (!this.networkProvider) {
-      throw new Error(
-        'Error: Message signing failed: There is no active network provider!'
-      );
+      const error =
+        'Message signing failed: There is no active network provider!';
+      EventsStore.run(EventStoreEvents.onSignMsgFailure, message, error);
+      throw new Error(error);
     }
 
     let messageSignature = '';
 
     try {
-      EventsStore.run(EventStoreEvents.onSignMsgStarted, message);
+      EventsStore.run(EventStoreEvents.onSignMsgStart, message);
 
       if (this.dappProvider instanceof ExtensionProvider) {
         const signedMessage = await this.dappProvider.signMessage(
@@ -431,8 +383,8 @@ export class ElvenJS {
       return { message, messageSignature };
     } catch (e) {
       const err = errorParse(e);
-      EventsStore.run(EventStoreEvents.onSignMsgError, message, err);
-      throw new Error(`Error: Message signing failed! ${err}`);
+      EventsStore.run(EventStoreEvents.onSignMsgFailure, message, err);
+      throw new Error(`Message signing failed! ${err}`);
     }
   }
 
@@ -447,28 +399,32 @@ export class ElvenJS {
     caller,
   }: SmartContractQueryArgs) {
     if (!this.networkProvider) {
-      throw new Error(
-        'Error: Query failed: There is no active network provider!'
-      );
+      throw new Error('Query failed: There is no active network provider!');
     }
 
     if (!address || !func) {
       throw new Error(
-        'Error: Query failed: The Query arguments are not valid! Address and func required'
+        'Query failed: The Query arguments are not valid! Address and func required'
       );
     }
 
+    const queryArgs = {
+      address,
+      func,
+      args,
+      value,
+      caller,
+    };
+
     try {
-      return await this.networkProvider.queryContract({
-        address,
-        func,
-        args,
-        value,
-        caller,
-      });
+      EventsStore.run(EventStoreEvents.onQueryStart, queryArgs);
+      const response = await this.networkProvider.queryContract(queryArgs);
+      EventsStore.run(EventStoreEvents.onQueryFinalized, response);
+      return response;
     } catch (e) {
       const err = errorParse(e);
-      throw new Error(`Error: Smart contract query failed! ${err}`);
+      EventsStore.run(EventStoreEvents.onQueryFinalized, queryArgs, err);
+      throw new Error(`Smart contract query failed! ${err}`);
     }
   }
 

@@ -24,7 +24,7 @@ export const loginWithWebWallet = async (
   };
 
   try {
-    EventsStore.run(EventStoreEvents.onLoginPending);
+    EventsStore.run(EventStoreEvents.onLoginStart);
     ls.set(
       'loginMethod',
       networkConfig[chainType].xAliasAddress === urlAddress
@@ -39,6 +39,6 @@ export const loginWithWebWallet = async (
     const err = errorParse(e);
     console.warn(`Something went wrong trying to login the user: ${err}`);
     ls.set('loginMethod', '');
-    EventsStore.run(EventStoreEvents.onLogout);
+    EventsStore.run(EventStoreEvents.onLoginFailure, err);
   }
 };

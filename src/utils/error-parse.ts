@@ -4,5 +4,5 @@ export const errorParse = (err: unknown) => {
   } else if (err instanceof Error) {
     return err.message;
   }
-  return `Error: ${JSON.stringify(err)}`;
+  return JSON.stringify(err);
 };

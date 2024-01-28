@@ -3,7 +3,7 @@
  * Based on sdk-dapp webview provider implementation
  * It will probably be replaced with separate library in the future
  */
-import { Transaction } from '@multiversx/sdk-core';
+import { Transaction } from '@multiversx/sdk-core/out/transaction';
 export declare class WebviewProvider {
     constructor();
     logout(): Promise<unknown>;

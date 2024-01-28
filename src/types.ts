@@ -3,6 +3,8 @@ import { Transaction } from '@multiversx/sdk-core/out/transaction';
 import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
 import { WebviewProvider } from './webview-provider/webview-provider';
+import { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts';
+import { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/contractQueryResponse';
 
 export interface InitOptions {
   apiUrl?: string;
@@ -10,18 +12,61 @@ export interface InitOptions {
   apiTimeout?: number;
   walletConnectV2ProjectId?: string;
   walletConnectV2RelayAddresses?: string[];
-  onLoginPending?: () => void;
-  onLoggedIn?: () => void;
-  onLogout?: () => void;
+  // Login
+  onLoginStart?: () => void;
+  onLoginEnd?: () => void;
+  onLoginSuccess?: () => void;
+  onLoginFailure?: (error: string) => void;
+  // Logout
+  onLogoutStart?: () => void;
+  onLogoutEnd?: () => void;
+  onLogoutSuccess?: () => void;
+  onLogoutFailure?: (error: string) => void;
+  // Qr
   onQrPending?: () => void;
   onQrLoaded?: () => void;
-  onTxStarted?: (transaction: Transaction) => void;
+  // Transaction
+  onTxStart?: (transaction: Transaction) => void;
   onTxSent?: (transaction: Transaction) => void;
   onTxFinalized?: (transaction: Transaction) => void;
-  onTxError?: (transaction: Transaction, error: string) => void;
-  onSignMsgStarted?: (message: string) => void;
+  onTxFailure?: (transaction: Transaction, error: string) => void;
+  // Signing
+  onSignMsgStart?: (message: string) => void;
   onSignMsgFinalized?: (messageSignature: string) => void;
-  onSignMsgError?: (message: string, error: string) => void;
+  onSignMsgFailure?: (message: string, error: string) => void;
+  // Query
+  onQueryStart?: (queryArgs: QueryArguments) => void;
+  onQueryFinalized?: (queryResponse: ContractQueryResponse) => void;
+  onQueryFailure?: (queryArgs: QueryArguments, error: string) => void;
+}
+
+export enum EventStoreEvents {
+  // Login
+  onLoginStart = 'onLoginStart',
+  onLoginEnd = 'onLoginEnd',
+  onLoginSuccess = 'onLoginSuccess',
+  onLoginFailure = 'onLoginFailure',
+  // Logout
+  onLogoutStart = 'onLogoutStart',
+  onLogoutEnd = 'onLogoutEnd',
+  onLogoutSuccess = 'onLogoutSuccess',
+  onLogoutFailure = 'onLogoutFailure',
+  // Qr
+  onQrPending = 'onQrPending',
+  onQrLoaded = 'onQrLoaded',
+  // Transaction
+  onTxStart = 'onTxStart',
+  onTxSent = 'onTxSent',
+  onTxFinalized = 'onTxFinalized',
+  onTxFailure = 'onTxFailure',
+  // Signing
+  onSignMsgStart = 'onSignMsgStart',
+  onSignMsgFinalized = 'onSignMsgFinalized',
+  onSignMsgFailure = 'onSignMsgFailure',
+  // Query
+  onQueryStart = 'onQueryStart',
+  onQueryFinalized = 'onQueryFinalized',
+  onQueryFailure = 'onQueryFailure',
 }
 
 export enum LoginMethodsEnum {
@@ -48,21 +93,6 @@ export interface LoginOptions {
 export enum DappCoreWCV2CustomMethodsEnum {
   mvx_cancelAction = 'mvx_cancelAction',
   mvx_signNativeAuthToken = 'mvx_signNativeAuthToken',
-}
-
-export enum EventStoreEvents {
-  onLoginPending = 'onLoginPending',
-  onLoggedIn = 'onLoggedIn',
-  onQrPending = 'onQrPending',
-  onQrLoaded = 'onQrLoaded',
-  onLogout = 'onLogout',
-  onTxStarted = 'onTxStarted',
-  onTxSent = 'onTxSent',
-  onTxFinalized = 'onTxFinalized',
-  onTxError = 'onTxError',
-  onSignMsgStarted = 'onSignMsgStarted',
-  onSignMsgFinalized = 'onSignMsgFinalized',
-  onSignMsgError = 'onSignMsgError',
 }
 
 export enum WebWalletUrlParamsEnum {
