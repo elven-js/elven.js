@@ -373,11 +373,19 @@ export class ElvenJS {
         );
       }
 
-      EventsStore.run(
-        EventStoreEvents.onSignMsgFinalized,
-        message,
-        messageSignature
-      );
+      const currentState = ls.get();
+
+      if (
+        currentState.loginMethod !== LoginMethodsEnum.webWallet &&
+        currentState.loginMethod !== LoginMethodsEnum.xAlias
+      ) {
+        EventsStore.run(
+          EventStoreEvents.onSignMsgFinalized,
+          message,
+          messageSignature
+        );
+      }
+
       return { message, messageSignature };
     } catch (e) {
       const err = errorParse(e);
