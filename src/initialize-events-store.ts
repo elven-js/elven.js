@@ -18,9 +18,6 @@ export const initializeEventsStore = (initOptions: InitOptions) => {
       initOptions.onLoginFailure
     );
   }
-  if (initOptions.onLoginEnd) {
-    EventsStore.set(EventStoreEvents.onLoginEnd, initOptions.onLoginEnd);
-  }
 
   // Logout initialiation
   if (initOptions.onLogoutStart) {
@@ -37,9 +34,6 @@ export const initializeEventsStore = (initOptions: InitOptions) => {
       EventStoreEvents.onLogoutFailure,
       initOptions.onLogoutFailure
     );
-  }
-  if (initOptions.onLogoutEnd) {
-    EventsStore.set(EventStoreEvents.onLogoutEnd, initOptions.onLogoutEnd);
   }
 
   // Qr code initialization

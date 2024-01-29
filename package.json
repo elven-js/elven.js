@@ -1,6 +1,6 @@
 {
   "name": "elven.js",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "Authenticate, sign and send transactions on the MultiversX blockchain in the browser.",
   "type": "module",
   "module": "build/elven.js",
@@ -49,8 +49,8 @@
     "@multiversx/sdk-web-wallet-provider": "3.2.0",
     "@types/qrcode": "1.5.5",
     "@types/serve-handler": "6.1.4",
-    "@typescript-eslint/eslint-plugin": "6.19.1",
-    "@typescript-eslint/parser": "6.19.1",
+    "@typescript-eslint/eslint-plugin": "6.20.0",
+    "@typescript-eslint/parser": "6.20.0",
     "esbuild": "0.20.0",
     "eslint": "8.56.0",
     "eslint-config-prettier": "9.1.0",

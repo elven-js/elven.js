@@ -52,7 +52,6 @@ export const loginWithMobile = async (
   const providerHandlers = {
     onClientLogin: async () => {
       if (elven.dappProvider instanceof WalletConnectV2Provider) {
-        EventsStore.run(EventStoreEvents.onLoginStart);
         const address = await elven.dappProvider.getAddress();
         const signature = await elven.dappProvider.getSignature();
 

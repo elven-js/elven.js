@@ -12,11 +12,9 @@ export interface InitOptions {
     walletConnectV2ProjectId?: string;
     walletConnectV2RelayAddresses?: string[];
     onLoginStart?: () => void;
-    onLoginEnd?: () => void;
     onLoginSuccess?: () => void;
     onLoginFailure?: (error: string) => void;
     onLogoutStart?: () => void;
-    onLogoutEnd?: () => void;
     onLogoutSuccess?: () => void;
     onLogoutFailure?: (error: string) => void;
     onQrPending?: () => void;
@@ -34,11 +32,9 @@ export interface InitOptions {
 }
 export declare enum EventStoreEvents {
     onLoginStart = "onLoginStart",
-    onLoginEnd = "onLoginEnd",
     onLoginSuccess = "onLoginSuccess",
     onLoginFailure = "onLoginFailure",
     onLogoutStart = "onLogoutStart",
-    onLogoutEnd = "onLogoutEnd",
     onLogoutSuccess = "onLogoutSuccess",
     onLogoutFailure = "onLogoutFailure",
     onQrPending = "onQrPending",

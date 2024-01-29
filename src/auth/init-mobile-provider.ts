@@ -4,10 +4,7 @@ import {
 } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { networkConfig } from '../utils/constants';
 import { logout } from './logout';
-import { accountSync } from './account-sync';
-import { EventsStore } from '../events-store';
 import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-network';
-import { EventStoreEvents } from '../types';
 
 export const initMobileProvider = async (elven: any) => {
   if (
@@ -18,9 +15,7 @@ export const initMobileProvider = async (elven: any) => {
   }
 
   const providerHandlers = {
-    onClientLogin: () => {
-      accountSync(elven), EventsStore.run(EventStoreEvents.onLoginSuccess);
-    },
+    onClientLogin: () => {},
     onClientLogout: () => logout(elven),
     onClientEvent: (event: SessionEventTypes['event']) => {
       console.log('wc2 session event: ', event);
