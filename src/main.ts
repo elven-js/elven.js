@@ -92,7 +92,7 @@ export class ElvenJS {
         getParamFromUrl('address'));
 
     if (isAddress && state?.loginMethod) {
-      await withLoginEvents(async (onLoginSyuccess) => {
+      await withLoginEvents(async (onLoginSuccess) => {
         if (state.loginMethod === LoginMethodsEnum.browserExtension) {
           this.dappProvider = await initExtensionProvider();
         }
@@ -121,7 +121,7 @@ export class ElvenJS {
           );
         }
         await accountSync(this);
-        onLoginSyuccess();
+        onLoginSuccess();
       });
 
       // After successful web wallet transaction (or guarded transaction that use web wallet 2FA hook) we will land back on our website
@@ -163,7 +163,7 @@ export class ElvenJS {
       throw new Error(error);
     }
 
-    await withLoginEvents(async (onLoginSuccess) => {
+    await withLoginEvents(async () => {
       // Native auth login token initialization
       const nativeAuthClient = new NativeAuthClient({
         apiUrl: this.initOptions?.apiUrl,
@@ -180,7 +180,6 @@ export class ElvenJS {
           options?.callbackRoute
         );
         this.dappProvider = dappProvider;
-        onLoginSuccess();
       }
 
       // Login with mobile app
@@ -192,7 +191,6 @@ export class ElvenJS {
           options?.qrCodeContainer
         );
         this.dappProvider = dappProvider;
-        onLoginSuccess();
       }
 
       // Login with Web Wallet

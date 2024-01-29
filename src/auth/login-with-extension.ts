@@ -26,9 +26,7 @@ export const loginWithExtension = async (
   try {
     if (dappProvider) {
       const address = await dappProvider.login(providerLoginData);
-      if (address) {
-        EventsStore.run(EventStoreEvents.onLoginStart);
-      } else {
+      if (!address) {
         throw new Error('There were problems while logging in!');
       }
     }
@@ -63,14 +61,14 @@ export const loginWithExtension = async (
 
       await accountSync(elven);
 
-      EventsStore.run(EventStoreEvents.onLoginSuccess);
-
       const accessToken = nativeAuthClient.getToken(
         address,
         loginToken,
         signature
       );
       ls.set('accessToken', accessToken);
+
+      EventsStore.run(EventStoreEvents.onLoginSuccess);
 
       return dappProvider;
     } catch (e: any) {

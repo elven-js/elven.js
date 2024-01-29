@@ -24,7 +24,6 @@ export const loginWithWebWallet = async (
   };
 
   try {
-    EventsStore.run(EventStoreEvents.onLoginStart);
     ls.set(
       'loginMethod',
       networkConfig[chainType].xAliasAddress === urlAddress

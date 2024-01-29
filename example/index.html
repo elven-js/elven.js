@@ -192,12 +192,10 @@
           // You could also rely on try catch to some extent, but callbacks in one place seems convenient
           // Login callbacks:
           onLoginStart: () => { uiPending(true) },
-          onLoginEnd: () => { uiPending(false) },
           onLoginSuccess: () => { uiLoggedInState(true); },
           onLoginFailure: (error) => { displayError(error); },
           // Logout callbacks:
           onLogoutStart: () => { uiPending(true) },
-          onLogoutEnd: () => { uiPending(false) },
           onLogoutSuccess: () => { uiLoggedInState(false); },
           onLogoutFailure: (error) => { displayError(error); },
           // Transaction callbacks

@@ -1,3 +1,7 @@
+### [0.17.0](https://github.com/elven-js/elven.js/releases/tag/v0.17.0) (2024-01-...)
+- remove onLoginEnd and onLogoutEnd callbacks. With success and failure callbacks, they are not needed
+- fix duplicate callbacks calls
+
 ### [0.16.0](https://github.com/elven-js/elven.js/releases/tag/v0.16.0) (2024-01-28)
 - rename and add more login callbacks (breaking)
 - rename some of the transaction and message signing callbacks (breaking)

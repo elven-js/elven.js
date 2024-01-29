@@ -22,7 +22,5 @@ export const logout = async (elven: any) => {
     const err = errorParse(e);
     console.warn(`Something went wrong trying to logout the user: ${err}`);
     EventsStore.run(EventStoreEvents.onLogoutFailure, err);
-  } finally {
-    EventsStore.run(EventStoreEvents.onLogoutEnd);
   }
 };

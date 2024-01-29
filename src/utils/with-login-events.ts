@@ -14,7 +14,5 @@ export const withLoginEvents = async (
     const err = errorParse(e);
     console.warn(`Something went wrong trying to login the user: ${err}`);
     EventsStore.run(EventStoreEvents.onLoginFailure, err);
-  } finally {
-    EventsStore.run(EventStoreEvents.onLoginEnd);
   }
 };
