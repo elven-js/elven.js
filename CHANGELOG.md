@@ -1,4 +1,4 @@
-### [0.17.0](https://github.com/elven-js/elven.js/releases/tag/v0.17.0) (2024-01-...)
+### [0.17.0](https://github.com/elven-js/elven.js/releases/tag/v0.17.0) (2024-01-29)
 - remove onLoginEnd and onLogoutEnd callbacks. With success and failure callbacks, they are not needed
 - fix duplicate callbacks calls
 
