@@ -71,7 +71,7 @@ export const webWalletTxFinalize = async (
     if (transactionObj) {
       const transaction = Transaction.fromPlainObject(transactionObj);
 
-      transaction.setNonce(nonce);
+      transaction.nonce = BigInt(nonce);
 
       preSendTx(transaction);
 

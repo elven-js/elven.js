@@ -10,7 +10,7 @@ esbuild
     entryPoints: ['./src/elven.ts'],
     bundle: true,
     metafile: true,
-    minify: true,
+    minify: false,
     outdir: 'build',
     platform: 'browser',
   })

@@ -166,14 +166,15 @@
       ElvenJS,
       Transaction,
       Address,
-      TransactionPayload,
       TokenTransfer,
+      Token,
       TransferTransactionsFactory,
+      TransactionsFactoryConfig,
+      TokenComputer,
       U32Value,
       AddressValue,
-      SmartContract,
-      GasEstimator,
-      ContractFunction
+      SmartContractTransactionsFactory,
+      parseAmount,
     } from './elven.js';
 
     // Options are the defaults and here only to show all of them
@@ -201,7 +202,7 @@
           // Transaction callbacks
           onTxStart: (tx) => { uiPending(true); },
           onTxSent: (tx) => { const hash = tx.getHash().toString(); hash && updateTxHashContainer(hash, true); },
-          onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
+          onTxFinalized: (tx) => { console.log(tx); tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
           onTxFailure: (tx, error) => { displayError(error); uiPending(false); },
           // Qr code callbacks:
           onQrPending: () => { uiPending(true); },
@@ -295,12 +296,14 @@
       // See more about gas limit calculation here: https://docs.multiversx.com/developers/gas-and-fees/overview/
       const gasLimit = ((isGuardian || isXalias) ? 100000 : 50000) + 1500 * demoMessage.length;
 
+      const textEncoder = new TextEncoder();
+
       const tx = new Transaction({
         nonce: ElvenJS.storage.get('nonce'),
         receiver: new Address(egldTransferAddress),
         gasLimit,
         chainID: 'D',
-        data: new TransactionPayload(demoMessage),
+        data: textEncoder.encode(demoMessage),
         value: TokenTransfer.egldFromAmount(0.001),
         sender: new Address(ElvenJS.storage.get('address')),
       });
@@ -320,19 +323,19 @@
       // You need to know its ticker and how many decimals places it has
       // In this case, the token has 18 decimal places. You can check it in the MultiversX devnet explorer
       // You can use the community-based faucet to get the BUILDO-22c0a5 token: https://r3d4.fr/faucet
-      const transfer = TokenTransfer.fungibleFromAmount(
-        'BUILDO-22c0a5',
-        '1',
-        18
-      );
+      const tokenTransfer = new TokenTransfer({
+        token: new Token({ identifier: 'BUILDO-22c0a5' }),
+        amount: 1000000000000000000n,
+      });
 
-      const factory = new TransferTransactionsFactory(new GasEstimator());
+      const factory = new TransferTransactionsFactory({
+        config: new TransactionsFactoryConfig({ chainID: 'D' }),
+      });
 
-      const tx = factory.createESDTTransfer({
-        tokenTransfer: transfer,
+      const tx = factory.createTransactionForESDTTokenTransfer({
         receiver: new Address(esdtTransferAddress),
         sender: new Address(ElvenJS.storage.get('address')),
-        chainID: 'D',
+        tokenTransfers: [tokenTransfer]
       });
 
       try {
@@ -347,21 +350,25 @@
     const nftMinterSmartContract = 'erd1qqqqqqqqqqqqqpgqufmyqvy3kvda2uywqgx809lglxftq9t667es3956pv';
     document.getElementById('button-mint').addEventListener('click', async () => {
       const contractAddress = new Address(nftMinterSmartContract);
-      const contract = new SmartContract({ address: contractAddress });
 
       const isGuardian = ElvenJS.storage.get('activeGuardian');
       // Additional 50000 when there is an active guardian
       // See more about gas limit calculation here: https://docs.multiversx.com/developers/gas-and-fees/overview/
       const gasLimit = isGuardian ? 14050000 : 14000000;
 
-      const tx = contract.call({
-        caller: new Address(ElvenJS.storage.get('address')),
-        value: TokenTransfer.egldFromAmount(0.01),
-        func: new ContractFunction("mint"),
-        gasLimit,
-        args: [new U32Value(1)],
-        chainID: "D"
-      })
+      const factory = new SmartContractTransactionsFactory({
+        config: new TransactionsFactoryConfig({ chainID: 'D' }),
+      });
+
+      const tx = factory.createTransactionForExecute({
+        sender: new Address(ElvenJS.storage.get('address')),
+        contract: new Address(contractAddress),
+        function: 'mint',
+        nativeTransferAmount: parseAmount({ amount: '0.01', decimals: 18 }),
+        gasLimit: BigInt(gasLimit),
+        arguments: [new U32Value(1)],
+      });
+
       try {
         await ElvenJS.signAndSendTransaction(tx);
       } catch (e) {
@@ -379,7 +386,7 @@
       try {
         await ElvenJS.queryContract({
           address: new Address(nftMinterSmartContract),
-          func: new ContractFunction('getMintedPerAddressTotal'),
+          func: 'getMintedPerAddressTotal',
           args: [new AddressValue(new Address(ElvenJS.storage.get('address')))]
         });
       } catch (e) {

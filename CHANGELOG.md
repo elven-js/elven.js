@@ -1,3 +1,14 @@
+### [0.18.0](https://github.com/elven-js/elven.js/releases/tag/v0.18.0) (2024-04-21)
+- switch to SDK v13
+- breaking: `SmartContract` is no longer exported, use `SmartContractTransactionsFactory`
+- breaking: `GasEstimator` removed
+- breaking: `ContractFunction` removed, pass normal strings
+- breaking: `TransactionPayload` removed, you can now pass `Uint8Array` instead
+- update examples
+- update reexported functions and helpers
+- return transaction on network in `onTxFinalized`
+- added two amount related helper functions: `parseAmount` and `formatAmount`
+
 ### [0.17.0](https://github.com/elven-js/elven.js/releases/tag/v0.17.0) (2024-01-29)
 - remove onLoginEnd and onLogoutEnd callbacks. With success and failure callbacks, they are not needed
 - fix duplicate callbacks calls

@@ -261,7 +261,7 @@ export class ElvenJS {
 
       const currentState = ls.get();
 
-      transaction.setNonce(currentState.nonce);
+      transaction.nonce = currentState.nonce;
 
       if (this.dappProvider instanceof ExtensionProvider) {
         signedTx = await this.dappProvider.signTransaction(transaction);
