@@ -304,7 +304,7 @@
         gasLimit,
         chainID: 'D',
         data: textEncoder.encode(demoMessage),
-        value: TokenTransfer.egldFromAmount(0.001),
+        value: parseAmount({ amount: '0.001', decimals: 18 }),
         sender: new Address(ElvenJS.storage.get('address')),
       });
 
@@ -325,7 +325,7 @@
       // You can use the community-based faucet to get the BUILDO-22c0a5 token: https://r3d4.fr/faucet
       const tokenTransfer = new TokenTransfer({
         token: new Token({ identifier: 'BUILDO-22c0a5' }),
-        amount: 1000000000000000000n,
+        amount: parseAmount({ amount: '1', decimals: 18 }),
       });
 
       const factory = new TransferTransactionsFactory({
