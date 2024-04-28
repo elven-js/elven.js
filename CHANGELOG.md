@@ -1,4 +1,4 @@
-### [0.18.0](https://github.com/elven-js/elven.js/releases/tag/v0.18.0) (2024-04-21)
+### [0.18.0](https://github.com/elven-js/elven.js/releases/tag/v0.18.0) (2024-04-28)
 - switch to SDK v13
 - breaking: `SmartContract` is no longer exported, use `SmartContractTransactionsFactory`
 - breaking: `GasEstimator` removed
