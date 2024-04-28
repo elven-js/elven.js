@@ -202,7 +202,7 @@
           // Transaction callbacks
           onTxStart: (tx) => { uiPending(true); },
           onTxSent: (tx) => { const hash = tx.getHash().toString(); hash && updateTxHashContainer(hash, true); },
-          onTxFinalized: (tx) => { console.log(tx); tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
+          onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
           onTxFailure: (tx, error) => { displayError(error); uiPending(false); },
           // Qr code callbacks:
           onQrPending: () => { uiPending(true); },
