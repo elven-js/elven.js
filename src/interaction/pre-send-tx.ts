@@ -5,7 +5,7 @@ import { ls } from '../utils/ls-helpers';
 export const preSendTx = (tx: Transaction) => {
   const sender = tx.getSender();
   const senderAccount = new Account(sender);
-  const currentNonce = tx.getNonce().valueOf();
+  const currentNonce = tx.nonce.valueOf();
   senderAccount.incrementNonce();
-  ls.set('nonce', currentNonce + 1);
+  ls.set('nonce', (currentNonce + 1n).toString());
 };

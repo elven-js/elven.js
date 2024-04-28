@@ -12,12 +12,13 @@ export const postSendTx = async (
 ) => {
   EventsStore.run(EventStoreEvents.onTxSent, transaction);
   const transactionWatcher = new TransactionWatcher(networkProvider);
-  await transactionWatcher.awaitCompleted(transaction);
-  const sender = transaction.getSender();
+  const transactionOnNetwork =
+    await transactionWatcher.awaitCompleted(transaction);
+  const sender = transactionOnNetwork.sender;
   const senderAccount = new Account(sender);
   const userAccountOnNetwork = await networkProvider.getAccount(sender);
   senderAccount.update(userAccountOnNetwork);
   ls.set('address', senderAccount.address.bech32());
   ls.set('balance', senderAccount.balance.toString());
-  EventsStore.run(EventStoreEvents.onTxFinalized, transaction);
+  EventsStore.run(EventStoreEvents.onTxFinalized, transactionOnNetwork);
 };
