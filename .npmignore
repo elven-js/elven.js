@@ -9,3 +9,4 @@ esbuild.config.cjs
 tsconfig.json
 meta.txt
 meta.json
+eslint.config.mjs
