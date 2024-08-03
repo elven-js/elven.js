@@ -23,15 +23,11 @@ export function isStringBase64(str: string) {
       // it is a regular base64 string
       return true;
     }
-  } catch (e) {
+  } catch {
     return false;
   }
 
   return false;
-}
-
-export function encodeToBase64(string: string) {
-  return btoa(string);
 }
 
 export function decodeBase64(string: string) {

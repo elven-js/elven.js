@@ -40,7 +40,7 @@ import {
 } from './interaction/guardian-operations';
 import { preSendTx } from './interaction/pre-send-tx';
 import { webWalletSignMessageFinalize } from './interaction/web-wallet-sign-message-finalize';
-import { WebviewProvider } from './webview-provider/webview-provider';
+import { WebviewProvider } from '@multiversx/sdk-webview-provider';
 import { loginWithNativeAuthToken } from './auth/login-with-native-auth-token';
 import { initializeEventsStore } from './initialize-events-store';
 import { withLoginEvents } from './utils/with-login-events';
@@ -270,7 +270,9 @@ export class ElvenJS {
         signedTx = await this.dappProvider.signTransaction(transaction);
       }
       if (this.dappProvider instanceof WebviewProvider) {
-        signedTx = await this.dappProvider.signTransaction(transaction);
+        signedTx = (await this.dappProvider.signTransaction(
+          transaction
+        )) as Transaction;
       }
       if (this.dappProvider instanceof WalletProvider) {
         await this.dappProvider.signTransaction(transaction);
@@ -350,7 +352,11 @@ export class ElvenJS {
         messageSignature = signedMessage.getSignature().toString('hex');
       }
       if (this.dappProvider instanceof WebviewProvider) {
-        messageSignature = await this.dappProvider.signMessage(message);
+        const signedMessage = await this.dappProvider.signMessage(
+          new SignableMessage({ message: Buffer.from(message) })
+        );
+
+        messageSignature = signedMessage?.getSignature().toString('hex') || '';
       }
       if (this.dappProvider instanceof WalletProvider) {
         const encodeRFC3986URIComponent = (str: string) => {

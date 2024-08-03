@@ -38,7 +38,7 @@ export declare class ElvenJS {
      * Main storage
      */
     static storage: {
-        get(key?: string | undefined): any;
+        get(key?: string): any;
         set(key: string, value: string | number): void;
         clear(): void;
     };

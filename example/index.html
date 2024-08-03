@@ -399,7 +399,7 @@
     // In case of browser extension provider and xPortal you can also get it from ElvenJS.signMessage return
     document.getElementById('button-sign-message').addEventListener('click', async () => {
       try {
-        await ElvenJS.signMessage('Elven Family is awesome!');
+        await ElvenJS.signMessage('ElvenFamily');
       } catch (e) {
         throw new Error(e?.message);
       }

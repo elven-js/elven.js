@@ -60,7 +60,7 @@ export const decodeNativeAuthToken = (
     }
 
     return result;
-  } catch (err) {
+  } catch {
     return null;
   }
 };

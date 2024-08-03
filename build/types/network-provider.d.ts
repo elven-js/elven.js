@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { Address } from '@multiversx/sdk-core/out/address';
 import { TransactionStatus } from '@multiversx/sdk-network-providers/out/transactionStatus';
 import { TransactionReceipt } from '@multiversx/sdk-network-providers/out/transactionReceipt';

@@ -4,5 +4,4 @@
  * It will probably be replaced with separate library in the future
  */
 export declare function isStringBase64(str: string): boolean;
-export declare function encodeToBase64(string: string): string;
 export declare function decodeBase64(string: string): string;

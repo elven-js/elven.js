@@ -5,7 +5,7 @@
 import { LoginMethodsEnum } from '../types';
 import { ls } from '../utils/ls-helpers';
 import { decodeNativeAuthToken } from '../webview-provider/decode-native-auth-token';
-import { WebviewProvider } from '../webview-provider/webview-provider';
+import { WebviewProvider } from '@multiversx/sdk-webview-provider';
 
 export function loginWithNativeAuthToken(token: string, elven: any) {
   const nativeAuthInfo = decodeNativeAuthToken(token);

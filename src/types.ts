@@ -2,7 +2,7 @@ import { ExtensionProvider } from '@multiversx/sdk-extension-provider/out/extens
 import { Transaction } from '@multiversx/sdk-core/out/transaction';
 import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
-import { WebviewProvider } from './webview-provider/webview-provider';
+import { WebviewProvider } from '@multiversx/sdk-webview-provider';
 import { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts';
 import { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/contractQueryResponse';
 

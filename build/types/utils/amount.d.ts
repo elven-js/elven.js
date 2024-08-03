@@ -9,7 +9,7 @@ type AmountArgs = {
  * @param decimals
  * @returns bigInt
  */
-export declare const parseAmount: ({ amount, decimals, }: Omit<AmountArgs, 'rounding'>) => bigint;
+export declare const parseAmount: ({ amount, decimals, }: Omit<AmountArgs, "rounding">) => bigint;
 /**
  * Formats the amount from string (bigInt)
  * @param amount

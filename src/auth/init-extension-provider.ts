@@ -21,7 +21,7 @@ export const initExtensionProvider = async () => {
     }
 
     return dappProvider;
-  } catch (e) {
+  } catch {
     console.warn("Can't initialize the Dapp Provider!");
   }
 };
