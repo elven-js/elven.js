@@ -1,10 +1,10 @@
 import { Address } from '@multiversx/sdk-core/out/address';
-import { TransactionStatus } from '@multiversx/sdk-network-providers/out/transactionStatus';
-import { TransactionReceipt } from '@multiversx/sdk-network-providers/out/transactionReceipt';
-import { TransactionLogs } from '@multiversx/sdk-network-providers/out/transactionLogs';
-import { ContractResults } from '@multiversx/sdk-network-providers/out/contractResults';
-import { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/contractQueryResponse';
-import { ContractQueryRequest } from '@multiversx/sdk-network-providers/out/contractQueryRequest';
+import { TransactionStatus } from '@multiversx/sdk-core/out/networkProviders/transactionStatus';
+import { TransactionReceipt } from '@multiversx/sdk-core/out/networkProviders/transactionReceipt';
+import { TransactionLogs } from '@multiversx/sdk-core/out/networkProviders/transactionLogs';
+import { ContractResults } from '@multiversx/sdk-core/out/networkProviders/contractResults';
+import { ContractQueryResponse } from '@multiversx/sdk-core/out/networkProviders/contractQueryResponse';
+import { ContractQueryRequest } from '@multiversx/sdk-core/out/networkProviders/contractQueryRequest';
 import { Query } from '@multiversx/sdk-core/out/smartcontracts/query';
 import { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts/interface';
 import { networkConfig, defaultChainTypeConfig } from './utils/constants';

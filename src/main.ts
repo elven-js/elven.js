@@ -4,7 +4,7 @@ import { ExtensionProvider } from '@multiversx/sdk-extension-provider/out/extens
 import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
 import { NativeAuthClient } from '@multiversx/sdk-native-auth-client/lib/src/native.auth.client';
-import { SignableMessage } from '@multiversx/sdk-core/out/signableMessage';
+import { Message } from '@multiversx/sdk-core/out/message';
 import { initMobileProvider } from './auth/init-mobile-provider';
 import { ls } from './utils/ls-helpers';
 import { ApiNetworkProvider, SmartContractQueryArgs } from './network-provider';
@@ -339,24 +339,30 @@ export class ElvenJS {
 
       if (this.dappProvider instanceof ExtensionProvider) {
         const signedMessage = await this.dappProvider.signMessage(
-          new SignableMessage({ message: Buffer.from(message) })
+          new Message({ data: Buffer.from(message) })
         );
 
-        messageSignature = signedMessage.getSignature().toString('hex');
+        messageSignature = Buffer.from(signedMessage?.signature || '').toString(
+          'hex'
+        );
       }
       if (this.dappProvider instanceof WalletConnectV2Provider) {
         const signedMessage = await this.dappProvider.signMessage(
-          new SignableMessage({ message: Buffer.from(message) })
+          new Message({ data: Buffer.from(message) })
         );
 
-        messageSignature = signedMessage.getSignature().toString('hex');
+        messageSignature = Buffer.from(signedMessage?.signature || '').toString(
+          'hex'
+        );
       }
       if (this.dappProvider instanceof WebviewProvider) {
         const signedMessage = await this.dappProvider.signMessage(
-          new SignableMessage({ message: Buffer.from(message) })
+          new Message({ data: Buffer.from(message) })
         );
 
-        messageSignature = signedMessage?.getSignature().toString('hex') || '';
+        messageSignature = Buffer.from(signedMessage?.signature || '').toString(
+          'hex'
+        );
       }
       if (this.dappProvider instanceof WalletProvider) {
         const encodeRFC3986URIComponent = (str: string) => {
@@ -368,7 +374,7 @@ export class ElvenJS {
 
         const url = options?.callbackUrl || window.location.origin;
         await this.dappProvider.signMessage(
-          new SignableMessage({ message: Buffer.from(message) }),
+          new Message({ data: Buffer.from(message) }),
           {
             callbackUrl: encodeURIComponent(
               `${url}${

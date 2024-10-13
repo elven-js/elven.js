@@ -4,7 +4,7 @@ import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider
 import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
 import { WebviewProvider } from '@multiversx/sdk-webview-provider';
 import { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts';
-import { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/contractQueryResponse';
+import { ContractQueryResponse } from '@multiversx/sdk-core/out/networkProviders/contractQueryResponse';
 
 export interface InitOptions {
   apiUrl?: string;

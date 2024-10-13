@@ -136,6 +136,10 @@ Why? Because it is supposed to be a browser script, it should be as small as pos
 4. test on example -> `npm run dev:server`
 5. rebuild with every change in the script
 
+To test the MultiversX browser extension you would need to run localhost with SSL.
+For quick dev testing tools like [localhost.run](https://localhost.run/) should be enough.
+After you run `npm run dev:server`, in separate teriminal window run `ssh -R 80:localhost:3000 localhost.run`. You can also relay on your own SSL setup.
+
 ### Articles
 
 - [How to Interact With the MultiversX Blockchain in a Simple Static Website](https://hackernoon.com/how-to-interact-with-the-elrond-blockchain-in-a-simple-static-website)

@@ -1,3 +1,8 @@
+### [0.20.0](https://github.com/elven-js/elven.js/releases/tag/v0.20.0) (2024-10-13)
+- remove `@multiversx/sdk-network-providers` package (now included in the sdk core)
+- remove/replace `SignableMessage` and adjust the code
+- update dependencies 
+
 ### [0.19.0](https://github.com/elven-js/elven.js/releases/tag/v0.19.0) (2024-08-03)
 - replace custom webview provider implementation with the dedicated library (xPortal)
 - update dependencies

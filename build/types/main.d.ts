@@ -33,7 +33,7 @@ export declare class ElvenJS {
     /**
      * Query Smart Contracts
      */
-    static queryContract({ address, func, args, value, caller, }: SmartContractQueryArgs): Promise<import("@multiversx/sdk-network-providers/out/contractQueryResponse").ContractQueryResponse | undefined>;
+    static queryContract({ address, func, args, value, caller, }: SmartContractQueryArgs): Promise<import("@multiversx/sdk-core/out").ContractQueryResponse | undefined>;
     /**
      * Main storage
      */

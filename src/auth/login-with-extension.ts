@@ -39,9 +39,10 @@ export const loginWithExtension = async (
     throw new Error('There were problems with auth provider initialization!');
   }
 
-  const { signature } = dappProvider.account;
+  const account = dappProvider.getAccount();
 
   ls.set('loginToken', loginToken);
+  const signature = account?.signature;
 
   if (signature) {
     ls.set('signature', signature);

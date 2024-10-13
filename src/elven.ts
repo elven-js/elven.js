@@ -25,7 +25,6 @@ export { Transaction } from '@multiversx/sdk-core/out/transaction';
 export { TransactionComputer } from '@multiversx/sdk-core/out/transactionComputer';
 export { Message, MessageComputer } from '@multiversx/sdk-core/out/message';
 export { TransactionWatcher } from '@multiversx/sdk-core/out/transactionWatcher';
-export { SignableMessage } from '@multiversx/sdk-core/out/signableMessage';
 export {
   BytesType,
   BytesValue,
@@ -51,7 +50,7 @@ export {
   AddressValue,
 } from '@multiversx/sdk-core/out/smartcontracts/typesystem/address';
 export { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts/interface';
-export { ContractQueryResponse } from '@multiversx/sdk-network-providers/out/contractQueryResponse';
+export { ContractQueryResponse } from '@multiversx/sdk-core/out/networkProviders/contractQueryResponse';
 
 export { ElvenJS } from './main';
 export { parseAmount, formatAmount } from './utils/amount';
