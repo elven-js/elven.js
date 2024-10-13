@@ -20,7 +20,7 @@
   "homepage": "https://www.elvenjs.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/elven-js/elven.js"
+    "url": "git+https://github.com/elven-js/elven.js.git"
   },
   "keywords": [
     "elrond",
