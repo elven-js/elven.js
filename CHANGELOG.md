@@ -1,3 +1,8 @@
+### [0.20.1](https://github.com/elven-js/elven.js/releases/tag/v0.20.1) (2024-10-...)
+- update to the newest SDK core
+- add required esbuild adjustments
+- ...
+
 ### [0.20.0](https://github.com/elven-js/elven.js/releases/tag/v0.20.0) (2024-10-13)
 - remove `@multiversx/sdk-network-providers` package (now included in the sdk core)
 - remove/replace `SignableMessage` and adjust the code

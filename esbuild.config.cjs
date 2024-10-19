@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const esbuild = require('esbuild');
-const path = require('path');
+const plugin = require('node-stdlib-browser/helpers/esbuild/plugin');
+const stdLibBrowser = require('node-stdlib-browser');
 
 const fs = require('fs');
 
@@ -14,26 +15,22 @@ esbuild
     minify: true,
     outdir: 'build',
     platform: 'browser',
+    drop: ['console', 'debugger'],
+    external: ['./node_modules/bip39/src/wordlists/*.json'],
     plugins: [
+      plugin(stdLibBrowser),
       {
         name: 'alias',
         setup(build) {
-          build.onResolve({ filter: /^bignumber\.js$/ }, () => {
-            return {
-              path: path.resolve(
-                __dirname,
-                'node_modules/bignumber.js/bignumber.mjs'
-              ),
-            };
-          });
-          build.onResolve({ filter: /^buffer$/ }, () => {
-            return {
-              path: path.resolve(
-                __dirname,
-                'node_modules/node-stdlib-browser/node_modules/buffer/index.js'
-              ),
-            };
-          });
+          build.onResolve({ filter: /^bn\.js$/ }, () => ({
+            path: require.resolve('bn.js'),
+          }));
+          build.onResolve({ filter: /^safe-buffer$/ }, () => ({
+            path: require.resolve('safe-buffer'),
+          }));
+          build.onResolve({ filter: /^bignumber.js$/ }, () => ({
+            path: require.resolve('bignumber.js'),
+          }));
         },
       },
     ],

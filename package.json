@@ -1,6 +1,6 @@
 {
   "name": "elven.js",
-  "version": "0.20.0",
+  "version": "0.20.1",
   "description": "Authenticate, sign and send transactions on the MultiversX blockchain in the browser.",
   "type": "module",
   "module": "build/elven.js",
@@ -43,7 +43,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "3.1.0",
     "@eslint/js": "9.12.0",
-    "@multiversx/sdk-core": "13.8.0",
+    "@multiversx/sdk-core": "13.10.0",
     "@multiversx/sdk-extension-provider": "4.0.0",
     "@multiversx/sdk-native-auth-client": "1.0.9",
     "@multiversx/sdk-wallet-connect-provider": "5.0.0",
@@ -64,8 +64,5 @@
     "rimraf": "6.0.1",
     "serve-handler": "6.1.5",
     "typescript": "5.6.3"
-  },
-  "dependencies": {
-    "bignumber.js": "^9.1.2"
   }
 }
