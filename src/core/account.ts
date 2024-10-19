@@ -1,3 +1,5 @@
+// Based on Multiversx sdk-core with modifications
+
 import { bytesToHex, hexToBytes, isValidHex } from './utils';
 
 /**

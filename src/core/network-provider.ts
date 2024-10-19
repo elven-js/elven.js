@@ -1,8 +1,11 @@
+// Based on Multiversx sdk-core with modifications
+
 import { TransactionStatus } from '../core/transaction-status';
 import { networkConfig, defaultChainTypeConfig } from '../utils/constants';
 import { InitOptions } from '../types';
 import { bytesFromBase64, stringToHex } from './utils';
 import { Transaction } from './transaction';
+import { TransactionsConverter } from './transaction-converter';
 
 export interface SmartContractQueryArgs {
   address: string;
@@ -146,7 +149,8 @@ export class ApiNetworkProvider {
   }
 
   async sendTransaction(tx: Transaction): Promise<string> {
-    const response = await this.apiPost('transactions', tx.toSendable());
+    const sendableTx = TransactionsConverter.transactionToPlainObject(tx);
+    const response = await this.apiPost('transactions', sendableTx);
     return response.txHash;
   }
 

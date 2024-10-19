@@ -1,8 +1,8 @@
 import { Transaction } from '../core/transaction';
 import { ls } from '../utils/ls-helpers';
-import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
-import { DAPP_INIT_ROUTE } from '../utils/constants';
-import { WebWalletUrlParamsEnum } from '../types';
+// import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
+// import { DAPP_INIT_ROUTE } from '../utils/constants';
+// import { WebWalletUrlParamsEnum } from '../types';
 import {
   TRANSACTION_OPTIONS_TX_GUARDED,
   TRANSACTION_VERSION_DEFAULT,
@@ -19,25 +19,25 @@ export const guardianPreSignTxOperations = (tx: Transaction) => {
   return tx;
 };
 
-export const sendTxToGuardian = async (
-  signedTx: Transaction,
-  walletAddress?: string
-) => {
-  const webWalletProvider = new WalletProvider(
-    `${walletAddress}${DAPP_INIT_ROUTE}`
-  );
-  const currentUrl = window?.location.href;
+// export const sendTxToGuardian = async (
+//   signedTx: Transaction,
+//   walletAddress?: string
+// ) => {
+//   const webWalletProvider = new WalletProvider(
+//     `${walletAddress}${DAPP_INIT_ROUTE}`
+//   );
+//   const currentUrl = window?.location.href;
 
-  const alteredCallbackUrl = new URL(currentUrl);
-  alteredCallbackUrl.searchParams.set(
-    WebWalletUrlParamsEnum.hasWebWalletGuardianSign,
-    'true'
-  );
+//   const alteredCallbackUrl = new URL(currentUrl);
+//   alteredCallbackUrl.searchParams.set(
+//     WebWalletUrlParamsEnum.hasWebWalletGuardianSign,
+//     'true'
+//   );
 
-  await webWalletProvider.guardTransactions([signedTx], {
-    callbackUrl: encodeURIComponent(alteredCallbackUrl.toString()),
-  });
-};
+//   await webWalletProvider.guardTransactions([signedTx], {
+//     callbackUrl: encodeURIComponent(alteredCallbackUrl.toString()),
+//   });
+// };
 
 export const checkNeedsGuardianSigning = (signedTx: Transaction) => {
   const guardian = ls.get('activeGuardian');

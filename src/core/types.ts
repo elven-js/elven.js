@@ -96,3 +96,23 @@ export interface ITransactionFetcher {
    */
   getTransaction(txHash: string): Promise<ITransactionOnNetwork>;
 }
+
+export interface IPlainTransactionObject extends Record<string, unknown> {
+  nonce: number;
+  value: string;
+  receiver: string;
+  sender: string;
+  receiverUsername?: string;
+  senderUsername?: string;
+  guardian?: string;
+  gasPrice: number;
+  gasLimit: number;
+  data?: string;
+  chainID: string;
+  version: number;
+  options?: number;
+  signature?: string;
+  guardianSignature?: string;
+  relayer?: string;
+  innerTransactions?: IPlainTransactionObject[];
+}

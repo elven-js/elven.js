@@ -140,8 +140,8 @@ export class Transaction {
       ? this.addressAsBech32(options.guardian)
       : '';
 
-    this.signature = options.signature || Buffer.from([]);
-    this.guardianSignature = options.guardianSignature || Buffer.from([]);
+    this.signature = options.signature || new Uint8Array([]);
+    this.guardianSignature = options.guardianSignature || new Uint8Array([]);
 
     this.relayer = options.relayer || '';
     this.innerTransactions = options.innerTransactions || [];

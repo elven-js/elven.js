@@ -1,3 +1,5 @@
+// Based on Multiversx sdk-core with modifications
+
 /**
  * The base class for exceptions (errors).
  */
@@ -382,5 +384,17 @@ export class ErrSmartContractQuery extends Err {
   public constructor(returnCode: string, message: string) {
     super(message);
     this.returnCode = returnCode;
+  }
+}
+
+export class ErrCannotSignSingleTransaction extends Err {
+  public constructor() {
+    super('Cannot sign single transaction.');
+  }
+}
+
+export class ErrAccountNotConnected extends Err {
+  public constructor() {
+    super('Account is not connected.');
   }
 }

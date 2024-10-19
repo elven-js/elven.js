@@ -54,3 +54,21 @@ export const bytesFromBase64 = (base64: string) => {
 
   return byteArray;
 };
+
+export const toBase64fromStringOrBytes = (value: string | Uint8Array) => {
+  if (!value || !value.length) return undefined;
+
+  let utf8Bytes;
+
+  if (typeof value === 'string') {
+    utf8Bytes = new TextEncoder().encode(value);
+  } else if (value instanceof Uint8Array) {
+    utf8Bytes = value;
+  } else {
+    return undefined; // Invalid input type
+  }
+
+  const binary = String.fromCharCode(...utf8Bytes);
+
+  return btoa(binary);
+};

@@ -1,3 +1,5 @@
+// Based on Multiversx sdk-core with modifications
+
 /**
  * An abstraction for handling and interpreting the "status" field of a transaction.
  */

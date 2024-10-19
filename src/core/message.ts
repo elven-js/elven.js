@@ -1,3 +1,5 @@
+// Based on Multiversx sdk-core with modifications
+
 import {
   DEFAULT_MESSAGE_VERSION,
   MESSAGE_PREFIX,

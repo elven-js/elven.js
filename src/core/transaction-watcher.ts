@@ -1,3 +1,5 @@
+// Based on Multiversx sdk-core with modifications
+
 import { AsyncTimer } from './async-timer';
 import { HEX_TRANSACTION_HASH_LENGTH } from './constants';
 import {
