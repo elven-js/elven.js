@@ -1,0 +1,9 @@
+- remove Buffer usage
+- remove bignumber.js usage
+- remove @multiversx/sdk-core usage (pick whats needed)
+- remove conflicting multiversx libs like network providers, signing providers etc
+- check what libs can be replaced
+- replace Transaction.fromPlainObject and Transaction.toSendable
+- probably query arguments and response review is needed, serializers etc.
+- move all required types, probably mostly TypedValues required to prepare data payloads, arguments etc.
+  - maybe it needs a bigger review and maybe there is a way to simplify passing arguments and building data payloads, more in a custom way instead MVX SDK way

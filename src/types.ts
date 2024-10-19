@@ -1,10 +1,12 @@
 import { ExtensionProvider } from '@multiversx/sdk-extension-provider/out/extensionProvider';
-import { Transaction } from '@multiversx/sdk-core/out/transaction';
+import { Transaction } from './core/transaction';
 import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
 import { WebviewProvider } from '@multiversx/sdk-webview-provider';
-import { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts';
-import { ContractQueryResponse } from '@multiversx/sdk-core/out/networkProviders/contractQueryResponse';
+import {
+  SmartContractQueryArgs,
+  SmartContractQueryResponse,
+} from './core/network-provider';
 
 export interface InitOptions {
   apiUrl?: string;
@@ -33,9 +35,9 @@ export interface InitOptions {
   onSignMsgFinalized?: (messageSignature: string) => void;
   onSignMsgFailure?: (message: string, error: string) => void;
   // Query
-  onQueryStart?: (queryArgs: QueryArguments) => void;
-  onQueryFinalized?: (queryResponse: ContractQueryResponse) => void;
-  onQueryFailure?: (queryArgs: QueryArguments, error: string) => void;
+  onQueryStart?: (queryArgs: SmartContractQueryArgs) => void;
+  onQueryFinalized?: (queryResponse: SmartContractQueryResponse) => void;
+  onQueryFailure?: (queryArgs: SmartContractQueryArgs, error: string) => void;
 }
 
 export enum EventStoreEvents {

@@ -43,7 +43,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "3.1.0",
     "@eslint/js": "9.12.0",
-    "@multiversx/sdk-core": "13.10.0",
     "@multiversx/sdk-extension-provider": "4.0.0",
     "@multiversx/sdk-native-auth-client": "1.0.9",
     "@multiversx/sdk-wallet-connect-provider": "5.0.0",
@@ -58,6 +57,7 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
     "globals": "15.11.0",
+    "js-sha3": "^0.9.3",
     "node-stdlib-browser": "1.2.1",
     "prettier": "3.3.3",
     "qrcode": "1.5.4",

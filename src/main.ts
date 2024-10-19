@@ -1,13 +1,16 @@
-import { Transaction } from '@multiversx/sdk-core/out/transaction';
+import { Transaction } from './core/transaction';
 import { initExtensionProvider } from './auth/init-extension-provider';
 import { ExtensionProvider } from '@multiversx/sdk-extension-provider/out/extensionProvider';
 import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
 import { NativeAuthClient } from '@multiversx/sdk-native-auth-client/lib/src/native.auth.client';
-import { Message } from '@multiversx/sdk-core/out/message';
+import { Message } from './core/message';
 import { initMobileProvider } from './auth/init-mobile-provider';
 import { ls } from './utils/ls-helpers';
-import { ApiNetworkProvider, SmartContractQueryArgs } from './network-provider';
+import {
+  ApiNetworkProvider,
+  SmartContractQueryArgs,
+} from './core/network-provider';
 import {
   DappProvider,
   LoginMethodsEnum,
@@ -44,6 +47,7 @@ import { WebviewProvider } from '@multiversx/sdk-webview-provider';
 import { loginWithNativeAuthToken } from './auth/login-with-native-auth-token';
 import { initializeEventsStore } from './initialize-events-store';
 import { withLoginEvents } from './utils/with-login-events';
+import { stringToBytes } from './core/utils';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
@@ -297,8 +301,8 @@ export class ElvenJS {
           return;
         }
 
-        await this.networkProvider.sendTransaction(signedTx);
-        await postSendTx(signedTx, this.networkProvider);
+        const txHash = await this.networkProvider.sendTransaction(signedTx);
+        await postSendTx(signedTx, txHash, this.networkProvider);
       }
     } catch (e) {
       const err = errorParse(e);
@@ -339,7 +343,7 @@ export class ElvenJS {
 
       if (this.dappProvider instanceof ExtensionProvider) {
         const signedMessage = await this.dappProvider.signMessage(
-          new Message({ data: Buffer.from(message) })
+          new Message({ data: stringToBytes(message) })
         );
 
         messageSignature = Buffer.from(signedMessage?.signature || '').toString(
@@ -348,7 +352,7 @@ export class ElvenJS {
       }
       if (this.dappProvider instanceof WalletConnectV2Provider) {
         const signedMessage = await this.dappProvider.signMessage(
-          new Message({ data: Buffer.from(message) })
+          new Message({ data: stringToBytes(message) })
         );
 
         messageSignature = Buffer.from(signedMessage?.signature || '').toString(
@@ -357,7 +361,7 @@ export class ElvenJS {
       }
       if (this.dappProvider instanceof WebviewProvider) {
         const signedMessage = await this.dappProvider.signMessage(
-          new Message({ data: Buffer.from(message) })
+          new Message({ data: stringToBytes(message) })
         );
 
         messageSignature = Buffer.from(signedMessage?.signature || '').toString(
@@ -374,7 +378,7 @@ export class ElvenJS {
 
         const url = options?.callbackUrl || window.location.origin;
         await this.dappProvider.signMessage(
-          new Message({ data: Buffer.from(message) }),
+          new Message({ data: stringToBytes(message) }),
           {
             callbackUrl: encodeURIComponent(
               `${url}${

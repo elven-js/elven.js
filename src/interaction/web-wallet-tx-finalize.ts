@@ -3,7 +3,7 @@ import {
   WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED,
   WalletProvider,
 } from '@multiversx/sdk-web-wallet-provider/out';
-import { Transaction } from '@multiversx/sdk-core/out/transaction';
+import { Transaction } from '../core/transaction';
 import { getParamFromUrl } from '../utils/get-param-from-url';
 import {
   DappProvider,
@@ -11,7 +11,7 @@ import {
   LoginMethodsEnum,
   WebWalletUrlParamsEnum,
 } from '../types';
-import { ApiNetworkProvider } from '../network-provider';
+import { ApiNetworkProvider } from '../core/network-provider';
 import { postSendTx } from './post-send-tx';
 import { errorParse } from '../utils/error-parse';
 import { EventsStore } from '../events-store';
@@ -77,8 +77,8 @@ export const webWalletTxFinalize = async (
 
       try {
         EventsStore.run(EventStoreEvents.onTxStart, transaction);
-        await networkProvider.sendTransaction(transaction);
-        await postSendTx(transaction, networkProvider);
+        const txHash = await networkProvider.sendTransaction(transaction);
+        await postSendTx(transaction, txHash, networkProvider);
       } catch (e) {
         const err = errorParse(e);
         const errMsg = `Getting transaction information failed! ${err}`;

@@ -1,6 +1,4 @@
-import { Address } from '@multiversx/sdk-core/out/address';
-import { Account } from '@multiversx/sdk-core/out/account';
-
+import { Account } from '../core/account';
 import { errorParse } from '../utils/error-parse';
 import { ls } from '../utils/ls-helpers';
 import { isLoginExpired } from './expires-at';
@@ -11,14 +9,13 @@ export const accountSync = async (elven: any) => {
   const loginExpired = loginExpires && isLoginExpired(loginExpires);
 
   if (!loginExpired && address && elven.networkProvider) {
-    const userAddressInstance = new Address(address);
-    const userAccountInstance = new Account(userAddressInstance);
+    const userAccountInstance = new Account(address);
     try {
       const userAccountOnNetwork =
-        await elven.networkProvider.getAccount(userAddressInstance);
+        await elven.networkProvider.getAccount(address);
 
       const userGuardianOnNetwork =
-        await elven.networkProvider.getGuardianData(userAddressInstance);
+        await elven.networkProvider.getGuardianData(address);
 
       ls.set('address', address);
       ls.set(
