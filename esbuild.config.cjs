@@ -3,7 +3,7 @@ const esbuild = require('esbuild');
 
 const fs = require('fs');
 
-const multiversXBanner = `/*!
+const banner = `/*!
  * Portions of this code are derived from MultiversX libraries.
  * These portions are licensed under the MIT License.
  *
@@ -20,7 +20,7 @@ esbuild
     minify: true,
     outdir: 'build',
     platform: 'browser',
-    banner: { js: multiversXBanner },
+    banner: { js: banner },
     // drop: ['console', 'debugger'],
   })
   .then((result) => {

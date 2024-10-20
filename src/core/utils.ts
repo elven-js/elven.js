@@ -86,35 +86,125 @@ export const combineBytes = (bytesArray: Uint8Array[]) => {
   return combinedBytes;
 };
 
-// TODO: fix these, should work similar to qs
+// ================== qs-like replacement start
+
+function parseKey(key: string): Array<string | number> {
+  const keys: Array<string | number> = [];
+  const regex = /([^[\]]+)|\[(.*?)\]/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(key)) !== null) {
+    if (match[1] !== undefined) {
+      keys.push(match[1]);
+    } else if (match[2] !== undefined) {
+      if (match[2] === '') {
+        keys.push('');
+      } else if (/^\d+$/.test(match[2])) {
+        keys.push(Number(match[2]));
+      } else {
+        keys.push(match[2]);
+      }
+    }
+  }
+
+  return keys;
+}
+
+function setDeep(obj: any, keys: Array<string | number>, value: any) {
+  let current = obj;
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+
+    if (i === keys.length - 1) {
+      if (key === '') {
+        if (!Array.isArray(current)) {
+          current = [];
+        }
+        current.push(value);
+      } else if (typeof key === 'number') {
+        if (!Array.isArray(current)) {
+          current = [];
+        }
+        current[key] = value;
+      } else {
+        current[key] = value;
+      }
+    } else {
+      const nextKey = keys[i + 1];
+
+      if (key === '') {
+        if (!Array.isArray(current)) {
+          current = [];
+        }
+        if (
+          current.length === 0 ||
+          typeof current[current.length - 1] !== 'object'
+        ) {
+          current.push(typeof nextKey === 'number' ? [] : {});
+        }
+        current = current[current.length - 1];
+      } else if (typeof key === 'number') {
+        if (!Array.isArray(current)) {
+          current = [];
+        }
+        if (!current[key]) {
+          current[key] = typeof nextKey === 'number' ? [] : {};
+        }
+        current = current[key];
+      } else {
+        if (!current[key]) {
+          current[key] =
+            typeof nextKey === 'number' || nextKey === '' ? [] : {};
+        }
+        current = current[key];
+      }
+    }
+  }
+}
+
+function buildQueryParams(
+  keys: Array<string | number>,
+  value: any,
+  queryParams: string[]
+) {
+  if (value === null || value === undefined) return;
+
+  if (typeof value === 'object') {
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        buildQueryParams([...keys, ''], item, queryParams);
+      });
+    } else {
+      for (const key in value) {
+        if (Object.prototype.hasOwnProperty.call(value, key)) {
+          buildQueryParams([...keys, key], value[key], queryParams);
+        }
+      }
+    }
+  } else {
+    const keyString = keys
+      .map((key, index) => {
+        if (index === 0) {
+          return encodeURIComponent(String(key));
+        } else if (key === '') {
+          return '[]';
+        } else {
+          return `[${encodeURIComponent(String(key))}]`;
+        }
+      })
+      .join('');
+    queryParams.push(`${keyString}=${encodeURIComponent(value)}`);
+  }
+}
+
 export function parseQueryString(queryString: string): Record<string, any> {
   const params = new URLSearchParams(queryString);
   const result: Record<string, any> = {};
 
   for (const [key, value] of params.entries()) {
-    const match = key.match(/^(\w+)(?:\[(\d*)\])?$/); // Match keys like nonce[0] or nonce (standard keys)
-
-    if (match) {
-      const paramName = match[1];
-      const index = match[2] !== undefined ? Number(match[2]) : null;
-
-      if (index !== null) {
-        // If it's an array-like param (e.g., nonce[0])
-        if (!result[paramName]) {
-          result[paramName] = [];
-        }
-        result[paramName][index] = value;
-      } else {
-        // Standard param (e.g., nonce)
-        if (!result[paramName]) {
-          result[paramName] = value;
-        } else if (Array.isArray(result[paramName])) {
-          (result[paramName] as any[]).push(value);
-        } else {
-          result[paramName] = [result[paramName], value];
-        }
-      }
-    }
+    const keys = parseKey(key);
+    setDeep(result, keys, value);
   }
 
   return result;
@@ -122,27 +212,8 @@ export function parseQueryString(queryString: string): Record<string, any> {
 
 export function stringifyQueryParams(params: Record<string, any>): string {
   const queryParams: string[] = [];
-
-  for (const key in params) {
-    if (Object.prototype.hasOwnProperty.call(params, key)) {
-      if (Array.isArray(params[key])) {
-        // Handle array-like parameters
-        params[key].forEach((value: any, index: number) => {
-          queryParams.push(`${key}[${index}]=${encodeURIComponent(value)}`);
-        });
-      } else if (typeof params[key] === 'object') {
-        // Handle nested objects (qs supports this)
-        for (const subKey in params[key]) {
-          queryParams.push(
-            `${key}[${subKey}]=${encodeURIComponent(params[key][subKey])}`
-          );
-        }
-      } else {
-        // Handle standard parameters
-        queryParams.push(`${key}=${encodeURIComponent(params[key])}`);
-      }
-    }
-  }
-
+  buildQueryParams([], params, queryParams);
   return queryParams.join('&');
 }
+
+// ================== qs-like replacement stop

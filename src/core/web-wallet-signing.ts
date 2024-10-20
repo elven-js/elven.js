@@ -123,17 +123,11 @@ export class WalletProvider {
     messageToSign: Message,
     options?: { callbackUrl?: string }
   ): Promise<string> {
-    const message = new Message({
-      data: messageToSign.data,
-      address: messageToSign.address,
-      signer: 'web-wallet',
-      version: messageToSign.version,
-    });
     const redirectUrl = this.buildWalletUrl({
       endpoint: WALLET_PROVIDER_SIGN_MESSAGE_URL,
       callbackUrl: options?.callbackUrl,
       params: {
-        message: message.data.toString(),
+        message: bytesToString(messageToSign.data),
       },
     });
 
