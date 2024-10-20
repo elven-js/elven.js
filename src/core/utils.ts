@@ -72,3 +72,77 @@ export const toBase64fromStringOrBytes = (value: string | Uint8Array) => {
 
   return btoa(binary);
 };
+
+export const combineBytes = (bytesArray: Uint8Array[]) => {
+  const totalLength = bytesArray.reduce((sum, bytes) => sum + bytes.length, 0);
+  const combinedBytes = new Uint8Array(totalLength);
+  let offset = 0;
+
+  bytesArray.forEach((bytes) => {
+    combinedBytes.set(bytes, offset);
+    offset += bytes.length;
+  });
+
+  return combinedBytes;
+};
+
+// TODO: fix these, should work similar to qs
+export function parseQueryString(queryString: string): Record<string, any> {
+  const params = new URLSearchParams(queryString);
+  const result: Record<string, any> = {};
+
+  for (const [key, value] of params.entries()) {
+    const match = key.match(/^(\w+)(?:\[(\d*)\])?$/); // Match keys like nonce[0] or nonce (standard keys)
+
+    if (match) {
+      const paramName = match[1];
+      const index = match[2] !== undefined ? Number(match[2]) : null;
+
+      if (index !== null) {
+        // If it's an array-like param (e.g., nonce[0])
+        if (!result[paramName]) {
+          result[paramName] = [];
+        }
+        result[paramName][index] = value;
+      } else {
+        // Standard param (e.g., nonce)
+        if (!result[paramName]) {
+          result[paramName] = value;
+        } else if (Array.isArray(result[paramName])) {
+          (result[paramName] as any[]).push(value);
+        } else {
+          result[paramName] = [result[paramName], value];
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+export function stringifyQueryParams(params: Record<string, any>): string {
+  const queryParams: string[] = [];
+
+  for (const key in params) {
+    if (Object.prototype.hasOwnProperty.call(params, key)) {
+      if (Array.isArray(params[key])) {
+        // Handle array-like parameters
+        params[key].forEach((value: any, index: number) => {
+          queryParams.push(`${key}[${index}]=${encodeURIComponent(value)}`);
+        });
+      } else if (typeof params[key] === 'object') {
+        // Handle nested objects (qs supports this)
+        for (const subKey in params[key]) {
+          queryParams.push(
+            `${key}[${subKey}]=${encodeURIComponent(params[key][subKey])}`
+          );
+        }
+      } else {
+        // Handle standard parameters
+        queryParams.push(`${key}=${encodeURIComponent(params[key])}`);
+      }
+    }
+  }
+
+  return queryParams.join('&');
+}

@@ -2,12 +2,12 @@ import { Transaction } from './core/transaction';
 import { initExtensionProvider } from './auth/init-extension-provider';
 import { ExtensionProvider } from './core/browser-extension-signing';
 // import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
-// import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
+import { WalletProvider } from './core/web-wallet-signing';
 import { NativeAuthClient } from './core/native-auth-client';
 // import { WebviewProvider } from '@multiversx/sdk-webview-provider';
 import { Message } from './core/message';
 // import { initMobileProvider } from './auth/init-mobile-provider';
-// import { initWebWalletProvider } from './auth/init-web-wallet-provider';
+import { initWebWalletProvider } from './auth/init-web-wallet-provider';
 import { ls } from './utils/ls-helpers';
 import {
   ApiNetworkProvider,
@@ -23,24 +23,24 @@ import {
 import { logout } from './auth/logout';
 import { loginWithExtension } from './auth/login-with-extension';
 // import { loginWithMobile } from './auth/login-with-mobile';
-// import { loginWithWebWallet } from './auth/login-with-web-wallet';
+import { loginWithWebWallet } from './auth/login-with-web-wallet';
 import { accountSync } from './auth/account-sync';
 import { errorParse } from './utils/error-parse';
 import { isLoginExpired } from './auth/expires-at';
 import { EventsStore } from './events-store';
 import {
-  // networkConfig,
+  networkConfig,
   defaultApiEndpoint,
   defaultChainTypeConfig,
   defaultWalletConnectV2RelayAddresses,
 } from './utils/constants';
 import { getParamFromUrl } from './utils/get-param-from-url';
 import { postSendTx } from './interaction/post-send-tx';
-// import { webWalletTxFinalize } from './interaction/web-wallet-tx-finalize';
+import { webWalletTxFinalize } from './interaction/web-wallet-tx-finalize';
 import {
   checkNeedsGuardianSigning,
-  // guardianPreSignTxOperations,
-  // sendTxToGuardian,
+  guardianPreSignTxOperations,
+  sendTxToGuardian,
 } from './interaction/guardian-operations';
 import { preSendTx } from './interaction/pre-send-tx';
 import { webWalletSignMessageFinalize } from './interaction/web-wallet-sign-message-finalize';
@@ -106,15 +106,15 @@ export class ElvenJS {
         // if (state.loginMethod === LoginMethodsEnum.xPortalHub) {
         //   this.dappProvider = new WebviewProvider();
         // }
-        // if (
-        //   state.loginMethod === LoginMethodsEnum.webWallet &&
-        //   this.initOptions?.chainType
-        // ) {
-        //   this.dappProvider = await initWebWalletProvider(
-        //     networkConfig[this.initOptions.chainType].walletAddress,
-        //     this.initOptions.apiUrl
-        //   );
-        // }
+        if (
+          state.loginMethod === LoginMethodsEnum.webWallet &&
+          this.initOptions?.chainType
+        ) {
+          this.dappProvider = await initWebWalletProvider(
+            networkConfig[this.initOptions.chainType].walletAddress,
+            this.initOptions.apiUrl
+          );
+        }
         // if (
         //   state.loginMethod === LoginMethodsEnum.xAlias &&
         //   this.initOptions?.chainType
@@ -132,16 +132,16 @@ export class ElvenJS {
       if (this.initOptions?.chainType) {
         // We need to get params from callback url and finalize the transaction
         // It will only trigger when there is a WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED in url params
-        // await webWalletTxFinalize(
-        //   this.dappProvider,
-        //   this.networkProvider,
-        //   networkConfig[this.initOptions.chainType][
-        //     state.loginMethod === LoginMethodsEnum.xAlias
-        //       ? 'xAliasAddress'
-        //       : 'walletAddress'
-        //   ],
-        //   state.nonce
-        // );
+        await webWalletTxFinalize(
+          this.dappProvider,
+          this.networkProvider,
+          networkConfig[this.initOptions.chainType][
+            state.loginMethod === LoginMethodsEnum.xAlias
+              ? 'xAliasAddress'
+              : 'walletAddress'
+          ],
+          state.nonce
+        );
 
         // We need to get the signature in case of signing a message with web wallet or guardians 2FA hook
         webWalletSignMessageFinalize();
@@ -199,18 +199,18 @@ export class ElvenJS {
       // }
 
       // Login with Web Wallet
-      // if (
-      //   loginMethod === LoginMethodsEnum.webWallet &&
-      //   this.initOptions?.chainType
-      // ) {
-      //   const dappProvider = await loginWithWebWallet(
-      //     networkConfig[this.initOptions.chainType].walletAddress,
-      //     loginToken,
-      //     this.initOptions?.chainType,
-      //     options?.callbackRoute
-      //   );
-      //   this.dappProvider = dappProvider;
-      // }
+      if (
+        loginMethod === LoginMethodsEnum.webWallet &&
+        this.initOptions?.chainType
+      ) {
+        const dappProvider = await loginWithWebWallet(
+          networkConfig[this.initOptions.chainType].walletAddress,
+          loginToken,
+          this.initOptions?.chainType,
+          options?.callbackRoute
+        );
+        this.dappProvider = dappProvider;
+      }
 
       // Login with xAlias
       // if (
@@ -259,8 +259,7 @@ export class ElvenJS {
       throw new Error(error);
     }
 
-    // let signedTx = guardianPreSignTxOperations(transaction);
-    let signedTx = transaction; // TODO: remove later uncomment up
+    let signedTx = guardianPreSignTxOperations(transaction);
 
     try {
       EventsStore.run(EventStoreEvents.onTxStart, transaction);
@@ -280,9 +279,9 @@ export class ElvenJS {
       //     transaction
       //   )) as Transaction;
       // }
-      // if (this.dappProvider instanceof WalletProvider) {
-      //   await this.dappProvider.signTransaction(transaction);
-      // }
+      if (this.dappProvider instanceof WalletProvider) {
+        await this.dappProvider.signTransaction(transaction);
+      }
 
       if (
         currentState.loginMethod !== LoginMethodsEnum.webWallet &&
@@ -294,14 +293,14 @@ export class ElvenJS {
           preSendTx(signedTx);
         }
 
-        // if (needsGuardianSign && this.initOptions?.chainType) {
-        //   await sendTxToGuardian(
-        //     signedTx,
-        //     networkConfig[this.initOptions.chainType].walletAddress
-        //   );
+        if (needsGuardianSign && this.initOptions?.chainType) {
+          await sendTxToGuardian(
+            signedTx,
+            networkConfig[this.initOptions.chainType].walletAddress
+          );
 
-        //   return;
-        // }
+          return;
+        }
 
         const txHash = await this.networkProvider.sendTransaction(signedTx);
         await postSendTx(signedTx, txHash, this.networkProvider);
@@ -323,8 +322,8 @@ export class ElvenJS {
    * Sign a single message
    */
   static async signMessage(
-    message: string
-    // options?: { callbackUrl?: string }
+    message: string,
+    options?: { callbackUrl?: string }
   ) {
     if (!this.dappProvider) {
       const error = 'Message signing failed: There is no active session!';
@@ -370,26 +369,26 @@ export class ElvenJS {
       //     'hex'
       //   );
       // }
-      // if (this.dappProvider instanceof WalletProvider) {
-      //   const encodeRFC3986URIComponent = (str: string) => {
-      //     return encodeURIComponent(str).replace(
-      //       /[!'()*]/g,
-      //       (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
-      //     );
-      //   };
+      if (this.dappProvider instanceof WalletProvider) {
+        const encodeRFC3986URIComponent = (str: string) => {
+          return encodeURIComponent(str).replace(
+            /[!'()*]/g,
+            (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
+          );
+        };
 
-      //   const url = options?.callbackUrl || window.location.origin;
-      //   await this.dappProvider.signMessage(
-      //     new Message({ data: stringToBytes(message) }),
-      //     {
-      //       callbackUrl: encodeURIComponent(
-      //         `${url}${
-      //           url.includes('?') ? '&' : '?'
-      //         }message=${encodeRFC3986URIComponent(message)}`
-      //       ),
-      //     }
-      //   );
-      // }
+        const url = options?.callbackUrl || window.location.origin;
+        await this.dappProvider.signMessage(
+          new Message({ data: stringToBytes(message) }),
+          {
+            callbackUrl: encodeURIComponent(
+              `${url}${
+                url.includes('?') ? '&' : '?'
+              }message=${encodeRFC3986URIComponent(message)}`
+            ),
+          }
+        );
+      }
 
       const currentState = ls.get();
 

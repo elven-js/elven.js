@@ -6,8 +6,8 @@ import {
   SDK_JS_SIGNER,
   UNKNOWN_SIGNER,
 } from './constants';
-
-import { keccak_256 } from 'js-sha3';
+import { keccak256 } from './keccak256';
+import { bytesToHex, combineBytes, hexToBytes, stringToBytes } from './utils';
 
 export class Message {
   /**
@@ -50,14 +50,14 @@ export class MessageComputer {
   constructor() {}
 
   computeBytesForSigning(message: Message): Uint8Array {
-    const messageSize = Buffer.from(message.data.length.toString());
-    const signableMessage = Buffer.concat([messageSize, message.data]);
-    const bytesToHash = Buffer.concat([
-      Buffer.from(MESSAGE_PREFIX),
+    const messageSize = stringToBytes(message.data.length.toString());
+    const signableMessage = combineBytes([messageSize, message.data]);
+    const bytes = combineBytes([
+      stringToBytes(MESSAGE_PREFIX),
       signableMessage,
     ]);
 
-    return new Uint8Array(keccak_256.update(bytesToHash).digest());
+    return keccak256(bytes);
   }
 
   computeBytesForVerifying(message: Message): Uint8Array {
@@ -72,10 +72,8 @@ export class MessageComputer {
     signer: string;
   } {
     return {
-      message: Buffer.from(message.data).toString('hex'),
-      signature: message.signature
-        ? Buffer.from(message.signature).toString('hex')
-        : '',
+      message: bytesToHex(message.data),
+      signature: message.signature ? bytesToHex(message.signature) : '',
       address: message.address || '',
       version: message.version,
       signer: message.signer,
@@ -90,10 +88,10 @@ export class MessageComputer {
     signer?: string;
   }): Message {
     const dataHex = this.trimHexPrefix(packedMessage.message);
-    const data = Buffer.from(dataHex, 'hex');
+    const data = hexToBytes(dataHex);
 
     const signatureHex = this.trimHexPrefix(packedMessage.signature || '');
-    const signature = Buffer.from(signatureHex, 'hex');
+    const signature = hexToBytes(signatureHex);
 
     let address: string | undefined = undefined;
     if (packedMessage.address) {

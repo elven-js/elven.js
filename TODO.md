@@ -1,9 +1,10 @@
 - remove Buffer usage
-- remove bignumber.js usage
-- remove @multiversx/sdk-core usage (pick whats needed)
-- remove conflicting multiversx libs like network providers, signing providers etc
-- check what libs can be replaced
-- replace Transaction.fromPlainObject and Transaction.toSendable
-- probably query arguments and response review is needed, serializers etc.
-- move all required types, probably mostly TypedValues required to prepare data payloads, arguments etc.
-  - maybe it needs a bigger review and maybe there is a way to simplify passing arguments and building data payloads, more in a custom way instead MVX SDK way
+- move all previous signing providers
+- check what can be done with wallet connect to make it as small as possible
+- prepare a new API
+  - for token operations
+  - for smart contracts interactions - the the best would be to pass the arguments as is (always requiring ABI without typed helpers)
+    - pass ABI as link to a file or as content or both?
+- use Knip to detect unused stuff and do the cleanup
+- test on  the testnet
+- update README and docs

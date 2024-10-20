@@ -1,4 +1,4 @@
-// Based on Multiversx sdk-core with modifications
+// Based on Multiversx sdk browser extension signing provider with modifications
 
 import { IPlainTransactionObject } from './types';
 import { Message } from './message';

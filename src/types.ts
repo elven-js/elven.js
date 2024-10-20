@@ -1,7 +1,7 @@
 import { ExtensionProvider } from './core/browser-extension-signing';
 import { Transaction } from './core/transaction';
 // import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
-// import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
+import { WalletProvider } from './core/web-wallet-signing';
 // import { WebviewProvider } from '@multiversx/sdk-webview-provider';
 import {
   SmartContractQueryArgs,
@@ -79,7 +79,7 @@ export enum LoginMethodsEnum {
 export type DappProvider =
   | ExtensionProvider
   // | WalletConnectV2Provider
-  // | WalletProvider
+  | WalletProvider
   // | WebviewProvider
   | undefined;
 
