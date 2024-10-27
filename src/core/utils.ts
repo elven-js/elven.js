@@ -30,47 +30,98 @@ export const stringToHex = (string: string) => {
   return bytesToHex(uint8Array);
 };
 
-export const bytesFromBase64 = (base64: string) => {
-  let byteArray;
+export const bytesFromBase64 = (base64String: string) => {
+  // Base64 character set
+  const base64Chars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const base64Map = new Uint8Array(256);
 
-  function isBase64(str: string) {
-    try {
-      return btoa(atob(str)) === str;
-    } catch {
-      return false;
+  // Initialize the inverse mapping from character code to Base64 value
+  for (let i = 0; i < base64Chars.length; i++) {
+    base64Map[base64Chars.charCodeAt(i)] = i;
+  }
+
+  // Remove any characters not part of the Base64 character set
+  base64String = base64String.replace(/[^A-Za-z0-9+/=]/g, '');
+
+  // Calculate padding
+  let padding = 0;
+  if (base64String.endsWith('==')) {
+    padding = 2;
+  } else if (base64String.endsWith('=')) {
+    padding = 1;
+  }
+
+  const byteLength = (base64String.length * 6) / 8 - padding;
+  const bytes = new Uint8Array(byteLength);
+
+  let buffer = 0;
+  let bitsCollected = 0;
+  let byteIndex = 0;
+
+  for (let i = 0; i < base64String.length; i++) {
+    const c = base64String.charAt(i);
+    if (c === '=') {
+      break; // Padding character, end of data
+    }
+
+    // Accumulate bits
+    buffer = (buffer << 6) | base64Map[c.charCodeAt(0)];
+    bitsCollected += 6;
+
+    // If we have 8 or more bits, extract the byte
+    if (bitsCollected >= 8) {
+      bitsCollected -= 8;
+      bytes[byteIndex++] = (buffer >> bitsCollected) & 0xff;
     }
   }
 
-  if (isBase64(base64)) {
-    const binaryString = atob(base64);
-    const binaryLength = binaryString.length;
-    byteArray = new Uint8Array(binaryLength);
-    for (let i = 0; i < binaryLength; i++) {
-      byteArray[i] = binaryString.charCodeAt(i);
-    }
-  } else {
-    byteArray = new TextEncoder().encode(base64);
-  }
-
-  return byteArray;
+  return bytes;
 };
 
-export const toBase64fromStringOrBytes = (value: string | Uint8Array) => {
-  if (!value || !value.length) return undefined;
+export const toBase64FromStringOrBytes = (input: string | Uint8Array) => {
+  // Base64 character set
+  const base64Chars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
-  let utf8Bytes;
+  let bytes;
 
-  if (typeof value === 'string') {
-    utf8Bytes = new TextEncoder().encode(value);
-  } else if (value instanceof Uint8Array) {
-    utf8Bytes = value;
+  // Convert input to Uint8Array if it's a string
+  if (typeof input === 'string') {
+    const encoder = new TextEncoder();
+    bytes = encoder.encode(input);
+  } else if (input instanceof Uint8Array) {
+    bytes = input;
   } else {
-    return undefined; // Invalid input type
+    throw new Error('Input must be a string or Uint8Array');
   }
 
-  const binary = String.fromCharCode(...utf8Bytes);
+  let base64 = '';
+  const len = bytes.length;
 
-  return btoa(binary);
+  for (let i = 0; i < len; i += 3) {
+    // Collect three bytes (or pad with zeros)
+    const byte1 = bytes[i];
+    const byte2 = i + 1 < len ? bytes[i + 1] : 0;
+    const byte3 = i + 2 < len ? bytes[i + 2] : 0;
+
+    // Combine the three bytes into a 24-bit number
+    const combined = (byte1 << 16) | (byte2 << 8) | byte3;
+
+    // Extract four 6-bit values
+    const enc1 = (combined >> 18) & 0x3f;
+    const enc2 = (combined >> 12) & 0x3f;
+    const enc3 = (combined >> 6) & 0x3f;
+    const enc4 = combined & 0x3f;
+
+    // Append the Base64 characters
+    base64 += base64Chars.charAt(enc1);
+    base64 += base64Chars.charAt(enc2);
+    base64 += i + 1 < len ? base64Chars.charAt(enc3) : '=';
+    base64 += i + 2 < len ? base64Chars.charAt(enc4) : '=';
+  }
+
+  return base64;
 };
 
 export const combineBytes = (bytesArray: Uint8Array[]) => {
@@ -84,6 +135,59 @@ export const combineBytes = (bytesArray: Uint8Array[]) => {
   });
 
   return combinedBytes;
+};
+
+export const stringFromBase64 = (base64String: string) => {
+  // Base64 character set
+  const base64Chars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const base64Map = new Uint8Array(256);
+
+  // Initialize the inverse mapping from character code to Base64 value
+  for (let i = 0; i < base64Chars.length; i++) {
+    base64Map[base64Chars.charCodeAt(i)] = i;
+  }
+
+  // Remove any characters not part of the Base64 character set
+  base64String = base64String.replace(/[^A-Za-z0-9+/=]/g, '');
+
+  // Calculate padding
+  let padding = 0;
+  if (base64String.endsWith('==')) {
+    padding = 2;
+  } else if (base64String.endsWith('=')) {
+    padding = 1;
+  }
+
+  const byteLength = (base64String.length * 6) / 8 - padding;
+  const bytes = new Uint8Array(byteLength);
+
+  let buffer = 0;
+  let bitsCollected = 0;
+  let byteIndex = 0;
+
+  for (let i = 0; i < base64String.length; i++) {
+    const c = base64String.charAt(i);
+    if (c === '=') {
+      break; // Padding character, end of data
+    }
+
+    // Accumulate bits
+    buffer = (buffer << 6) | base64Map[c.charCodeAt(0)];
+    bitsCollected += 6;
+
+    // If we have 8 or more bits, extract the byte
+    if (bitsCollected >= 8) {
+      bitsCollected -= 8;
+      bytes[byteIndex++] = (buffer >> bitsCollected) & 0xff;
+    }
+  }
+
+  // Decode bytes to string
+  const decoder = new TextDecoder();
+  const decodedString = decoder.decode(bytes);
+
+  return decodedString;
 };
 
 // ================== qs-like replacement start
@@ -217,3 +321,28 @@ export function stringifyQueryParams(params: Record<string, any>): string {
 }
 
 // ================== qs-like replacement stop
+
+export const isWindowAvailable = () =>
+  typeof window != 'undefined' && typeof window?.location != 'undefined';
+
+export const getTargetOrigin = () => {
+  if (isWindowAvailable()) {
+    const ancestorOrigins = window.location.ancestorOrigins;
+    return ancestorOrigins?.[ancestorOrigins.length - 1] ?? '*';
+  }
+
+  return '*';
+};
+
+export const getSafeWindow = () => {
+  return typeof window !== 'undefined' ? window : ({} as any);
+};
+
+export const getSafeDocument = () => {
+  return typeof document !== 'undefined' ? document : ({} as any);
+};
+
+export const isMobileWebview = () => {
+  const safeWindow = getSafeWindow();
+  return safeWindow.ReactNativeWebView || safeWindow.webkit;
+};

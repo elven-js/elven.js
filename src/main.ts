@@ -4,7 +4,7 @@ import { ExtensionProvider } from './core/browser-extension-signing';
 // import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
 import { WalletProvider } from './core/web-wallet-signing';
 import { NativeAuthClient } from './core/native-auth-client';
-// import { WebviewProvider } from '@multiversx/sdk-webview-provider';
+import { WebviewProvider } from './core/webview-signing';
 import { Message } from './core/message';
 // import { initMobileProvider } from './auth/init-mobile-provider';
 import { initWebWalletProvider } from './auth/init-web-wallet-provider';
@@ -44,7 +44,7 @@ import {
 } from './interaction/guardian-operations';
 import { preSendTx } from './interaction/pre-send-tx';
 import { webWalletSignMessageFinalize } from './interaction/web-wallet-sign-message-finalize';
-// import { loginWithNativeAuthToken } from './auth/login-with-native-auth-token';
+import { loginWithNativeAuthToken } from './auth/login-with-native-auth-token';
 import { initializeEventsStore } from './initialize-events-store';
 import { withLoginEvents } from './utils/with-login-events';
 import { bytesToHex, stringToBytes } from './core/utils';
@@ -83,7 +83,7 @@ export class ElvenJS {
     const nativeAuthTokenFromUrl = getParamFromUrl('accessToken');
     if (nativeAuthTokenFromUrl) {
       await withLoginEvents(async (onLoginSuccess) => {
-        // loginWithNativeAuthToken(nativeAuthTokenFromUrl, this);
+        loginWithNativeAuthToken(nativeAuthTokenFromUrl, this);
         await accountSync(this);
         onLoginSuccess();
       });
@@ -103,9 +103,9 @@ export class ElvenJS {
         // if (state.loginMethod === LoginMethodsEnum.mobile) {
         //   this.dappProvider = await initMobileProvider(this);
         // }
-        // if (state.loginMethod === LoginMethodsEnum.xPortalHub) {
-        //   this.dappProvider = new WebviewProvider();
-        // }
+        if (state.loginMethod === LoginMethodsEnum.webview) {
+          this.dappProvider = new WebviewProvider();
+        }
         if (
           state.loginMethod === LoginMethodsEnum.webWallet &&
           this.initOptions?.chainType
@@ -115,15 +115,15 @@ export class ElvenJS {
             this.initOptions.apiUrl
           );
         }
-        // if (
-        //   state.loginMethod === LoginMethodsEnum.xAlias &&
-        //   this.initOptions?.chainType
-        // ) {
-        //   this.dappProvider = await initWebWalletProvider(
-        //     networkConfig[this.initOptions.chainType].xAliasAddress,
-        //     this.initOptions.apiUrl
-        //   );
-        // }
+        if (
+          state.loginMethod === LoginMethodsEnum.xAlias &&
+          this.initOptions?.chainType
+        ) {
+          this.dappProvider = await initWebWalletProvider(
+            networkConfig[this.initOptions.chainType].xAliasAddress,
+            this.initOptions.apiUrl
+          );
+        }
         await accountSync(this);
         onLoginSuccess();
       });
@@ -213,19 +213,19 @@ export class ElvenJS {
       }
 
       // Login with xAlias
-      // if (
-      //   loginMethod === LoginMethodsEnum.xAlias &&
-      //   this.initOptions?.chainType
-      // ) {
-      //   // Login with xAlias is almost the same as with the web wallet, only endpoints are different
-      //   const dappProvider = await loginWithWebWallet(
-      //     networkConfig[this.initOptions.chainType].xAliasAddress,
-      //     loginToken,
-      //     this.initOptions?.chainType,
-      //     options?.callbackRoute
-      //   );
-      //   this.dappProvider = dappProvider;
-      // }
+      if (
+        loginMethod === LoginMethodsEnum.xAlias &&
+        this.initOptions?.chainType
+      ) {
+        // Login with xAlias is almost the same as with the web wallet, only endpoints are different
+        const dappProvider = await loginWithWebWallet(
+          networkConfig[this.initOptions.chainType].xAliasAddress,
+          loginToken,
+          this.initOptions?.chainType,
+          options?.callbackRoute
+        );
+        this.dappProvider = dappProvider;
+      }
     });
   }
 
@@ -274,11 +274,9 @@ export class ElvenJS {
       // if (this.dappProvider instanceof WalletConnectV2Provider) {
       //   signedTx = await this.dappProvider.signTransaction(transaction);
       // }
-      // if (this.dappProvider instanceof WebviewProvider) {
-      //   signedTx = (await this.dappProvider.signTransaction(
-      //     transaction
-      //   )) as Transaction;
-      // }
+      if (this.dappProvider instanceof WebviewProvider) {
+        signedTx = await this.dappProvider.signTransaction(transaction);
+      }
       if (this.dappProvider instanceof WalletProvider) {
         await this.dappProvider.signTransaction(transaction);
       }
@@ -302,8 +300,8 @@ export class ElvenJS {
           return;
         }
 
-        const txHash = await this.networkProvider.sendTransaction(signedTx);
-        await postSendTx(signedTx, txHash, this.networkProvider);
+        const response = await this.networkProvider.sendTransaction(signedTx);
+        await postSendTx(response, this.networkProvider);
       }
     } catch (e) {
       const err = errorParse(e);
@@ -356,19 +354,20 @@ export class ElvenJS {
       //     new Message({ data: stringToBytes(message) })
       //   );
 
-      //   messageSignature = Buffer.from(signedMessage?.signature || '').toString(
-      //     'hex'
-      //   );
+      //   if (signedMessage?.signature) {
+      //     messageSignature = bytesToHex(signedMessage.signature);
+      //   }
       // }
-      // if (this.dappProvider instanceof WebviewProvider) {
-      //   const signedMessage = await this.dappProvider.signMessage(
-      //     new Message({ data: stringToBytes(message) })
-      //   );
 
-      //   messageSignature = Buffer.from(signedMessage?.signature || '').toString(
-      //     'hex'
-      //   );
-      // }
+      if (this.dappProvider instanceof WebviewProvider) {
+        const signedMessage = await this.dappProvider.signMessage(
+          new Message({ data: stringToBytes(message) })
+        );
+
+        if (signedMessage?.signature) {
+          messageSignature = bytesToHex(signedMessage.signature);
+        }
+      }
       if (this.dappProvider instanceof WalletProvider) {
         const encodeRFC3986URIComponent = (str: string) => {
           return encodeURIComponent(str).replace(

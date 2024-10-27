@@ -1,6 +1,8 @@
-### [0.20.1](https://github.com/elven-js/elven.js/releases/tag/v0.20.1) (2024-10-...)
-- update to the newest SDK core
-- add required esbuild adjustments
+### [1.0.0](https://github.com/elven-js/elven.js/releases/tag/v1.0.0) (2024-...-...)
+- remove MultiversX dependencies and take only what is needed
+- introduce new API (breaking changes)
+- add esbuild adjustments
+- elven.js script is now much smaller
 - ...
 
 ### [0.20.0](https://github.com/elven-js/elven.js/releases/tag/v0.20.0) (2024-10-13)

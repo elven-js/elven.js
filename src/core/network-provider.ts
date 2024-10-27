@@ -6,6 +6,7 @@ import { InitOptions } from '../types';
 import { bytesFromBase64, stringToHex } from './utils';
 import { Transaction } from './transaction';
 import { TransactionsConverter } from './transaction-converter';
+import { ISentTransactionResponse } from './types';
 
 export interface SmartContractQueryArgs {
   address: string;
@@ -148,10 +149,13 @@ export class ApiNetworkProvider {
     throw new Error(originalErrorMessage);
   }
 
-  async sendTransaction(tx: Transaction): Promise<string> {
+  async sendTransaction(tx: Transaction): Promise<ISentTransactionResponse> {
     const sendableTx = TransactionsConverter.transactionToPlainObject(tx);
-    const response = await this.apiPost('transactions', sendableTx);
-    return response.txHash;
+    const response: ISentTransactionResponse = await this.apiPost(
+      'transactions',
+      sendableTx
+    );
+    return response;
   }
 
   async getAccount(address: string) {

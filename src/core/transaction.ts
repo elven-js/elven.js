@@ -87,16 +87,6 @@ export class Transaction {
   public guardianSignature: Uint8Array;
 
   /**
-   * The relayer in case it is a relayedV3 Transaction.
-   */
-  public relayer: string;
-
-  /**
-   * The inner transactions in case it is a relayedV3 Transaction.
-   */
-  public innerTransactions: ITransaction[];
-
-  /**
    * Creates a new Transaction object.
    */
   public constructor(options: {
@@ -142,9 +132,6 @@ export class Transaction {
 
     this.signature = options.signature || new Uint8Array([]);
     this.guardianSignature = options.guardianSignature || new Uint8Array([]);
-
-    this.relayer = options.relayer || '';
-    this.innerTransactions = options.innerTransactions || [];
   }
 
   private addressAsBech32(address: string): string {

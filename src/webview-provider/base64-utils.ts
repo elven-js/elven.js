@@ -4,27 +4,23 @@
  * It will probably be replaced with separate library in the future
  */
 
-import {
-  bytesFromBase64,
-  bytesToString,
-  toBase64fromStringOrBytes,
-} from '../core/utils';
+import { stringFromBase64, toBase64FromStringOrBytes } from '../core/utils';
 
 export function isStringBase64(str: string) {
   try {
     // Try to decode the string and encode it back using base64 functions
     const atobDecoded = atob(str);
     const btoaEncoded = btoa(atobDecoded);
-    const bufferFromDecoded = bytesToString(bytesFromBase64(str));
-    const bufferFromEncoded = toBase64fromStringOrBytes(bufferFromDecoded);
+    const bufferFromDecoded = stringFromBase64(str);
+    const bufferFromEncoded = toBase64FromStringOrBytes(bufferFromDecoded)!;
 
     // If the result is equal to the initial string
-    const isEqualToInitialString =
-      str === btoaEncoded && str === bufferFromEncoded;
+    const isBtoaEqual = str === btoaEncoded || btoaEncoded.startsWith(str);
+    const isBufferFromBase64Equal =
+      str === bufferFromEncoded || bufferFromEncoded.startsWith(str);
+    const isEqualToInitialString = isBtoaEqual && isBufferFromBase64Equal;
 
-    const isAtobEqualToBufferFrom = atobDecoded === bufferFromDecoded;
-
-    if (isEqualToInitialString || isAtobEqualToBufferFrom) {
+    if (isEqualToInitialString) {
       // it is a regular base64 string
       return true;
     }

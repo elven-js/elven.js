@@ -1,10 +1,12 @@
-- remove Buffer usage
-- move all previous signing providers
-- check what can be done with wallet connect to make it as small as possible
+- move all previous signing providers (wallet connect is left)
+  - check what can be done with wallet connect to make it as small as possible
 - prepare a new API
   - for token operations
-  - for smart contracts interactions - the the best would be to pass the arguments as is (always requiring ABI without typed helpers)
+  - for smart contracts interactions - the the best would be to pass the arguments as is (always requiring ABI without typed helpers ???)
     - pass ABI as link to a file or as content or both?
+- test guardians 
 - use Knip to detect unused stuff and do the cleanup
 - test on  the testnet
-- update README and docs
+- update README and docs and demos
+  - how it is built now
+  - what it can't do

@@ -22,7 +22,7 @@ import { DAPP_INIT_ROUTE } from '../utils/constants';
 import { preSendTx } from './pre-send-tx';
 import { TransactionsConverter } from '../core/transaction-converter';
 import { IPlainTransactionObject } from '../core/types';
-import { toBase64fromStringOrBytes } from '../core/utils';
+import { toBase64FromStringOrBytes } from '../core/utils';
 
 export const webWalletTxFinalize = async (
   dappProvider: DappProvider,
@@ -55,7 +55,7 @@ export const webWalletTxFinalize = async (
       // getTransactionsFromWalletUrl should return the same data for both cases
       // and then it should be consumed in the same way on the web wallet and xAlias sides
       if (loginMethod === LoginMethodsEnum.webWallet) {
-        transactionObj.data = toBase64fromStringOrBytes(transactionObj.data)!;
+        transactionObj.data = toBase64FromStringOrBytes(transactionObj.data)!;
       }
     } else if (
       guardian &&
@@ -81,8 +81,8 @@ export const webWalletTxFinalize = async (
 
       try {
         EventsStore.run(EventStoreEvents.onTxStart, transaction);
-        const txHash = await networkProvider.sendTransaction(transaction);
-        await postSendTx(transaction, txHash, networkProvider);
+        const response = await networkProvider.sendTransaction(transaction);
+        await postSendTx(response, networkProvider);
       } catch (e) {
         const err = errorParse(e);
         const errMsg = `Getting transaction information failed! ${err}`;

@@ -197,7 +197,7 @@
           onLogoutFailure: (error) => { displayError(error); },
           // Transaction callbacks
           onTxStart: (tx) => { uiPending(true); },
-          onTxSent: (tx) => { const hash = tx.hash; hash && updateTxHashContainer(hash, true); },
+          onTxSent: (txOnNetwork) => { const hash = txOnNetwork.txHash; hash && updateTxHashContainer(hash, true); },
           onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
           onTxFailure: (tx, error) => { displayError(error); uiPending(false); },
           // Qr code callbacks:

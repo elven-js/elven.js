@@ -1,5 +1,11 @@
 // Based on Multiversx sdk-core with modifications
 
+import {
+  ResponseTypeMap,
+  WindowProviderRequestEnums,
+  WindowProviderResponseEnums,
+} from './types';
+
 export const TRANSACTION_MIN_GAS_PRICE = 1000000000;
 export const TRANSACTION_OPTIONS_DEFAULT = 0;
 export const TRANSACTION_VERSION_DEFAULT = 2;
@@ -17,3 +23,24 @@ export const WALLET_PROVIDER_GUARD_TRANSACTION_URL = 'hook/2fa';
 export const WALLET_PROVIDER_SIGN_MESSAGE_URL = 'hook/sign-message';
 export const WALLET_PROVIDER_CALLBACK_PARAM = 'walletProviderStatus';
 export const WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED = 'transactionsSigned';
+
+// Webview-related constants
+
+export const responseTypeMap: ResponseTypeMap = {
+  [WindowProviderRequestEnums.signTransactionsRequest]:
+    WindowProviderResponseEnums.signTransactionsResponse,
+  [WindowProviderRequestEnums.guardTransactionsRequest]:
+    WindowProviderResponseEnums.guardTransactionsResponse,
+  [WindowProviderRequestEnums.signMessageRequest]:
+    WindowProviderResponseEnums.signMessageResponse,
+  [WindowProviderRequestEnums.loginRequest]:
+    WindowProviderResponseEnums.loginResponse,
+  [WindowProviderRequestEnums.logoutRequest]:
+    WindowProviderResponseEnums.disconnectResponse,
+  [WindowProviderRequestEnums.cancelAction]:
+    WindowProviderResponseEnums.cancelResponse,
+  [WindowProviderRequestEnums.finalizeHandshakeRequest]:
+    WindowProviderResponseEnums.noneResponse,
+  [WindowProviderRequestEnums.finalizeResetStateRequest]:
+    WindowProviderResponseEnums.resetStateResponse,
+};

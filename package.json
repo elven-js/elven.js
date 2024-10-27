@@ -1,6 +1,6 @@
 {
   "name": "elven.js",
-  "version": "0.20.1",
+  "version": "1.0.0",
   "description": "Sync, sign and send transactions on the MultiversX blockchain in the browser.",
   "type": "module",
   "module": "build/elven.js",
@@ -42,20 +42,20 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.1.0",
-    "@eslint/js": "9.12.0",
+    "@eslint/js": "9.13.0",
     "@types/qrcode": "1.5.5",
     "@types/serve-handler": "6.1.4",
-    "@typescript-eslint/eslint-plugin": "8.8.1",
-    "@typescript-eslint/parser": "8.8.1",
+    "@typescript-eslint/eslint-plugin": "8.11.0",
+    "@typescript-eslint/parser": "8.11.0",
     "esbuild": "0.24.0",
-    "eslint": "9.12.0",
+    "eslint": "9.13.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
     "globals": "15.11.0",
     "prettier": "3.3.3",
     "qrcode": "1.5.4",
     "rimraf": "6.0.1",
-    "serve-handler": "6.1.5",
+    "serve-handler": "6.1.6",
     "typescript": "5.6.3"
   }
 }
