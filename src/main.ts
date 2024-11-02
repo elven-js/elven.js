@@ -1,12 +1,12 @@
 import { Transaction } from './core/transaction';
 import { initExtensionProvider } from './auth/init-extension-provider';
 import { ExtensionProvider } from './core/browser-extension-signing';
-// import { WalletConnectV2Provider } from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
+import { WalletConnectV2Provider } from './core/walletconnect-signing';
 import { WalletProvider } from './core/web-wallet-signing';
 import { NativeAuthClient } from './core/native-auth-client';
 import { WebviewProvider } from './core/webview-signing';
 import { Message } from './core/message';
-// import { initMobileProvider } from './auth/init-mobile-provider';
+import { initMobileProvider } from './auth/init-mobile-provider';
 import { initWebWalletProvider } from './auth/init-web-wallet-provider';
 import { ls } from './utils/ls-helpers';
 import {
@@ -22,7 +22,7 @@ import {
 } from './types';
 import { logout } from './auth/logout';
 import { loginWithExtension } from './auth/login-with-extension';
-// import { loginWithMobile } from './auth/login-with-mobile';
+import { loginWithMobile } from './auth/login-with-mobile';
 import { loginWithWebWallet } from './auth/login-with-web-wallet';
 import { accountSync } from './auth/account-sync';
 import { errorParse } from './utils/error-parse';
@@ -100,9 +100,9 @@ export class ElvenJS {
         if (state.loginMethod === LoginMethodsEnum.browserExtension) {
           this.dappProvider = await initExtensionProvider();
         }
-        // if (state.loginMethod === LoginMethodsEnum.mobile) {
-        //   this.dappProvider = await initMobileProvider(this);
-        // }
+        if (state.loginMethod === LoginMethodsEnum.mobile) {
+          this.dappProvider = await initMobileProvider(this);
+        }
         if (state.loginMethod === LoginMethodsEnum.webview) {
           this.dappProvider = new WebviewProvider();
         }
@@ -188,15 +188,15 @@ export class ElvenJS {
       }
 
       // Login with mobile app
-      // if (loginMethod === LoginMethodsEnum.mobile) {
-      //   const dappProvider = await loginWithMobile(
-      //     this,
-      //     loginToken,
-      //     nativeAuthClient,
-      //     options?.qrCodeContainer
-      //   );
-      //   this.dappProvider = dappProvider;
-      // }
+      if (loginMethod === LoginMethodsEnum.mobile) {
+        const dappProvider = await loginWithMobile(
+          this,
+          loginToken,
+          nativeAuthClient,
+          options?.qrCodeContainer
+        );
+        this.dappProvider = dappProvider;
+      }
 
       // Login with Web Wallet
       if (
@@ -271,9 +271,9 @@ export class ElvenJS {
       if (this.dappProvider instanceof ExtensionProvider) {
         signedTx = await this.dappProvider.signTransaction(transaction);
       }
-      // if (this.dappProvider instanceof WalletConnectV2Provider) {
-      //   signedTx = await this.dappProvider.signTransaction(transaction);
-      // }
+      if (this.dappProvider instanceof WalletConnectV2Provider) {
+        signedTx = await this.dappProvider.signTransaction(transaction);
+      }
       if (this.dappProvider instanceof WebviewProvider) {
         signedTx = await this.dappProvider.signTransaction(transaction);
       }
@@ -349,15 +349,15 @@ export class ElvenJS {
           messageSignature = bytesToHex(signedMessage.signature);
         }
       }
-      // if (this.dappProvider instanceof WalletConnectV2Provider) {
-      //   const signedMessage = await this.dappProvider.signMessage(
-      //     new Message({ data: stringToBytes(message) })
-      //   );
+      if (this.dappProvider instanceof WalletConnectV2Provider) {
+        const signedMessage = await this.dappProvider.signMessage(
+          new Message({ data: stringToBytes(message) })
+        );
 
-      //   if (signedMessage?.signature) {
-      //     messageSignature = bytesToHex(signedMessage.signature);
-      //   }
-      // }
+        if (signedMessage?.signature) {
+          messageSignature = bytesToHex(signedMessage.signature);
+        }
+      }
 
       if (this.dappProvider instanceof WebviewProvider) {
         const signedMessage = await this.dappProvider.signMessage(

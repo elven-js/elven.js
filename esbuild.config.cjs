@@ -22,6 +22,7 @@ esbuild
     outdir: 'build',
     platform: 'browser',
     banner: { js: banner },
+    treeShaking: true,
     // drop: ['console', 'debugger'],
   })
   .then((result) => {

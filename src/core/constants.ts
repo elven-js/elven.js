@@ -23,6 +23,13 @@ export const WALLET_PROVIDER_GUARD_TRANSACTION_URL = 'hook/2fa';
 export const WALLET_PROVIDER_SIGN_MESSAGE_URL = 'hook/sign-message';
 export const WALLET_PROVIDER_CALLBACK_PARAM = 'walletProviderStatus';
 export const WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED = 'transactionsSigned';
+export const WALLETCONNECT_SIGN_LOGIN_DELAY = 500;
+export const WALLETCONNECT_MULTIVERSX_NAMESPACE = 'mvx';
+export const WALLETCONNECT_MULTIVERSX_METHODS = [
+  'mvx_signTransaction',
+  'mvx_signTransactions',
+  'mvx_signMessage',
+];
 
 // Webview-related constants
 
