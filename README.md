@@ -2,6 +2,10 @@
 
 ### One static file to rule it all on the MultiversX blockchain!
 
+> [!NOTE]  
+> Version 1.0 is in progress, with a reimagined API and compact core - building a powerful base for future tools.  
+> Follow us on [x.com](https://x.com/elvenjscom) to stay up to date!
+
 ## Docs
 - [www.elvenjs.com](https://www.elvenjs.com)
 
