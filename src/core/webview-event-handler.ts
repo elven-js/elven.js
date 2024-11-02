@@ -1,9 +1,4 @@
-import {
-  getTargetOrigin,
-  isMobileWebview,
-  getSafeWindow,
-  getSafeDocument,
-} from './utils';
+import { getTargetOrigin, isMobileWebview } from './utils';
 import {
   WindowProviderResponseEnums,
   ReplyWithPostMessagePayloadType,
@@ -50,14 +45,12 @@ export const webviewProviderEventHandler = <
       return;
     }
 
-    getSafeWindow().removeEventListener?.(
-      'message',
-      webviewProviderEventHandler(action, resolve)
-    );
-    getSafeDocument().removeEventListener?.(
-      'message',
-      webviewProviderEventHandler(action, resolve)
-    );
+    if (typeof window !== 'undefined') {
+      window.removeEventListener?.(
+        'message',
+        webviewProviderEventHandler(action, resolve)
+      );
+    }
 
     resolve({ type, payload });
   };

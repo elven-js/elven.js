@@ -1,5 +1,7 @@
 - move all previous signing providers (wallet connect is left)
   - check what can be done with wallet connect to make it as small as possible
+- think about moving xPortal and webview integrations to separate files ????  
+- add tests for at least most used utilities, maybe some core tools, check tests in MVX SDKs (more tests can be added later)
 - prepare a new API
   - for token operations
   - for smart contracts interactions - the the best would be to pass the arguments as is (always requiring ABI without typed helpers ???)

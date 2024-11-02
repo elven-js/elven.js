@@ -11,13 +11,7 @@ import {
 } from './types';
 import { responseTypeMap } from './constants';
 import { Message } from './message';
-import {
-  getTargetOrigin,
-  getSafeWindow,
-  getSafeDocument,
-  bytesToString,
-  hexToBytes,
-} from './utils';
+import { getTargetOrigin, bytesToString, hexToBytes } from './utils';
 
 interface IWebviewProviderOptions {
   resetStateCallback?: () => void;
@@ -48,21 +42,23 @@ export class WebviewProvider {
   }
 
   private resetState = (resetStateCallback?: () => void) => {
-    getSafeWindow().addEventListener?.(
-      'message',
-      webviewProviderEventHandler(
-        WindowProviderResponseEnums.resetStateResponse,
-        (data: { type: string }) => {
-          if (data.type === WindowProviderResponseEnums.resetStateResponse) {
-            resetStateCallback?.();
+    if (typeof window !== 'undefined') {
+      window.addEventListener(
+        'message',
+        webviewProviderEventHandler(
+          WindowProviderResponseEnums.resetStateResponse,
+          (data: { type: string }) => {
+            if (data.type === WindowProviderResponseEnums.resetStateResponse) {
+              resetStateCallback?.();
 
-            setTimeout(() => {
-              this.finalizeResetState();
-            }, 500);
+              setTimeout(() => {
+                this.finalizeResetState();
+              }, 500);
+            }
           }
-        }
-      )
-    );
+        )
+      );
+    }
   };
 
   private disconnect() {
@@ -253,17 +249,19 @@ export class WebviewProvider {
   sendPostMessage = async <T extends WindowProviderRequestEnums>(
     message: PostMessageParamsType<T>
   ): Promise<PostMessageReturnType<T>> => {
-    const safeWindow = getSafeWindow();
+    const safeWindow = window as any;
 
-    if (safeWindow.ReactNativeWebView) {
-      safeWindow.ReactNativeWebView.postMessage(JSON.stringify(message));
-    } else if (safeWindow.webkit) {
-      safeWindow.webkit.messageHandlers?.jsHandler?.postMessage(
-        JSON.stringify(message),
-        getTargetOrigin()
-      );
-    } else if (safeWindow.parent) {
-      safeWindow.parent.postMessage(message, getTargetOrigin());
+    if (safeWindow) {
+      if (safeWindow.ReactNativeWebView) {
+        safeWindow.ReactNativeWebView.postMessage(JSON.stringify(message));
+      } else if (safeWindow.webkit) {
+        safeWindow.webkit.messageHandlers?.jsHandler?.postMessage(
+          JSON.stringify(message),
+          getTargetOrigin()
+        );
+      } else if (safeWindow.parent) {
+        safeWindow.parent.postMessage(message, getTargetOrigin());
+      }
     }
 
     return await this.waitingForResponse(responseTypeMap[message.type]);
@@ -276,14 +274,12 @@ export class WebviewProvider {
     payload: ReplyWithPostMessagePayloadType<T>;
   }> => {
     return await new Promise((resolve) => {
-      getSafeWindow().addEventListener?.(
-        'message',
-        webviewProviderEventHandler(action, resolve)
-      );
-      getSafeDocument().addEventListener?.(
-        'message',
-        webviewProviderEventHandler(action, resolve)
-      );
+      if (typeof window !== 'undefined') {
+        window.addEventListener?.(
+          'message',
+          webviewProviderEventHandler(action, resolve)
+        );
+      }
     });
   };
 }
