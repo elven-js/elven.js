@@ -15,7 +15,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "rimraf build && node ./esbuild.config.js && tsc && cp build/elven.js ../../demo-app/elven.js",
+    "build": "rimraf build && node ./esbuild.config.js && tsc --project ./tsconfig.json && cp build/elven.js ../../demo-app/elven.js",
     "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix",
     "prettier": "prettier --write 'src/**/*.{js,ts,json}'",
     "check-types": "tsc --noEmit",

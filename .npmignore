@@ -1,13 +1,15 @@
-apps
+demo-app
 node_modules
 src
 configs
 .prettierrc
 .eslintrc
 .editorconfig
+.turbo
 dev-server.mjs
 esbuild.config.cjs
 tsconfig.json
 meta.txt
 meta.json
 eslint.config.mjs
+esbuild.config.js
