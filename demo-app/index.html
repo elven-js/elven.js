@@ -173,6 +173,8 @@
       parseAmount,
     } from './elven.js';
 
+    import { MobileSigningProvider } from './mobile-signing-provider.js';
+
     // Options are the defaults and here only to show all of them
     // You don't have to add them if you want to use default setup
     // You can only add your custom callbacks
@@ -182,9 +184,17 @@
           apiUrl: 'https://devnet-api.multiversx.com',
           chainType: 'devnet',
           apiTimeout: 10000,
-          // Remember to change it. Get yours here: https://cloud.walletconnect.com/sign-in
-          walletConnectV2ProjectId: 'f502675c63610bfe4454080ac86d70e6',
-          walletConnectV2RelayAddresses: ['wss://relay.walletconnect.com'],
+          externalSigningProviders: {
+            mobile: {
+              provider: MobileSigningProvider,
+              config: {
+                // Remember to change it. Get yours here: https://cloud.walletconnect.com/sign-in
+                walletConnectV2ProjectId: 'f502675c63610bfe4454080ac86d70e6',
+                walletConnectV2RelayAddresses: ['wss://relay.walletconnect.com'],
+                qrCodeContainer: 'qr-code-container',
+              }
+            }
+          },
           // All callbacks are optional
           // You could also rely on try catch to some extent, but callbacks in one place seems convenient
           // Login callbacks:
@@ -240,11 +250,7 @@
     document.getElementById('button-login-mobile').addEventListener('click', async () => {
       clearQrCodeContainer();
       try {
-        await ElvenJS.login('mobile', {
-          // You can also use the DOM element here: 
-          // qrCodeContainer: document.querySelector('#qr-code-container')
-          qrCodeContainer: 'qr-code-container',
-        });
+        await ElvenJS.login('mobile');
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);
       }

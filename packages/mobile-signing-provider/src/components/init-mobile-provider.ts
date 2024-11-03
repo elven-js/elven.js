@@ -1,16 +1,20 @@
 import {
   SessionEventTypes,
   WalletConnectV2Provider,
-} from '../core/walletconnect-signing';
-import { networkConfig } from '../utils/constants';
-import { logout } from './logout';
-import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-network';
+} from './walletconnect-signing';
+import { getRandomAddressFromNetwork } from './utils';
 
-export const initMobileProvider = async (elven: any) => {
-  if (
-    !elven.initOptions.walletConnectV2ProjectId ||
-    !elven.initOptions.chainType
-  ) {
+export const initMobileProvider = async (
+  elven: any,
+  logout: any,
+  networkConfig: any,
+  Message: any,
+  Transaction: any,
+  TransactionsConverter: any,
+  walletConnectV2ProjectId: string,
+  walletConnectV2RelayAddresses: string[]
+) => {
+  if (!walletConnectV2ProjectId || !elven.initOptions.chainType) {
     return undefined;
   }
 
@@ -23,14 +27,17 @@ export const initMobileProvider = async (elven: any) => {
   };
 
   const relayAddress = getRandomAddressFromNetwork(
-    elven.initOptions.walletConnectV2RelayAddresses
+    walletConnectV2RelayAddresses
   );
 
   const dappProviderInstance = new WalletConnectV2Provider(
     providerHandlers,
     networkConfig[elven.initOptions.chainType].shortId,
     relayAddress,
-    elven.initOptions.walletConnectV2ProjectId
+    walletConnectV2ProjectId,
+    Message,
+    Transaction,
+    TransactionsConverter
   );
 
   try {

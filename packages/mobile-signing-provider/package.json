@@ -22,6 +22,14 @@
     "clean": "rimraf build node_modules"
   },
   "devDependencies": {
-    "esbuild": "0.24.0"
+    "@types/qrcode": "1.5.5",
+    "@walletconnect/sign-client": "2.17.1",
+    "@walletconnect/types": "2.17.1",
+    "@walletconnect/utils": "2.17.1",
+    "esbuild": "0.24.0",
+    "qrcode": "1.5.4"
+  },
+  "peerDependencies": {
+    "elven.js": "*"
   }
 }

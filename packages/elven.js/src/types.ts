@@ -1,19 +1,71 @@
 import { ExtensionProvider } from './core/browser-extension-signing';
 import { Transaction } from './core/transaction';
-import { WalletConnectV2Provider } from './core/walletconnect-signing';
 import { WalletProvider } from './core/web-wallet-signing';
 import { WebviewProvider } from './core/webview-signing';
 import {
   SmartContractQueryArgs,
   SmartContractQueryResponse,
 } from './core/network-provider';
+import { NativeAuthClient } from './core/native-auth-client';
+import { Message } from './core/message';
+import { TransactionsConverter } from './core/transaction-converter';
+import { NetworkType } from './utils/constants';
+import { ls } from './utils/ls-helpers';
+import { EventsStore } from './events-store';
+
+export interface MobileSigningProviderConfig {
+  walletConnectV2ProjectId: string;
+  walletConnectV2RelayAddresses: string[];
+  qrCodeContainer: string | HTMLElement;
+}
+
+export interface WalletConnectV2Provider
+  extends Omit<ExtensionProvider | WalletProvider | WebviewProvider, never> {
+  signTransaction(transaction: Transaction): Promise<Transaction>;
+}
+
+export interface MobileSigningProvider {
+  initMobileProvider: (
+    elvenJS: any,
+    logout: typeof import('./auth/logout').logout,
+    networkConfig: typeof import('./utils/constants').networkConfig,
+    Message: typeof import('./core/message').Message,
+    Transaction: typeof import('./core/transaction').Transaction,
+    TransactionsConverter: typeof import('./core/transaction-converter').TransactionsConverter
+  ) => Promise<any>;
+  loginWithMobile: (
+    celvenJS: any,
+    loginToken: string,
+    nativeAuthClient: NativeAuthClient,
+    storage: typeof ls,
+    logout: (elven: any) => Promise<boolean>,
+    getNewLoginExpiresTimestamp: () => number,
+    accountSync: (elven: any) => Promise<void>,
+    EventsStoreClass: typeof EventsStore,
+    networkConfig: Record<string, NetworkType>,
+    MessageClass: typeof Message,
+    TransactionClass: typeof Transaction,
+    TransactionsConverterClass: typeof TransactionsConverter
+  ) => Promise<any>;
+  WalletConnectV2Provider: {
+    new (...args: any[]): WalletConnectV2Provider;
+  };
+}
+
+export interface MobileProvider {
+  new (config: MobileSigningProviderConfig): MobileSigningProvider;
+}
 
 export interface InitOptions {
   apiUrl?: string;
   chainType?: string;
   apiTimeout?: number;
-  walletConnectV2ProjectId?: string;
-  walletConnectV2RelayAddresses?: string[];
+  externalSigningProviders?: {
+    mobile?: {
+      provider: MobileProvider;
+      config: MobileSigningProviderConfig;
+    };
+  };
   // Login
   onLoginStart?: () => void;
   onLoginSuccess?: () => void;
@@ -78,7 +130,6 @@ export enum LoginMethodsEnum {
 
 export type DappProvider =
   | ExtensionProvider
-  | WalletConnectV2Provider
   | WalletProvider
   | WebviewProvider
   | undefined;

@@ -1,12 +1,10 @@
 import { Transaction } from './core/transaction';
 import { initExtensionProvider } from './auth/init-extension-provider';
 import { ExtensionProvider } from './core/browser-extension-signing';
-import { WalletConnectV2Provider } from './core/walletconnect-signing';
 import { WalletProvider } from './core/web-wallet-signing';
 import { NativeAuthClient } from './core/native-auth-client';
 import { WebviewProvider } from './core/webview-signing';
 import { Message } from './core/message';
-import { initMobileProvider } from './auth/init-mobile-provider';
 import { initWebWalletProvider } from './auth/init-web-wallet-provider';
 import { ls } from './utils/ls-helpers';
 import {
@@ -19,20 +17,19 @@ import {
   LoginOptions,
   InitOptions,
   EventStoreEvents,
+  MobileSigningProvider,
 } from './types';
 import { logout } from './auth/logout';
 import { loginWithExtension } from './auth/login-with-extension';
-import { loginWithMobile } from './auth/login-with-mobile';
 import { loginWithWebWallet } from './auth/login-with-web-wallet';
 import { accountSync } from './auth/account-sync';
 import { errorParse } from './utils/error-parse';
-import { isLoginExpired } from './auth/expires-at';
+import { getNewLoginExpiresTimestamp, isLoginExpired } from './auth/expires-at';
 import { EventsStore } from './events-store';
 import {
   networkConfig,
   defaultApiEndpoint,
   defaultChainTypeConfig,
-  defaultWalletConnectV2RelayAddresses,
 } from './utils/constants';
 import { getParamFromUrl } from './utils/get-param-from-url';
 import { postSendTx } from './interaction/post-send-tx';
@@ -48,11 +45,13 @@ import { loginWithNativeAuthToken } from './auth/login-with-native-auth-token';
 import { initializeEventsStore } from './initialize-events-store';
 import { withLoginEvents } from './utils/with-login-events';
 import { bytesToHex, stringToBytes } from './core/utils';
+import { TransactionsConverter } from './core/transaction-converter';
 
 export class ElvenJS {
   private static initOptions: InitOptions | undefined;
   static dappProvider: DappProvider;
   static networkProvider: ApiNetworkProvider | undefined;
+  static mobileProvider: MobileSigningProvider | undefined;
 
   /**
    * Initialization of the Elven.js
@@ -70,12 +69,18 @@ export class ElvenJS {
       chainType: defaultChainTypeConfig,
       apiUrl: defaultApiEndpoint,
       apiTimeout: 10000,
-      walletConnectV2ProjectId: '',
-      walletConnectV2RelayAddresses: defaultWalletConnectV2RelayAddresses,
       ...options,
     };
 
     this.networkProvider = new ApiNetworkProvider(this.initOptions);
+
+    // Initialize the optional mobile provider
+    this.mobileProvider = this.initOptions?.externalSigningProviders?.mobile
+      ?.provider
+      ? new this.initOptions.externalSigningProviders.mobile.provider(
+          this.initOptions.externalSigningProviders.mobile.config
+        )
+      : undefined;
 
     initializeEventsStore(this.initOptions);
 
@@ -100,8 +105,18 @@ export class ElvenJS {
         if (state.loginMethod === LoginMethodsEnum.browserExtension) {
           this.dappProvider = await initExtensionProvider();
         }
-        if (state.loginMethod === LoginMethodsEnum.mobile) {
-          this.dappProvider = await initMobileProvider(this);
+        if (
+          state.loginMethod === LoginMethodsEnum.mobile &&
+          this.mobileProvider
+        ) {
+          this.dappProvider = await this.mobileProvider?.initMobileProvider(
+            this,
+            logout,
+            networkConfig,
+            Message,
+            Transaction,
+            TransactionsConverter
+          );
         }
         if (state.loginMethod === LoginMethodsEnum.webview) {
           this.dappProvider = new WebviewProvider();
@@ -187,13 +202,21 @@ export class ElvenJS {
         this.dappProvider = dappProvider;
       }
 
-      // Login with mobile app
-      if (loginMethod === LoginMethodsEnum.mobile) {
-        const dappProvider = await loginWithMobile(
+      // Login with optional mobile provider
+      if (loginMethod === LoginMethodsEnum.mobile && this.mobileProvider) {
+        const dappProvider = await this.mobileProvider?.loginWithMobile(
           this,
           loginToken,
           nativeAuthClient,
-          options?.qrCodeContainer
+          ls,
+          logout,
+          getNewLoginExpiresTimestamp,
+          accountSync,
+          EventsStore,
+          networkConfig,
+          Message,
+          Transaction,
+          TransactionsConverter
         );
         this.dappProvider = dappProvider;
       }
@@ -271,7 +294,10 @@ export class ElvenJS {
       if (this.dappProvider instanceof ExtensionProvider) {
         signedTx = await this.dappProvider.signTransaction(transaction);
       }
-      if (this.dappProvider instanceof WalletConnectV2Provider) {
+      if (
+        this.mobileProvider &&
+        this.dappProvider instanceof this.mobileProvider.WalletConnectV2Provider
+      ) {
         signedTx = await this.dappProvider.signTransaction(transaction);
       }
       if (this.dappProvider instanceof WebviewProvider) {
@@ -345,16 +371,20 @@ export class ElvenJS {
           new Message({ data: stringToBytes(message) })
         );
 
-        if (signedMessage?.signature) {
+        if (typeof signedMessage !== 'string' && signedMessage?.signature) {
           messageSignature = bytesToHex(signedMessage.signature);
         }
       }
-      if (this.dappProvider instanceof WalletConnectV2Provider) {
+
+      if (
+        this.mobileProvider &&
+        this.dappProvider instanceof this.mobileProvider.WalletConnectV2Provider
+      ) {
         const signedMessage = await this.dappProvider.signMessage(
           new Message({ data: stringToBytes(message) })
         );
 
-        if (signedMessage?.signature) {
+        if (typeof signedMessage !== 'string' && signedMessage?.signature) {
           messageSignature = bytesToHex(signedMessage.signature);
         }
       }
@@ -364,7 +394,7 @@ export class ElvenJS {
           new Message({ data: stringToBytes(message) })
         );
 
-        if (signedMessage?.signature) {
+        if (typeof signedMessage !== 'string' && signedMessage?.signature) {
           messageSignature = bytesToHex(signedMessage.signature);
         }
       }

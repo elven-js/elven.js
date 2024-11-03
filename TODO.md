@@ -1,14 +1,12 @@
-- move xPortal integration to separate file
-  - do a monorepo, mainly for example testing
-  - the wallet connect dependencies are quite big, there is not much that can be done here  
-  - anyway check what can be done with wallet connect to make it as small as possible
+- anyway check what can be done with wallet connect to make it as small as possible
+- check and handle all the errors for the mobile provider when the provider is not initialized etc.
 - add tests for at least most used utilities, maybe some core tools, check tests in MVX SDKs (more tests can be added later)
 - prepare a new API
   - for token operations
   - for smart contracts interactions - the the best would be to pass the arguments as is (always requiring ABI without typed helpers ???)
     - pass ABI as link to a file or as content or both?
 - test guardians 
-- use Knip to detect unused stuff and do the cleanup
+- use Knip to detect unused stuff (in both packages) and do the cleanup
 - test on  the testnet
 - update README and docs and demos
   - how it is built now

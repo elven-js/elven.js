@@ -1,11 +1,8 @@
 import { toString } from 'qrcode';
-import {
-  WalletConnectV2Provider,
-  PairingTypes,
-} from '../core/walletconnect-signing';
-import { walletConnectDeepLink } from '../utils/constants';
-import { errorParse } from '../utils/error-parse';
-import { DappProvider, DappCoreWCV2CustomMethodsEnum } from '../types';
+import { WalletConnectV2Provider, PairingTypes } from './walletconnect-signing';
+import { walletConnectDeepLink } from './utils';
+import { errorParse } from './utils';
+import { DappCoreWCV2CustomMethodsEnum } from './types';
 
 const htmlStringToElement = (htmlString: string) => {
   const template = document.createElement('template');
@@ -134,7 +131,7 @@ const generateQRCode = async (walletConnectUri: string) => {
 export const qrCodeAndPairingsBuilder = async (
   qrCodeContainer: string | HTMLElement,
   walletConnectUri: string,
-  dappProvider: DappProvider,
+  dappProvider: any,
   token?: string
 ) => {
   if (!qrCodeContainer)

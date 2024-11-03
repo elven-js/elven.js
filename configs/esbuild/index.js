@@ -17,7 +17,7 @@ export const baseConfig = {
   target: ['es2020'],
   banner: { js: banner },
   treeShaking: true,
-  pure: ['console.log', 'console.info', 'console.debug', 'console.warn'],
+  // pure: ['console.log', 'console.info', 'console.debug', 'console.warn'],
   sourcemap: false,
   define: {
     'process.env.NODE_ENV': '"production"',

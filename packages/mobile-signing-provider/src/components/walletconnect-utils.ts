@@ -1,6 +1,5 @@
 // Based on Multiversx sdk WalletConnect signing provider with modifications
 
-import { Transaction } from './transaction';
 import Client from '@walletconnect/sign-client';
 import { getAppMetadata } from '@walletconnect/utils';
 import {
@@ -133,9 +132,9 @@ export function applyTransactionSignature({
   transaction,
   response,
 }: {
-  transaction: Transaction;
+  transaction: any;
   response: TransactionResponse;
-}): Transaction {
+}): any {
   if (!response) {
     console.log(
       WalletConnectV2ProviderErrorMessagesEnum.invalidTransactionResponse

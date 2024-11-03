@@ -1,25 +1,32 @@
-import { errorParse } from '../utils/error-parse';
+import { errorParse, getRandomAddressFromNetwork } from './utils';
 import { qrCodeAndPairingsBuilder } from './qr-code-and-pairings-builder';
-import { networkConfig } from '../utils/constants';
-import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-network';
 import {
   WalletConnectV2Provider,
   SessionEventTypes,
-} from '../core/walletconnect-signing';
-import { EventStoreEvents, LoginMethodsEnum } from '../types';
-import { ls } from '../utils/ls-helpers';
-import { logout } from './logout';
-import { getNewLoginExpiresTimestamp } from './expires-at';
-import { accountSync } from './account-sync';
-import { EventsStore } from '../events-store';
-import { DappCoreWCV2CustomMethodsEnum } from '../types';
-import { NativeAuthClient } from '../core/native-auth-client';
+} from './walletconnect-signing';
+import {
+  EventStoreEvents,
+  LoginMethodsEnum,
+  DappCoreWCV2CustomMethodsEnum,
+} from './types';
 
+// TODO: think how to handle types
 export const loginWithMobile = async (
   elven: any,
   loginToken: string,
-  nativeAuthClient: NativeAuthClient,
-  qrCodeContainer?: string | HTMLElement
+  nativeAuthClient: any,
+  ls: any,
+  logout: any,
+  getNewLoginExpiresTimestamp: any,
+  accountSync: any,
+  EventsStore: any,
+  networkConfig: any,
+  Message: any,
+  Transaction: any,
+  TransactionsConverter: any,
+  walletConnectV2ProjectId: string,
+  walletConnectV2RelayAddresses: string[],
+  qrCodeContainer: string | HTMLElement
 ) => {
   if (!qrCodeContainer) {
     throw new Error(
@@ -28,7 +35,7 @@ export const loginWithMobile = async (
   }
 
   const relayAddress = getRandomAddressFromNetwork(
-    elven.initOptions.walletConnectV2RelayAddresses
+    walletConnectV2RelayAddresses
   );
 
   if (!relayAddress || !elven.networkProvider) {
@@ -37,7 +44,7 @@ export const loginWithMobile = async (
     );
   }
 
-  if (!elven.initOptions.walletConnectV2ProjectId) {
+  if (!walletConnectV2ProjectId) {
     throw new Error(
       'Please provide your WalletConnect project id. You can get it here: https://cloud.walletconnect.com)'
     );
@@ -92,7 +99,10 @@ export const loginWithMobile = async (
     providerHandlers,
     networkConfig[elven.initOptions.chainType].shortId,
     relayAddress,
-    elven.initOptions.walletConnectV2ProjectId
+    walletConnectV2ProjectId,
+    Message,
+    Transaction,
+    TransactionsConverter
   );
 
   try {

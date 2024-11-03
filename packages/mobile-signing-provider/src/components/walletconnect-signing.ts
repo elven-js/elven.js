@@ -1,7 +1,5 @@
 // Based on Multiversx sdk WalletConnect signing provider with modifications
 
-import { Message } from './message';
-import { Transaction } from './transaction';
 import Client from '@walletconnect/sign-client';
 import {
   EngineTypes,
@@ -10,11 +8,6 @@ import {
   SignClientTypes,
 } from '@walletconnect/types';
 import { getSdkError, isValidArray } from '@walletconnect/utils';
-import {
-  WALLETCONNECT_MULTIVERSX_NAMESPACE,
-  WALLETCONNECT_SIGN_LOGIN_DELAY,
-} from './constants';
-import { WalletConnectV2ProviderErrorMessagesEnum } from './types';
 import {
   applyTransactionSignature,
   addressIsValid,
@@ -27,7 +20,12 @@ import {
   TransactionResponse,
   sleep,
 } from './walletconnect-utils';
-import { TransactionsConverter } from './transaction-converter';
+
+import {
+  WALLETCONNECT_MULTIVERSX_NAMESPACE,
+  WALLETCONNECT_SIGN_LOGIN_DELAY,
+} from './constants';
+import { WalletConnectV2ProviderErrorMessagesEnum } from './types';
 
 enum Operation {
   SIGN_TRANSACTION = 'mvx_signTransaction',
@@ -81,6 +79,9 @@ export class WalletConnectV2Provider {
   pairings: PairingTypes.Struct[] | undefined;
   processingTopic: string = '';
   options: SignClientTypes.Options | undefined = {};
+  Message: any;
+  Transaction: any;
+  TransactionsConverter: any;
 
   private onClientConnect: IClientConnect;
   private account: IProviderAccount = { address: '' };
@@ -90,12 +91,18 @@ export class WalletConnectV2Provider {
     chainId: string,
     walletConnectV2Relay: string,
     walletConnectV2ProjectId: string,
+    Message: any,
+    Transaction: any,
+    TransactionsConverter: any,
     options?: SignClientTypes.Options
   ) {
     this.onClientConnect = onClientConnect;
     this.chainId = chainId;
     this.walletConnectV2Relay = walletConnectV2Relay;
     this.walletConnectV2ProjectId = walletConnectV2ProjectId;
+    this.Message = Message;
+    this.Transaction = Transaction;
+    this.TransactionsConverter = TransactionsConverter;
     this.options = options;
   }
 
@@ -385,8 +392,10 @@ export class WalletConnectV2Provider {
    * Signs a message and returns it signed
    * @param message
    */
-  async signMessage(messageToSign: Message): Promise<Message> {
-    const message = new Message({
+  async signMessage(
+    messageToSign: typeof this.Message
+  ): Promise<typeof this.Message> {
+    const message = new this.Message({
       data: Buffer.from(messageToSign.data),
       address: messageToSign.address ?? this.account.address,
       signer: 'wallet-connect-v2',
@@ -453,7 +462,9 @@ export class WalletConnectV2Provider {
    * Signs a transaction and returns it signed
    * @param transaction
    */
-  async signTransaction(transaction: Transaction): Promise<Transaction> {
+  async signTransaction(
+    transaction: typeof this.Transaction
+  ): Promise<typeof this.Transaction> {
     if (typeof this.walletConnector === 'undefined') {
       console.error(WalletConnectV2ProviderErrorMessagesEnum.notInitialized);
       throw new Error(WalletConnectV2ProviderErrorMessagesEnum.notInitialized);
@@ -470,7 +481,7 @@ export class WalletConnectV2Provider {
     }
 
     const plainTransaction =
-      TransactionsConverter.transactionToPlainObject(transaction);
+      this.TransactionsConverter.transactionToPlainObject(transaction);
 
     if (this.chainId !== transaction.chainID) {
       console.error(
@@ -505,7 +516,9 @@ export class WalletConnectV2Provider {
    * Signs an array of transactions and returns it signed
    * @param transactions
    */
-  async signTransactions(transactions: Transaction[]): Promise<Transaction[]> {
+  async signTransactions(
+    transactions: (typeof this.Transaction)[]
+  ): Promise<(typeof this.Transaction)[]> {
     if (typeof this.walletConnector === 'undefined') {
       console.error(WalletConnectV2ProviderErrorMessagesEnum.notInitialized);
       throw new Error(WalletConnectV2ProviderErrorMessagesEnum.notInitialized);
@@ -530,7 +543,7 @@ export class WalletConnectV2Provider {
           WalletConnectV2ProviderErrorMessagesEnum.requestDifferentChain
         );
       }
-      return TransactionsConverter.transactionToPlainObject(transaction);
+      return this.TransactionsConverter.transactionToPlainObject(transaction);
     });
 
     try {

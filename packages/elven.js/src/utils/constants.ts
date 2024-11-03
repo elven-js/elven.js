@@ -1,4 +1,4 @@
-interface NetworkType {
+export interface NetworkType {
   id: string;
   shortId: string;
   name: string;
