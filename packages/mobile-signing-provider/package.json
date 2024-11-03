@@ -15,8 +15,8 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "rimraf build && node ./esbuild.config.cjs && tsc",
-    "lint": "eslint src/** --fix",
+    "build": "rimraf build && node ./esbuild.config.js && tsc",
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix",
     "prettier": "prettier --write 'src/**/*.{js,ts,json}'",
     "check-types": "tsc --noEmit",
     "clean": "rimraf build node_modules"

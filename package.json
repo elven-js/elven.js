@@ -1,5 +1,8 @@
 {
+  "name": "elven.js-monorepo",
   "private": true,
+  "type": "module",
+  "packageManager": "npm@10.2.4",
   "workspaces": [
     "packages/*",
     "configs/*"
@@ -13,9 +16,14 @@
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
-    "turbo": "2.2.3",
+    "@configs/esbuild": "workspace:*",
     "@configs/eslint-config": "workspace:*",
     "@configs/tsconfig": "workspace:*",
-    "@configs/esbuild": "workspace:*"
+    "@types/node": "22.8.7",
+    "eslint": "9.14.0",
+    "prettier": "3.3.3",
+    "rimraf": "6.0.1",
+    "turbo": "2.2.3",
+    "typescript": "5.6.3"
   }
 }

@@ -5,8 +5,10 @@
     "baseUrl": ".",
     "paths": {
       "elven.js(/*)": ["packages/elven.js/src$1"],
-      "@elven.js/mobile-signing-provider(/*)": ["packages/@elven.js/mobile-signing-provider/src$1"]
-    }
+      "mobile-signing-provider(/*)": ["packages/mobile-signing-provider/src$1"]
+    },
+    "types": ["node"]
   },
+  "include": ["packages/*/src/**/*"],
   "exclude": ["node_modules"]
 }
