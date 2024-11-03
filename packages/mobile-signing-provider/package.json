@@ -20,5 +20,8 @@
     "prettier": "prettier --write 'src/**/*.{js,ts,json}'",
     "check-types": "tsc --noEmit",
     "clean": "rimraf build node_modules"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0"
   }
 }

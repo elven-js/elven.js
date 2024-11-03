@@ -7,14 +7,19 @@ const banner = `/*!
  */
 `;
 
-export default {
+export const baseConfig = {
   format: 'esm',
   bundle: true,
   metafile: true,
   minify: true,
   outdir: 'build',
   platform: 'browser',
+  target: ['es2020'],
   banner: { js: banner },
   treeShaking: true,
-  // drop: ['console', 'debugger'],
+  pure: ['console.log', 'console.info', 'console.debug', 'console.warn'],
+  sourcemap: false,
+  define: {
+    'process.env.NODE_ENV': '"production"',
+  },
 };
