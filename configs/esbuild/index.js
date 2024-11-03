@@ -14,12 +14,13 @@ export const baseConfig = {
   minify: true,
   outdir: 'build',
   platform: 'browser',
-  target: ['es2020'],
+  target: ['es2022'],
   banner: { js: banner },
   treeShaking: true,
   // pure: ['console.log', 'console.info', 'console.debug', 'console.warn'],
   sourcemap: false,
   define: {
     'process.env.NODE_ENV': '"production"',
+    global: 'window',
   },
 };

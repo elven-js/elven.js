@@ -1,4 +1,4 @@
-import { toString } from 'qrcode';
+import { renderSVG } from 'uqr';
 import { WalletConnectV2Provider, PairingTypes } from './walletconnect-signing';
 import { walletConnectDeepLink } from './utils';
 import { errorParse } from './utils';
@@ -116,16 +116,14 @@ const isMobile = () =>
     navigator.userAgent
   );
 
-const generateQRCode = async (walletConnectUri: string) => {
+const generateQRCode = (walletConnectUri: string) => {
   if (!walletConnectUri) {
     return;
   }
 
-  const svg = await toString(walletConnectUri, {
-    type: 'svg',
-  });
+  const qrCode = renderSVG(walletConnectUri);
 
-  return svg;
+  return qrCode;
 };
 
 export const qrCodeAndPairingsBuilder = async (
@@ -147,7 +145,7 @@ export const qrCodeAndPairingsBuilder = async (
     containerElem = qrCodeContainer;
   }
 
-  const qrCodeElementString = await generateQRCode(walletConnectUri);
+  const qrCodeElementString = generateQRCode(walletConnectUri);
 
   // QRCode
 
