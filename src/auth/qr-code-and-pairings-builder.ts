@@ -1,8 +1,8 @@
-import QRCode from 'qrcode';
+import { toString } from 'qrcode';
 import {
   WalletConnectV2Provider,
   PairingTypes,
-} from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
+} from '../core/walletconnect-signing';
 import { walletConnectDeepLink } from '../utils/constants';
 import { errorParse } from '../utils/error-parse';
 import { DappProvider, DappCoreWCV2CustomMethodsEnum } from '../types';
@@ -124,7 +124,7 @@ const generateQRCode = async (walletConnectUri: string) => {
     return;
   }
 
-  const svg = await QRCode.toString(walletConnectUri, {
+  const svg = await toString(walletConnectUri, {
     type: 'svg',
   });
 

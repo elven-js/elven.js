@@ -1,4 +1,4 @@
-import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
+import { WalletProvider } from '../core/web-wallet-signing';
 import { EventStoreEvents, LoginMethodsEnum } from '../types';
 import { DAPP_INIT_ROUTE, networkConfig } from '../utils/constants';
 import { errorParse } from '../utils/error-parse';

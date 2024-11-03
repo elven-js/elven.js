@@ -23,6 +23,7 @@
   <meta name="twitter:url" content="https://elvenjs.netlify.app/" />
   <meta name="twitter:image" content="" />
   <link href="demo-styles.css" rel="stylesheet" />
+  <script src="https://unpkg.com/@walletconnect/sign-client/dist/index.umd.js"></script>
 </head>
 
 <body>
@@ -170,15 +171,6 @@
     import {
       ElvenJS,
       Transaction,
-      Address,
-      TokenTransfer,
-      Token,
-      TransferTransactionsFactory,
-      TransactionsFactoryConfig,
-      TokenComputer,
-      U32Value,
-      AddressValue,
-      SmartContractTransactionsFactory,
       parseAmount,
     } from './elven.js';
 
@@ -206,7 +198,7 @@
           onLogoutFailure: (error) => { displayError(error); },
           // Transaction callbacks
           onTxStart: (tx) => { uiPending(true); },
-          onTxSent: (tx) => { const hash = tx.getHash().toString(); hash && updateTxHashContainer(hash, true); },
+          onTxSent: (txOnNetwork) => { const hash = txOnNetwork.txHash; hash && updateTxHashContainer(hash, true); },
           onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
           onTxFailure: (tx, error) => { displayError(error); uiPending(false); },
           // Qr code callbacks:
@@ -305,12 +297,12 @@
 
       const tx = new Transaction({
         nonce: ElvenJS.storage.get('nonce'),
-        receiver: new Address(egldTransferAddress),
+        receiver: egldTransferAddress,
         gasLimit,
         chainID: 'D',
         data: textEncoder.encode(demoMessage),
         value: parseAmount({ amount: '0.001', decimals: 18 }),
-        sender: new Address(ElvenJS.storage.get('address')),
+        sender: ElvenJS.storage.get('address'),
       });
 
       try {

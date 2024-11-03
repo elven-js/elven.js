@@ -5,7 +5,7 @@ import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-ne
 import {
   WalletConnectV2Provider,
   SessionEventTypes,
-} from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
+} from '../core/walletconnect-signing';
 import { EventStoreEvents, LoginMethodsEnum } from '../types';
 import { ls } from '../utils/ls-helpers';
 import { logout } from './logout';
@@ -13,7 +13,7 @@ import { getNewLoginExpiresTimestamp } from './expires-at';
 import { accountSync } from './account-sync';
 import { EventsStore } from '../events-store';
 import { DappCoreWCV2CustomMethodsEnum } from '../types';
-import { NativeAuthClient } from '@multiversx/sdk-native-auth-client/lib/src/native.auth.client';
+import { NativeAuthClient } from '../core/native-auth-client';
 
 export const loginWithMobile = async (
   elven: any,

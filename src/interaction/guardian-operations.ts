@@ -1,23 +1,19 @@
-import { Transaction } from '@multiversx/sdk-core/out/transaction';
+import { Transaction } from '../core/transaction';
 import { ls } from '../utils/ls-helpers';
-import {
-  TransactionVersion,
-  TransactionOptions,
-} from '@multiversx/sdk-core/out/networkParams';
-import { Address } from '@multiversx/sdk-core/out/address';
-import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
+import { WalletProvider } from '../core/web-wallet-signing';
 import { DAPP_INIT_ROUTE } from '../utils/constants';
 import { WebWalletUrlParamsEnum } from '../types';
+import {
+  TRANSACTION_OPTIONS_TX_GUARDED,
+  TRANSACTION_VERSION_DEFAULT,
+} from '../core/constants';
 
 export const guardianPreSignTxOperations = (tx: Transaction) => {
   const guardian = ls.get('activeGuardian');
   if (guardian) {
-    const options = {
-      guarded: true,
-    };
-    tx.setVersion(TransactionVersion.withTxOptions());
-    tx.setOptions(TransactionOptions.withOptions(options));
-    tx.setGuardian(Address.fromBech32(guardian));
+    tx.version = TRANSACTION_VERSION_DEFAULT;
+    tx.options = TRANSACTION_OPTIONS_TX_GUARDED;
+    tx.guardian = guardian;
   }
 
   return tx;

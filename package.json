@@ -1,7 +1,7 @@
 {
   "name": "elven.js",
-  "version": "0.20.0",
-  "description": "Authenticate, sign and send transactions on the MultiversX blockchain in the browser.",
+  "version": "1.0.0",
+  "description": "Sync, sign and send transactions on the MultiversX blockchain in the browser.",
   "type": "module",
   "module": "build/elven.js",
   "types": "build/types/elven.d.ts",
@@ -42,30 +42,21 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.1.0",
-    "@eslint/js": "9.12.0",
-    "@multiversx/sdk-core": "13.8.0",
-    "@multiversx/sdk-extension-provider": "4.0.0",
-    "@multiversx/sdk-native-auth-client": "1.0.9",
-    "@multiversx/sdk-wallet-connect-provider": "5.0.0",
-    "@multiversx/sdk-web-wallet-provider": "4.0.0",
-    "@multiversx/sdk-webview-provider": "2.0.0-alpha.0",
+    "@eslint/js": "9.14.0",
     "@types/qrcode": "1.5.5",
     "@types/serve-handler": "6.1.4",
-    "@typescript-eslint/eslint-plugin": "8.8.1",
-    "@typescript-eslint/parser": "8.8.1",
+    "@typescript-eslint/eslint-plugin": "8.12.2",
+    "@typescript-eslint/parser": "8.12.2",
+    "@walletconnect/sign-client": "^2.17.1",
     "esbuild": "0.24.0",
-    "eslint": "9.12.0",
+    "eslint": "9.14.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
     "globals": "15.11.0",
-    "node-stdlib-browser": "1.2.1",
     "prettier": "3.3.3",
     "qrcode": "1.5.4",
     "rimraf": "6.0.1",
-    "serve-handler": "6.1.5",
+    "serve-handler": "6.1.6",
     "typescript": "5.6.3"
-  },
-  "dependencies": {
-    "bignumber.js": "^9.1.2"
   }
 }

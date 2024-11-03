@@ -1,7 +1,7 @@
 import {
   SessionEventTypes,
   WalletConnectV2Provider,
-} from '@multiversx/sdk-wallet-connect-provider/out/walletConnectV2Provider';
+} from '../core/walletconnect-signing';
 import { networkConfig } from '../utils/constants';
 import { logout } from './logout';
 import { getRandomAddressFromNetwork } from '../utils/get-random-address-from-network';

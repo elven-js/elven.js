@@ -5,7 +5,7 @@
 import { LoginMethodsEnum } from '../types';
 import { ls } from '../utils/ls-helpers';
 import { decodeNativeAuthToken } from '../webview-provider/decode-native-auth-token';
-import { WebviewProvider } from '@multiversx/sdk-webview-provider';
+import { WebviewProvider } from '../core/webview-signing';
 
 export function loginWithNativeAuthToken(token: string, elven: any) {
   const nativeAuthInfo = decodeNativeAuthToken(token);
@@ -21,7 +21,7 @@ export function loginWithNativeAuthToken(token: string, elven: any) {
     ls.set('accessToken', token);
     ls.set('signature', signature);
     ls.set('address', address);
-    ls.set('loginMethod', LoginMethodsEnum.xPortalHub);
+    ls.set('loginMethod', LoginMethodsEnum.webview);
 
     elven.dappProvider = new WebviewProvider();
   }

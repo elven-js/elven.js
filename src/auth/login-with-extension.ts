@@ -5,7 +5,7 @@ import { EventStoreEvents, LoginMethodsEnum } from '../types';
 import { getNewLoginExpiresTimestamp } from './expires-at';
 import { accountSync } from './account-sync';
 import { EventsStore } from '../events-store';
-import { NativeAuthClient } from '@multiversx/sdk-native-auth-client/lib/src/native.auth.client';
+import { NativeAuthClient } from '../core/native-auth-client';
 
 export const loginWithExtension = async (
   elven: any,

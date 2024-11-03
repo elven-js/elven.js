@@ -1,9 +1,11 @@
 import {
+  WalletProvider,
+  PlainSignedTransaction,
+} from '../core/web-wallet-signing';
+import {
   WALLET_PROVIDER_CALLBACK_PARAM,
   WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED,
-  WalletProvider,
-} from '@multiversx/sdk-web-wallet-provider/out';
-import { Transaction } from '@multiversx/sdk-core/out/transaction';
+} from '../core/constants';
 import { getParamFromUrl } from '../utils/get-param-from-url';
 import {
   DappProvider,
@@ -11,14 +13,16 @@ import {
   LoginMethodsEnum,
   WebWalletUrlParamsEnum,
 } from '../types';
-import { ApiNetworkProvider } from '../network-provider';
+import { ApiNetworkProvider } from '../core/network-provider';
 import { postSendTx } from './post-send-tx';
 import { errorParse } from '../utils/error-parse';
 import { EventsStore } from '../events-store';
 import { ls } from '../utils/ls-helpers';
-import { PlainSignedTransaction } from '@multiversx/sdk-web-wallet-provider/out/plainSignedTransaction';
 import { DAPP_INIT_ROUTE } from '../utils/constants';
 import { preSendTx } from './pre-send-tx';
+import { TransactionsConverter } from '../core/transaction-converter';
+import { IPlainTransactionObject } from '../core/types';
+import { toBase64FromStringOrBytes } from '../core/utils';
 
 export const webWalletTxFinalize = async (
   dappProvider: DappProvider,
@@ -51,9 +55,7 @@ export const webWalletTxFinalize = async (
       // getTransactionsFromWalletUrl should return the same data for both cases
       // and then it should be consumed in the same way on the web wallet and xAlias sides
       if (loginMethod === LoginMethodsEnum.webWallet) {
-        transactionObj.data = Buffer.from(transactionObj.data).toString(
-          'base64'
-        );
+        transactionObj.data = toBase64FromStringOrBytes(transactionObj.data)!;
       }
     } else if (
       guardian &&
@@ -69,7 +71,9 @@ export const webWalletTxFinalize = async (
     }
 
     if (transactionObj) {
-      const transaction = Transaction.fromPlainObject(transactionObj);
+      const transaction = TransactionsConverter.plainObjectToTransaction(
+        transactionObj as IPlainTransactionObject
+      );
 
       transaction.nonce = BigInt(nonce);
 
@@ -77,8 +81,8 @@ export const webWalletTxFinalize = async (
 
       try {
         EventsStore.run(EventStoreEvents.onTxStart, transaction);
-        await networkProvider.sendTransaction(transaction);
-        await postSendTx(transaction, networkProvider);
+        const response = await networkProvider.sendTransaction(transaction);
+        await postSendTx(response, networkProvider);
       } catch (e) {
         const err = errorParse(e);
         const errMsg = `Getting transaction information failed! ${err}`;

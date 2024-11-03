@@ -1,12 +1,19 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const esbuild = require('esbuild');
-const path = require('path');
 
 const fs = require('fs');
 
+const banner = `/*!
+ * Portions of this code are derived from MultiversX libraries.
+ * These portions are licensed under the MIT License.
+ *
+ * See the MultiversX repository for details: https://github.com/multiversx
+ * See the attached MIT licence for elven.js: https://github.com/elven-js/elven.js/blob/main/LICENSE
+ */
+`;
+
 esbuild
   .build({
-    inject: [require.resolve('node-stdlib-browser/helpers/esbuild/shim')],
     format: 'esm',
     entryPoints: ['./src/elven.ts'],
     bundle: true,
@@ -14,29 +21,9 @@ esbuild
     minify: true,
     outdir: 'build',
     platform: 'browser',
-    plugins: [
-      {
-        name: 'alias',
-        setup(build) {
-          build.onResolve({ filter: /^bignumber\.js$/ }, () => {
-            return {
-              path: path.resolve(
-                __dirname,
-                'node_modules/bignumber.js/bignumber.mjs'
-              ),
-            };
-          });
-          build.onResolve({ filter: /^buffer$/ }, () => {
-            return {
-              path: path.resolve(
-                __dirname,
-                'node_modules/node-stdlib-browser/node_modules/buffer/index.js'
-              ),
-            };
-          });
-        },
-      },
-    ],
+    banner: { js: banner },
+    treeShaking: true,
+    // drop: ['console', 'debugger'],
   })
   .then((result) => {
     fs.writeFileSync('./build/meta.json', JSON.stringify(result.metafile));

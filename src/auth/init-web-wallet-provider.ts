@@ -1,8 +1,8 @@
-import { WalletProvider } from '@multiversx/sdk-web-wallet-provider/out/walletProvider';
+import { WalletProvider } from '../core/web-wallet-signing';
 import { ls } from '../utils/ls-helpers';
 import { getParamFromUrl } from '../utils/get-param-from-url';
 import { DAPP_INIT_ROUTE } from '../utils/constants';
-import { NativeAuthClient } from '@multiversx/sdk-native-auth-client/lib/src/native.auth.client';
+import { NativeAuthClient } from '../core/native-auth-client';
 
 export const initWebWalletProvider = async (
   webWalletAddress: string,

@@ -1,21 +1,26 @@
-import { Address } from '@multiversx/sdk-core/out/address';
-import { TransactionStatus } from '@multiversx/sdk-core/out/networkProviders/transactionStatus';
-import { TransactionReceipt } from '@multiversx/sdk-core/out/networkProviders/transactionReceipt';
-import { TransactionLogs } from '@multiversx/sdk-core/out/networkProviders/transactionLogs';
-import { ContractResults } from '@multiversx/sdk-core/out/networkProviders/contractResults';
-import { ContractQueryResponse } from '@multiversx/sdk-core/out/networkProviders/contractQueryResponse';
-import { ContractQueryRequest } from '@multiversx/sdk-core/out/networkProviders/contractQueryRequest';
-import { Query } from '@multiversx/sdk-core/out/smartcontracts/query';
-import { QueryArguments } from '@multiversx/sdk-core/out/smartcontracts/interface';
-import { networkConfig, defaultChainTypeConfig } from './utils/constants';
-import { InitOptions } from './types';
+// Based on Multiversx sdk-core with modifications
 
-export interface IAddress {
-  bech32: () => string;
+import { TransactionStatus } from '../core/transaction-status';
+import { networkConfig, defaultChainTypeConfig } from '../utils/constants';
+import { InitOptions } from '../types';
+import { bytesFromBase64, stringToHex } from './utils';
+import { Transaction } from './transaction';
+import { TransactionsConverter } from './transaction-converter';
+import { ISentTransactionResponse } from './types';
+
+export interface SmartContractQueryArgs {
+  address: string;
+  func: string;
+  // TODO: this won't be only string, to rethink, maybe serializers from SDK will be needed
+  args?: string[];
+  value?: number;
+  caller?: string;
 }
 
-export interface SmartContractQueryArgs extends QueryArguments {
-  address: IAddress;
+export interface SmartContractQueryResponse {
+  returnData: string;
+  returnCode: string;
+  returnMessage: string;
 }
 
 export type NetworkProviderOptions = Pick<
@@ -24,7 +29,7 @@ export type NetworkProviderOptions = Pick<
 >;
 
 export interface AccountOnNetwork {
-  address: IAddress;
+  address: string;
   nonce: number;
   balance: bigint;
   code: string;
@@ -33,7 +38,7 @@ export interface AccountOnNetwork {
 
 export interface Guardian {
   activationEpoch: number;
-  address: IAddress;
+  address: string;
   serviceUID: string;
 }
 
@@ -42,13 +47,6 @@ export interface GuardianData {
   activeGuardian?: Guardian;
   pendingGuardian?: Guardian;
 }
-
-export interface ITransaction {
-  toSendable(): any;
-}
-
-// This is a simplified version of ApiNetworkProvider,
-// basic helpers, all other stuff isn't required for now
 
 export class ApiNetworkProvider {
   private apiUrl: string;
@@ -151,18 +149,22 @@ export class ApiNetworkProvider {
     throw new Error(originalErrorMessage);
   }
 
-  async sendTransaction(tx: ITransaction): Promise<string> {
-    const response = await this.apiPost('transactions', tx.toSendable());
-    return response.txHash;
+  async sendTransaction(tx: Transaction): Promise<ISentTransactionResponse> {
+    const sendableTx = TransactionsConverter.transactionToPlainObject(tx);
+    const response: ISentTransactionResponse = await this.apiPost(
+      'transactions',
+      sendableTx
+    );
+    return response;
   }
 
-  async getAccount(address: IAddress): Promise<AccountOnNetwork> {
-    const responsePayload = await this.apiGet(`accounts/${address.bech32()}`);
+  async getAccount(address: string) {
+    const responsePayload = await this.apiGet(`accounts/${address}`);
 
     const account = {
-      address: new Address(responsePayload?.address || ''),
+      address: responsePayload?.address || '',
       nonce: Number(responsePayload?.nonce || 0),
-      balance: BigInt(responsePayload?.balance || 0),
+      balance: responsePayload?.balance,
       code: responsePayload?.code || '',
       userName: responsePayload?.username || '',
     };
@@ -170,10 +172,8 @@ export class ApiNetworkProvider {
     return account;
   }
 
-  async getGuardianData(address: IAddress): Promise<GuardianData> {
-    const response = await this.apiGet(
-      `address/${address.bech32()}/guardian-data`
-    );
+  async getGuardianData(address: string): Promise<GuardianData> {
+    const response = await this.apiGet(`address/${address}/guardian-data`);
 
     const accountGuardian = {
       guarded: response?.data?.guardianData?.guarded || false,
@@ -189,6 +189,7 @@ export class ApiNetworkProvider {
 
     const status = new TransactionStatus(payload.status);
 
+    // TODO: review, data types, what is really needed etc.
     const transaction = {
       hash: txHash,
       type: payload.type || '',
@@ -196,24 +197,19 @@ export class ApiNetworkProvider {
       round: payload.round,
       epoch: payload.epoch || 0,
       value: (payload.value || 0).toString(),
-      sender: new Address(payload.sender),
-      receiver: new Address(payload.receiver),
+      sender: payload.sender,
+      receiver: payload.receiver,
       gasPrice: payload.gasPrice || 0,
       gasLimit: payload.gasLimit || 0,
-      data: Buffer.from(payload.data || '', 'base64'),
+      data: bytesFromBase64(payload.data || ''),
       status,
       timestamp: payload.timestamp || 0,
-
       blockNonce: payload.blockNonce || 0,
       hyperblockNonce: payload.hyperblockNonce || 0,
       hyperblockHash: payload.hyperblockHash || '',
-
-      receipt: TransactionReceipt.fromHttpResponse(payload.receipt || {}),
-      logs: TransactionLogs.fromHttpResponse(payload.logs || {}),
-
-      contractResults: ContractResults.fromApiHttpResponse(
-        payload.results || []
-      ),
+      receipt: payload.receipt,
+      logs: payload.logs,
+      contractResults: payload.results || [],
       isCompleted: !status.isPending(),
     };
 
@@ -226,18 +222,24 @@ export class ApiNetworkProvider {
     args,
     value,
     caller,
-  }: SmartContractQueryArgs): Promise<ContractQueryResponse | undefined> {
+  }: SmartContractQueryArgs) {
     try {
-      const query = new Query({
-        address,
-        func,
-        args,
-        value,
+      const request = {
+        scAddress: address,
         caller,
-      });
-      const request = new ContractQueryRequest(query).toHttpRequest();
+        funcName: func,
+        value,
+        // TODO: it will need to react to different values, probably serializers from SDK are needed
+        args: () => args?.map((arg) => stringToHex(arg)),
+      };
+
       const response = await this.apiPost('query', request);
-      return ContractQueryResponse.fromHttpResponse(response);
+
+      return {
+        returnData: response.returnData,
+        returnCode: response.returnCode,
+        returnMessage: response.returnMessage,
+      };
     } catch (e) {
       this.handleApiError(e, 'query');
     }
