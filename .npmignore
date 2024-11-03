@@ -1,6 +1,7 @@
-example
+apps
 node_modules
 src
+configs
 .prettierrc
 .eslintrc
 .editorconfig

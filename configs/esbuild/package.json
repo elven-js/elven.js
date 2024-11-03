@@ -1,0 +1,9 @@
+{
+  "name": "@configs/esbuild",
+  "type": "module",
+  "private": true,
+  "main": "index.js",
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  }
+}

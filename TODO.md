@@ -1,6 +1,7 @@
-- move all previous signing providers (wallet connect is left)
-  - check what can be done with wallet connect to make it as small as possible
-- think about moving xPortal and webview integrations to separate files ????  
+- move xPortal integration to separate file
+  - do a monorepo, mainly for example testing
+  - the wallet connect dependencies are quite big, there is not much that can be done here  
+  - anyway check what can be done with wallet connect to make it as small as possible
 - add tests for at least most used utilities, maybe some core tools, check tests in MVX SDKs (more tests can be added later)
 - prepare a new API
   - for token operations
