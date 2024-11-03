@@ -192,6 +192,8 @@
                 walletConnectV2ProjectId: 'f502675c63610bfe4454080ac86d70e6',
                 walletConnectV2RelayAddresses: ['wss://relay.walletconnect.com'],
                 qrCodeContainer: 'qr-code-container',
+                onQrPending: () => { uiPending(true); },
+                onQrLoaded: () => { uiPending(false); },
               }
             }
           },
@@ -210,9 +212,6 @@
           onTxSent: (txOnNetwork) => { const hash = txOnNetwork.txHash; hash && updateTxHashContainer(hash, true); },
           onTxFinalized: (tx) => { tx?.hash && updateTxHashContainer(tx.hash); uiPending(false); },
           onTxFailure: (tx, error) => { displayError(error); uiPending(false); },
-          // Qr code callbacks:
-          onQrPending: () => { uiPending(true); },
-          onQrLoaded: () => { uiPending(false); },
           // Signing callbacks:
           onSignMsgStart: (message) => { uiPending(true); },
           onSignMsgFinalized: (message, messageSignature) => { messageSignature && updateOperationResultContainer(`➡️ The signature for "${message}" message:\n${messageSignature}`); uiPending(false); },

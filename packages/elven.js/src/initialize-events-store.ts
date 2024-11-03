@@ -37,11 +37,12 @@ export const initializeEventsStore = (initOptions: InitOptions) => {
   }
 
   // Qr code initialization
-  if (initOptions.onQrPending) {
-    EventsStore.set(EventStoreEvents.onQrPending, initOptions.onQrPending);
+  const mobileConfig = initOptions?.externalSigningProviders?.mobile?.config;
+  if (mobileConfig?.onQrPending) {
+    EventsStore.set(EventStoreEvents.onQrPending, mobileConfig.onQrPending);
   }
-  if (initOptions.onQrLoaded) {
-    EventsStore.set(EventStoreEvents.onQrLoaded, initOptions.onQrLoaded);
+  if (mobileConfig?.onQrLoaded) {
+    EventsStore.set(EventStoreEvents.onQrLoaded, mobileConfig.onQrLoaded);
   }
 
   // Transactions initialization

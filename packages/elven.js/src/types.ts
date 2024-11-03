@@ -17,6 +17,8 @@ export interface MobileSigningProviderConfig {
   walletConnectV2ProjectId: string;
   walletConnectV2RelayAddresses: string[];
   qrCodeContainer: string | HTMLElement;
+  onQrPending: () => void;
+  onQrLoaded: () => void;
 }
 
 export interface WalletConnectV2Provider
@@ -74,9 +76,6 @@ export interface InitOptions {
   onLogoutStart?: () => void;
   onLogoutSuccess?: () => void;
   onLogoutFailure?: (error: string) => void;
-  // Qr
-  onQrPending?: () => void;
-  onQrLoaded?: () => void;
   // Transaction
   onTxStart?: (transaction: Transaction) => void;
   onTxSent?: (transaction: Transaction) => void;
