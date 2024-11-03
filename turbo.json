@@ -17,10 +17,6 @@
       "outputs": [],
       "cache": true
     },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
     "check-types": {
       "cache": true,
       "outputs": []

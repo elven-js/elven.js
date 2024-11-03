@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev:server": "node dev-server.js",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "prettier": "turbo run prettier",
@@ -23,6 +23,7 @@
     "eslint": "9.14.0",
     "prettier": "3.3.3",
     "rimraf": "6.0.1",
+    "serve-handler": "6.1.6",
     "turbo": "2.2.3",
     "typescript": "5.6.3"
   }

@@ -3,7 +3,7 @@ import http from 'http';
 
 const server = http.createServer((request, response) => {
   return handler(request, response, {
-    public: 'apps/demo-app',
+    public: 'demo-app',
     headers: [
       {
         source: '**/*',
