@@ -22,11 +22,9 @@
     "clean": "rimraf build node_modules"
   },
   "devDependencies": {
-    "@noble/secp256k1": "2.1.0",
-    "@walletconnect/sign-client": "2.17.1",
-    "@walletconnect/types": "2.17.1",
-    "@walletconnect/utils": "2.17.1",
-    "esbuild": "0.24.0",
+    "@walletconnect/sign-client": "2.17.2",
+    "@walletconnect/types": "2.17.2",
+    "@walletconnect/utils": "2.17.2",
     "uqr": "0.1.2"
   },
   "peerDependencies": {

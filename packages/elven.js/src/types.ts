@@ -10,7 +10,7 @@ import { NativeAuthClient } from './core/native-auth-client';
 import { Message } from './core/message';
 import { TransactionsConverter } from './core/transaction-converter';
 import { NetworkType } from './utils/constants';
-import { ls } from './utils/ls-helpers';
+import { LocalStorage } from './utils/ls-helpers';
 import { EventsStore } from './events-store';
 
 export interface MobileSigningProviderConfig {
@@ -27,35 +27,34 @@ export interface WalletConnectV2Provider
 }
 
 export interface MobileSigningProvider {
-  initMobileProvider: (
-    elvenJS: any,
-    logout: typeof import('./auth/logout').logout,
-    networkConfig: typeof import('./utils/constants').networkConfig,
-    Message: typeof import('./core/message').Message,
-    Transaction: typeof import('./core/transaction').Transaction,
-    TransactionsConverter: typeof import('./core/transaction-converter').TransactionsConverter
-  ) => Promise<any>;
+  initMobileProvider: (elvenJS: any) => Promise<any>;
   loginWithMobile: (
     celvenJS: any,
     loginToken: string,
-    nativeAuthClient: NativeAuthClient,
-    storage: typeof ls,
-    logout: (elven: any) => Promise<boolean>,
-    getNewLoginExpiresTimestamp: () => number,
-    accountSync: (elven: any) => Promise<void>,
-    EventsStoreClass: typeof EventsStore,
-    networkConfig: Record<string, NetworkType>,
-    MessageClass: typeof Message,
-    TransactionClass: typeof Transaction,
-    TransactionsConverterClass: typeof TransactionsConverter
+    nativeAuthClient: NativeAuthClient
   ) => Promise<any>;
   WalletConnectV2Provider: {
     new (...args: any[]): WalletConnectV2Provider;
   };
 }
 
+export type MobileSigningProviderDeps = {
+  networkConfig: Record<string, NetworkType>;
+  Message: typeof Message;
+  Transaction: typeof Transaction;
+  TransactionsConverter: typeof TransactionsConverter;
+  ls: LocalStorage;
+  logout: (instance: any) => Promise<boolean>;
+  getNewLoginExpiresTimestamp: () => number;
+  accountSync: (instance: any) => Promise<void>;
+  EventsStore: typeof EventsStore;
+};
+
 export interface MobileProvider {
-  new (config: MobileSigningProviderConfig): MobileSigningProvider;
+  new (
+    config: MobileSigningProviderConfig,
+    deps: MobileSigningProviderDeps
+  ): MobileSigningProvider;
 }
 
 export interface InitOptions {

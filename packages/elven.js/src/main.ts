@@ -18,6 +18,7 @@ import {
   InitOptions,
   EventStoreEvents,
   MobileSigningProvider,
+  MobileSigningProviderDeps,
 } from './types';
 import { logout } from './auth/logout';
 import { loginWithExtension } from './auth/login-with-extension';
@@ -74,15 +75,31 @@ export class ElvenJS {
 
     this.networkProvider = new ApiNetworkProvider(this.initOptions);
 
-    // Initialize the optional mobile provider
-    this.mobileProvider = this.initOptions?.externalSigningProviders?.mobile
-      ?.provider
-      ? new this.initOptions.externalSigningProviders.mobile.provider(
-          this.initOptions.externalSigningProviders.mobile.config
-        )
-      : undefined;
-
     initializeEventsStore(this.initOptions);
+
+    // Initialize the optional mobile provider
+    const MobileProvider =
+      this.initOptions?.externalSigningProviders?.mobile?.provider;
+    if (MobileProvider) {
+      const deps: MobileSigningProviderDeps = {
+        networkConfig,
+        Message,
+        Transaction,
+        TransactionsConverter,
+        ls,
+        logout,
+        getNewLoginExpiresTimestamp,
+        accountSync,
+        EventsStore,
+      };
+      const mobileProviderConfig =
+        this.initOptions?.externalSigningProviders?.mobile?.config;
+      if (mobileProviderConfig) {
+        this.mobileProvider = new MobileProvider(mobileProviderConfig, deps);
+      } else {
+        throw new Error('Mobile provider config is required!');
+      }
+    }
 
     // Catch the nativeAuthToken and login with it (for example within xPortal Hub)
     const nativeAuthTokenFromUrl = getParamFromUrl('accessToken');
@@ -109,14 +126,8 @@ export class ElvenJS {
           state.loginMethod === LoginMethodsEnum.mobile &&
           this.mobileProvider
         ) {
-          this.dappProvider = await this.mobileProvider?.initMobileProvider(
-            this,
-            logout,
-            networkConfig,
-            Message,
-            Transaction,
-            TransactionsConverter
-          );
+          this.dappProvider =
+            await this.mobileProvider?.initMobileProvider(this);
         }
         if (state.loginMethod === LoginMethodsEnum.webview) {
           this.dappProvider = new WebviewProvider();
@@ -207,16 +218,7 @@ export class ElvenJS {
         const dappProvider = await this.mobileProvider?.loginWithMobile(
           this,
           loginToken,
-          nativeAuthClient,
-          ls,
-          logout,
-          getNewLoginExpiresTimestamp,
-          accountSync,
-          EventsStore,
-          networkConfig,
-          Message,
-          Transaction,
-          TransactionsConverter
+          nativeAuthClient
         );
         this.dappProvider = dappProvider;
       }

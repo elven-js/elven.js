@@ -1,4 +1,3 @@
-- anyway check what can be done with wallet connect to make it as small as possible
 - check and handle all the errors for the mobile provider when the provider is not initialized etc.
 - add tests for at least most used utilities, maybe some core tools, check tests in MVX SDKs (more tests can be added later)
 - prepare a new API
@@ -11,3 +10,4 @@
 - update README and docs and demos
   - how it is built now
   - what it can't do
+  - why the mobile provider is so big and what can be done to make it smaller, plus why it isn't so bad because it is a separate file

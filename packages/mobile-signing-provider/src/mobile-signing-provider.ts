@@ -20,37 +20,62 @@ export class MobileSigningProvider {
   private walletConnectV2ProjectId: string;
   private walletConnectV2RelayAddresses: string[];
   private qrCodeContainer: string | HTMLElement;
+  private networkConfig: NetworkConfig;
+  private Message: new (...args: any[]) => unknown;
+  private Transaction: new (...args: any[]) => unknown;
+  private TransactionsConverter: new (...args: any[]) => unknown;
+  private ls: LocalStorage;
+  private logout: (context: Context) => Promise<void>;
+  private getNewLoginExpiresTimestamp: () => number;
+  private accountSync: (context: Context) => Promise<void>;
+  private EventsStore: EventsStore;
+
   WalletConnectV2Provider = WalletConnectV2Provider;
 
-  constructor({
-    walletConnectV2ProjectId,
-    walletConnectV2RelayAddresses,
-    qrCodeContainer,
-  }: {
-    walletConnectV2ProjectId: string;
-    walletConnectV2RelayAddresses: string[];
-    qrCodeContainer: string | HTMLElement;
-  }) {
+  constructor(
+    {
+      walletConnectV2ProjectId,
+      walletConnectV2RelayAddresses,
+      qrCodeContainer,
+    }: {
+      walletConnectV2ProjectId: string;
+      walletConnectV2RelayAddresses: string[];
+      qrCodeContainer: string | HTMLElement;
+    },
+    deps: {
+      networkConfig: NetworkConfig;
+      Message: new (...args: any[]) => unknown;
+      Transaction: new (...args: any[]) => unknown;
+      TransactionsConverter: new (...args: any[]) => unknown;
+      ls: LocalStorage;
+      logout: (context: Context) => Promise<void>;
+      getNewLoginExpiresTimestamp: () => number;
+      accountSync: (context: Context) => Promise<void>;
+      EventsStore: EventsStore;
+    }
+  ) {
     this.walletConnectV2ProjectId = walletConnectV2ProjectId;
     this.walletConnectV2RelayAddresses = walletConnectV2RelayAddresses;
     this.qrCodeContainer = qrCodeContainer;
+    this.networkConfig = deps.networkConfig;
+    this.Message = deps.Message;
+    this.Transaction = deps.Transaction;
+    this.TransactionsConverter = deps.TransactionsConverter;
+    this.ls = deps.ls;
+    this.logout = deps.logout;
+    this.getNewLoginExpiresTimestamp = deps.getNewLoginExpiresTimestamp;
+    this.accountSync = deps.accountSync;
+    this.EventsStore = deps.EventsStore;
   }
 
-  initMobileProvider = async (
-    context: Context,
-    logout: (context: Context) => Promise<void>,
-    networkConfig: NetworkConfig,
-    Message: new (...args: any[]) => unknown,
-    Transaction: new (...args: any[]) => unknown,
-    TransactionsConverter: new (...args: any[]) => unknown
-  ) => {
+  initMobileProvider = async (context: Context) => {
     if (!this.walletConnectV2ProjectId || !context.initOptions.chainType) {
       return undefined;
     }
 
     const providerHandlers = {
       onClientLogin: () => {},
-      onClientLogout: () => logout(context),
+      onClientLogout: () => this.logout(context),
       onClientEvent: (event: SessionEventTypes['event']) => {
         console.log('wc2 session event: ', event);
       },
@@ -62,12 +87,12 @@ export class MobileSigningProvider {
 
     const dappProviderInstance = new WalletConnectV2Provider(
       providerHandlers,
-      networkConfig[context.initOptions.chainType].shortId,
+      this.networkConfig[context.initOptions.chainType].shortId,
       relayAddress,
       this.walletConnectV2ProjectId,
-      Message,
-      Transaction,
-      TransactionsConverter
+      this.Message,
+      this.Transaction,
+      this.TransactionsConverter
     );
 
     try {
@@ -82,16 +107,7 @@ export class MobileSigningProvider {
   loginWithMobile = async (
     context: Context,
     loginToken: string,
-    nativeAuthClient: NativeAuthClient,
-    ls: LocalStorage,
-    logout: (context: Context) => Promise<void>,
-    getNewLoginExpiresTimestamp: () => number,
-    accountSync: (context: Context) => Promise<void>,
-    EventsStore: EventsStore,
-    networkConfig: NetworkConfig,
-    Message: new (...args: any[]) => unknown,
-    Transaction: new (...args: any[]) => unknown,
-    TransactionsConverter: new (...args: any[]) => unknown
+    nativeAuthClient: NativeAuthClient
   ) => {
     if (!this.qrCodeContainer) {
       throw new Error(
@@ -129,15 +145,15 @@ export class MobileSigningProvider {
           const address = context.dappProvider.getAddress();
           const signature = context.dappProvider.getSignature();
 
-          ls.set('address', address);
-          ls.set('loginMethod', LoginMethodsEnum.mobile);
-          ls.set('expires', getNewLoginExpiresTimestamp());
+          this.ls.set('address', address);
+          this.ls.set('loginMethod', LoginMethodsEnum.mobile);
+          this.ls.set('expires', this.getNewLoginExpiresTimestamp());
 
-          await accountSync(context);
+          await this.accountSync(context);
 
           if (signature) {
-            ls.set('signature', signature);
-            ls.set('loginToken', loginToken);
+            this.ls.set('signature', signature);
+            this.ls.set('loginToken', loginToken);
 
             const accessToken = nativeAuthClient.getToken(
               address,
@@ -145,16 +161,16 @@ export class MobileSigningProvider {
               signature
             );
 
-            ls.set('accessToken', accessToken);
+            this.ls.set('accessToken', accessToken);
 
-            EventsStore.run(EventStoreEvents.onLoginSuccess);
+            this.EventsStore.run(EventStoreEvents.onLoginSuccess);
             qrCodeElement?.replaceChildren();
           }
         }
       },
       onClientLogout: async () => {
         if (context.dappProvider instanceof WalletConnectV2Provider) {
-          await logout(context);
+          await this.logout(context);
         }
       },
       onClientEvent: (event: SessionEventTypes['event']) => {
@@ -164,19 +180,19 @@ export class MobileSigningProvider {
 
     const dappProvider = new WalletConnectV2Provider(
       providerHandlers,
-      networkConfig[context.initOptions.chainType].shortId,
+      this.networkConfig[context.initOptions.chainType].shortId,
       relayAddress,
       this.walletConnectV2ProjectId,
-      Message,
-      Transaction,
-      TransactionsConverter
+      this.Message,
+      this.Transaction,
+      this.TransactionsConverter
     );
 
     try {
       if (dappProvider) {
         context.dappProvider = dappProvider;
 
-        EventsStore.run(EventStoreEvents.onQrPending);
+        this.EventsStore.run(EventStoreEvents.onQrPending);
 
         await dappProvider.init();
 
@@ -199,7 +215,7 @@ export class MobileSigningProvider {
             loginToken
           );
 
-          EventsStore.run(EventStoreEvents.onQrLoaded);
+          this.EventsStore.run(EventStoreEvents.onQrLoaded);
         }
 
         await dappProvider.login({
@@ -212,7 +228,7 @@ export class MobileSigningProvider {
     } catch (e) {
       const err = errorParse(e);
       console.warn(`Something went wrong trying to login the user: ${err}`);
-      EventsStore.run(EventStoreEvents.onLoginFailure, err);
+      this.EventsStore.run(EventStoreEvents.onLoginFailure, err);
     }
   };
 }
