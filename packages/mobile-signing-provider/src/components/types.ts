@@ -65,3 +65,25 @@ export enum WalletConnectV2ProviderErrorMessagesEnum {
   connectionError = 'WalletConnect could not establish a connection',
   invalidGuardian = 'WalletConnect: Invalid Guardian',
 }
+
+export interface Context {
+  networkProvider?: unknown;
+  initOptions: { chainType: string };
+  dappProvider?: unknown;
+}
+
+export interface NativeAuthClient {
+  getToken(address: string, loginToken: string, signature: string): string;
+}
+
+export interface LocalStorage {
+  set(key: string, value: unknown): void;
+}
+
+export interface EventsStore {
+  run(event: string, ...args: unknown[]): void;
+}
+
+export interface NetworkConfig {
+  [key: string]: { shortId: string };
+}
