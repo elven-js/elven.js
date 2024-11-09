@@ -200,7 +200,9 @@ export class ElvenJS {
         origin: window.location.origin,
       });
 
-      const loginToken = await nativeAuthClient.initialize();
+      const loginToken = await nativeAuthClient.initialize({
+        timestamp: `${Math.floor(Date.now() / 1000)}`,
+      });
 
       // Login with browser extension
       if (loginMethod === LoginMethodsEnum.browserExtension) {

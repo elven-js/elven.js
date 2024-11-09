@@ -194,7 +194,7 @@ export class WalletProvider {
   async signTransaction(
     transaction: Transaction,
     options?: { callbackUrl?: string }
-  ): Promise<void> {
+  ) {
     await this.signTransactions([transaction], options);
   }
 

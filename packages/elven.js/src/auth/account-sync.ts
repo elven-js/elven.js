@@ -6,7 +6,8 @@ import { isLoginExpired } from './expires-at';
 export const accountSync = async (elven: any) => {
   const address = ls.get('address');
   const loginExpires = ls.get('expires');
-  const loginExpired = loginExpires && isLoginExpired(loginExpires);
+  const loginExpired =
+    typeof loginExpires === 'number' ? isLoginExpired(loginExpires) : true;
 
   if (!loginExpired && address && elven.networkProvider) {
     const userAccountInstance = new Account(address);

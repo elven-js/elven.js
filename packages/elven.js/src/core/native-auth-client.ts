@@ -1,8 +1,6 @@
 // Based on Multiversx sdk-core with modifications
 
-import { stringToHex } from './utils';
-
-// TODO: review what is really needed regarding the gateway and api fallbacks
+import { toBase64FromStringOrBytes } from './utils';
 
 class NativeAuthClientConfig {
   origin: string =
@@ -10,9 +8,8 @@ class NativeAuthClientConfig {
       ? window.location.hostname
       : '';
   apiUrl: string = 'https://api.multiversx.com';
-  expirySeconds: number = 60 * 60 * 24;
+  expirySeconds: number = 60 * 60 * 2;
   blockHashShard?: number;
-  gatewayUrl?: string;
   extraRequestHeaders?: { [key: string]: string };
 }
 
@@ -40,35 +37,7 @@ export class NativeAuthClient {
   }
 
   async getCurrentBlockHash(): Promise<string> {
-    if (this.config.gatewayUrl) {
-      return await this.getCurrentBlockHashWithGateway();
-    }
     return await this.getCurrentBlockHashWithApi();
-  }
-
-  private async getCurrentBlockHashWithGateway(): Promise<string> {
-    const round = await this.getCurrentRound();
-    const url = `${this.config.gatewayUrl}/blocks/by-round/${round}`;
-    const response = await this.get(url);
-    const blocks = response.data.data.blocks;
-    const block = blocks.filter(
-      (block: { shard: number }) => block.shard === this.config.blockHashShard
-    )[0];
-    return block.hash;
-  }
-
-  private async getCurrentRound(): Promise<number> {
-    if (!this.config.gatewayUrl) {
-      throw new Error('Gateway URL not set');
-    }
-    if (!this.config.blockHashShard) {
-      throw new Error('Blockhash shard not set');
-    }
-
-    const url = `${this.config.gatewayUrl}/network/status/${this.config.blockHashShard}`;
-    const response = await this.get(url);
-    const status = response.data.data.status;
-    return status.erd_current_round;
   }
 
   private async getCurrentBlockHashWithApi(): Promise<string> {
@@ -89,8 +58,9 @@ export class NativeAuthClient {
     const response = await this.get(url);
     return response.hash;
   }
+
   encodeValue(str: string) {
-    return this.escape(stringToHex(str));
+    return this.escape(toBase64FromStringOrBytes(str));
   }
 
   private escape(str: string) {
