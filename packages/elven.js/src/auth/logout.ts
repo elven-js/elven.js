@@ -1,5 +1,5 @@
 import { ls } from '../utils/ls-helpers';
-import { EventsStore } from '../events-store';
+import * as EventsStore from '../events-store';
 import { EventStoreEvents } from '../types';
 import { errorParse } from '../utils/error-parse';
 

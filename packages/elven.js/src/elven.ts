@@ -4,6 +4,6 @@ export { Account } from './core/account';
 export { Transaction } from './core/transaction';
 export { TransactionWatcher } from './core/transaction-watcher';
 
-export { ElvenJS } from './main';
+export * from './main';
 export { parseAmount, formatAmount } from './utils/amount';
 export * from './types';

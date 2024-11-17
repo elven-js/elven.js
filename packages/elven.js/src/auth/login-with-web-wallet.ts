@@ -4,7 +4,7 @@ import { DAPP_INIT_ROUTE, networkConfig } from '../utils/constants';
 import { errorParse } from '../utils/error-parse';
 import { ls } from '../utils/ls-helpers';
 import { getNewLoginExpiresTimestamp } from './expires-at';
-import { EventsStore } from '../events-store';
+import * as EventsStore from '../events-store';
 
 export const loginWithWebWallet = async (
   urlAddress: string,

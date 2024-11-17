@@ -11,7 +11,7 @@ import { Message } from './core/message';
 import { TransactionsConverter } from './core/transaction-converter';
 import { NetworkType } from './utils/constants';
 import { LocalStorage } from './utils/ls-helpers';
-import { EventsStore } from './events-store';
+import * as EventsStore from './events-store';
 
 export interface MobileSigningProviderConfig {
   walletConnectV2ProjectId: string;

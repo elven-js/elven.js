@@ -12,21 +12,19 @@ import {
   SmartContractQueryArgs,
 } from './core/network-provider';
 import {
-  DappProvider,
   LoginMethodsEnum,
   LoginOptions,
   InitOptions,
   EventStoreEvents,
-  MobileSigningProvider,
   MobileSigningProviderDeps,
 } from './types';
-import { logout } from './auth/logout';
+import { logout as logoutHelper } from './auth/logout';
 import { loginWithExtension } from './auth/login-with-extension';
 import { loginWithWebWallet } from './auth/login-with-web-wallet';
 import { accountSync } from './auth/account-sync';
 import { errorParse } from './utils/error-parse';
 import { getNewLoginExpiresTimestamp, isLoginExpired } from './auth/expires-at';
-import { EventsStore } from './events-store';
+import * as EventsStore from './events-store';
 import {
   networkConfig,
   defaultApiEndpoint,
@@ -47,455 +45,452 @@ import { initializeEventsStore } from './initialize-events-store';
 import { withLoginEvents } from './utils/with-login-events';
 import { bytesToHex, stringToBytes } from './core/utils';
 import { TransactionsConverter } from './core/transaction-converter';
+import { config, resetConfig } from './config';
 
-export class ElvenJS {
-  private static initOptions: InitOptions | undefined;
-  static dappProvider: DappProvider;
-  static networkProvider: ApiNetworkProvider | undefined;
-  static mobileProvider: MobileSigningProvider | undefined;
+/**
+ * Initialization of the Elven.js
+ */
+export const init = async (options: InitOptions) => {
+  const state = ls.get();
 
-  /**
-   * Initialization of the Elven.js
-   */
-  static async init(options: InitOptions) {
-    const state = ls.get();
+  if (state.expires && isLoginExpired(state.expires)) {
+    ls.clear();
+    config.dappProvider = undefined;
+    return;
+  }
 
-    if (state.expires && isLoginExpired(state.expires)) {
-      ls.clear();
-      this.dappProvider = undefined;
-      return;
-    }
+  config.initOptions = {
+    chainType: defaultChainTypeConfig,
+    apiUrl: defaultApiEndpoint,
+    apiTimeout: 10000,
+    ...options,
+  };
 
-    this.initOptions = {
-      chainType: defaultChainTypeConfig,
-      apiUrl: defaultApiEndpoint,
-      apiTimeout: 10000,
-      ...options,
+  config.networkProvider = new ApiNetworkProvider(config.initOptions);
+
+  initializeEventsStore(config.initOptions);
+
+  // Initialize the optional mobile provider
+  const MobileProvider =
+    config.initOptions?.externalSigningProviders?.mobile?.provider;
+  if (MobileProvider) {
+    const deps: MobileSigningProviderDeps = {
+      networkConfig,
+      Message,
+      Transaction,
+      TransactionsConverter,
+      ls,
+      logout: logoutHelper,
+      getNewLoginExpiresTimestamp,
+      accountSync,
+      EventsStore,
     };
-
-    this.networkProvider = new ApiNetworkProvider(this.initOptions);
-
-    initializeEventsStore(this.initOptions);
-
-    // Initialize the optional mobile provider
-    const MobileProvider =
-      this.initOptions?.externalSigningProviders?.mobile?.provider;
-    if (MobileProvider) {
-      const deps: MobileSigningProviderDeps = {
-        networkConfig,
-        Message,
-        Transaction,
-        TransactionsConverter,
-        ls,
-        logout,
-        getNewLoginExpiresTimestamp,
-        accountSync,
-        EventsStore,
-      };
-      const mobileProviderConfig =
-        this.initOptions?.externalSigningProviders?.mobile?.config;
-      if (mobileProviderConfig) {
-        this.mobileProvider = new MobileProvider(mobileProviderConfig, deps);
-      } else {
-        throw new Error('Mobile provider config is required!');
-      }
-    }
-
-    // Catch the nativeAuthToken and login with it (for example within xPortal Hub)
-    const nativeAuthTokenFromUrl = getParamFromUrl('accessToken');
-    if (nativeAuthTokenFromUrl) {
-      await withLoginEvents(async (onLoginSuccess) => {
-        loginWithNativeAuthToken(nativeAuthTokenFromUrl, this);
-        await accountSync(this);
-        onLoginSuccess();
-      });
-    }
-
-    const isAddress =
-      state?.address ||
-      ((state.loginMethod === LoginMethodsEnum.webWallet ||
-        state.loginMethod === LoginMethodsEnum.xAlias) &&
-        getParamFromUrl('address'));
-
-    if (isAddress && state?.loginMethod) {
-      await withLoginEvents(async (onLoginSuccess) => {
-        if (state.loginMethod === LoginMethodsEnum.browserExtension) {
-          this.dappProvider = await initExtensionProvider();
-        }
-        if (
-          state.loginMethod === LoginMethodsEnum.mobile &&
-          this.mobileProvider
-        ) {
-          this.dappProvider =
-            await this.mobileProvider?.initMobileProvider(this);
-        }
-        if (state.loginMethod === LoginMethodsEnum.webview) {
-          this.dappProvider = new WebviewProvider();
-        }
-        if (
-          state.loginMethod === LoginMethodsEnum.webWallet &&
-          this.initOptions?.chainType
-        ) {
-          this.dappProvider = await initWebWalletProvider(
-            networkConfig[this.initOptions.chainType].walletAddress,
-            this.initOptions.apiUrl
-          );
-        }
-        if (
-          state.loginMethod === LoginMethodsEnum.xAlias &&
-          this.initOptions?.chainType
-        ) {
-          this.dappProvider = await initWebWalletProvider(
-            networkConfig[this.initOptions.chainType].xAliasAddress,
-            this.initOptions.apiUrl
-          );
-        }
-        await accountSync(this);
-        onLoginSuccess();
-      });
-
-      // After successful web wallet transaction (or guarded transaction that use web wallet 2FA hook) we will land back on our website
-      if (this.initOptions?.chainType) {
-        // We need to get params from callback url and finalize the transaction
-        // It will only trigger when there is a WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED in url params
-        await webWalletTxFinalize(
-          this.dappProvider,
-          this.networkProvider,
-          networkConfig[this.initOptions.chainType][
-            state.loginMethod === LoginMethodsEnum.xAlias
-              ? 'xAliasAddress'
-              : 'walletAddress'
-          ],
-          state.nonce
-        );
-
-        // We need to get the signature in case of signing a message with web wallet or guardians 2FA hook
-        webWalletSignMessageFinalize();
-      }
+    const mobileProviderConfig =
+      config.initOptions?.externalSigningProviders?.mobile?.config;
+    if (mobileProviderConfig) {
+      config.mobileProvider = new MobileProvider(mobileProviderConfig, deps);
+    } else {
+      throw new Error('Mobile provider config is required!');
     }
   }
 
-  /**
-   * Login function
-   */
-  static async login(loginMethod: LoginMethodsEnum, options?: LoginOptions) {
-    const isProperLoginMethod =
-      Object.values(LoginMethodsEnum).includes(loginMethod);
-    if (!isProperLoginMethod) {
-      const error = 'Wrong login method!';
-      EventsStore.run(EventStoreEvents.onLoginFailure, error);
-      throw new Error(error);
-    }
-
-    if (!this.networkProvider) {
-      const error = 'Login failed: Use ElvenJs.init() first!';
-      EventsStore.run(EventStoreEvents.onLoginFailure, error);
-      throw new Error(error);
-    }
-
-    await withLoginEvents(async () => {
-      // Native auth login token initialization
-      const nativeAuthClient = new NativeAuthClient({
-        apiUrl: this.initOptions?.apiUrl,
-        origin: window.location.origin,
-      });
-
-      const loginToken = await nativeAuthClient.initialize({
-        timestamp: `${Math.floor(Date.now() / 1000)}`,
-      });
-
-      // Login with browser extension
-      if (loginMethod === LoginMethodsEnum.browserExtension) {
-        const dappProvider = await loginWithExtension(
-          this,
-          loginToken,
-          nativeAuthClient,
-          options?.callbackRoute
-        );
-        this.dappProvider = dappProvider;
-      }
-
-      // Login with optional mobile provider
-      if (loginMethod === LoginMethodsEnum.mobile && this.mobileProvider) {
-        const dappProvider = await this.mobileProvider?.loginWithMobile(
-          this,
-          loginToken,
-          nativeAuthClient
-        );
-        this.dappProvider = dappProvider;
-      }
-
-      // Login with Web Wallet
-      if (
-        loginMethod === LoginMethodsEnum.webWallet &&
-        this.initOptions?.chainType
-      ) {
-        const dappProvider = await loginWithWebWallet(
-          networkConfig[this.initOptions.chainType].walletAddress,
-          loginToken,
-          this.initOptions?.chainType,
-          options?.callbackRoute
-        );
-        this.dappProvider = dappProvider;
-      }
-
-      // Login with xAlias
-      if (
-        loginMethod === LoginMethodsEnum.xAlias &&
-        this.initOptions?.chainType
-      ) {
-        // Login with xAlias is almost the same as with the web wallet, only endpoints are different
-        const dappProvider = await loginWithWebWallet(
-          networkConfig[this.initOptions.chainType].xAliasAddress,
-          loginToken,
-          this.initOptions?.chainType,
-          options?.callbackRoute
-        );
-        this.dappProvider = dappProvider;
-      }
+  // Catch the nativeAuthToken and login with it (for example within xPortal Hub)
+  const nativeAuthTokenFromUrl = getParamFromUrl('accessToken');
+  if (nativeAuthTokenFromUrl) {
+    await withLoginEvents(async (onLoginSuccess) => {
+      loginWithNativeAuthToken(nativeAuthTokenFromUrl, config);
+      await accountSync(config);
+      onLoginSuccess();
     });
   }
 
-  /**
-   * Logout function
-   */
-  static async logout() {
-    try {
-      const isLoggedOut = await logout(this);
-      this.dappProvider = undefined;
-      return isLoggedOut;
-    } catch (e) {
-      const err = errorParse(e);
-      console.warn('Something went wrong when logging out: ', err);
-    }
-  }
+  const isAddress =
+    state?.address ||
+    ((state.loginMethod === LoginMethodsEnum.webWallet ||
+      state.loginMethod === LoginMethodsEnum.xAlias) &&
+      getParamFromUrl('address'));
 
-  /**
-   * Sign and send function
-   */
-  static async signAndSendTransaction(transaction: Transaction) {
-    if (!this.dappProvider) {
-      const error = 'Transaction signing failed: There is no active session!';
-      EventsStore.run(EventStoreEvents.onTxFailure, transaction, error);
-      throw new Error(error);
-    }
-    if (!this.networkProvider) {
-      const error =
-        'Transaction signing failed: There is no active network provider!';
-      EventsStore.run(EventStoreEvents.onTxFailure, transaction, error);
-      throw new Error(error);
-    }
-
-    let signedTx = guardianPreSignTxOperations(transaction);
-
-    try {
-      EventsStore.run(EventStoreEvents.onTxStart, transaction);
-
-      const currentState = ls.get();
-
-      transaction.nonce = currentState.nonce;
-
-      if (this.dappProvider instanceof ExtensionProvider) {
-        signedTx = await this.dappProvider.signTransaction(transaction);
+  if (isAddress && state?.loginMethod) {
+    await withLoginEvents(async (onLoginSuccess) => {
+      if (state.loginMethod === LoginMethodsEnum.browserExtension) {
+        config.dappProvider = await initExtensionProvider();
       }
       if (
-        this.mobileProvider &&
-        this.dappProvider instanceof this.mobileProvider.WalletConnectV2Provider
+        state.loginMethod === LoginMethodsEnum.mobile &&
+        config.mobileProvider
       ) {
-        signedTx = await this.dappProvider.signTransaction(transaction);
+        config.dappProvider =
+          await config.mobileProvider?.initMobileProvider(config);
       }
-      if (this.dappProvider instanceof WebviewProvider) {
-        signedTx = await this.dappProvider.signTransaction(transaction);
+      if (state.loginMethod === LoginMethodsEnum.webview) {
+        config.dappProvider = new WebviewProvider();
       }
-      if (this.dappProvider instanceof WalletProvider) {
-        await this.dappProvider.signTransaction(transaction);
-      }
-
       if (
-        currentState.loginMethod !== LoginMethodsEnum.webWallet &&
-        currentState.loginMethod !== LoginMethodsEnum.xAlias
+        state.loginMethod === LoginMethodsEnum.webWallet &&
+        config.initOptions?.chainType
       ) {
-        const needsGuardianSign = checkNeedsGuardianSigning(signedTx);
-
-        if (!needsGuardianSign) {
-          preSendTx(signedTx);
-        }
-
-        if (needsGuardianSign && this.initOptions?.chainType) {
-          await sendTxToGuardian(
-            signedTx,
-            networkConfig[this.initOptions.chainType].walletAddress
-          );
-
-          return;
-        }
-
-        const response = await this.networkProvider.sendTransaction(signedTx);
-        await postSendTx(response, this.networkProvider);
+        config.dappProvider = await initWebWalletProvider(
+          networkConfig[config.initOptions.chainType].walletAddress,
+          config.initOptions.apiUrl
+        );
       }
-    } catch (e) {
-      const err = errorParse(e);
-      EventsStore.run(
-        EventStoreEvents.onTxFailure,
-        signedTx,
-        `Getting transaction information failed! ${err}`
+      if (
+        state.loginMethod === LoginMethodsEnum.xAlias &&
+        config.initOptions?.chainType
+      ) {
+        config.dappProvider = await initWebWalletProvider(
+          networkConfig[config.initOptions.chainType].xAliasAddress,
+          config.initOptions.apiUrl
+        );
+      }
+      await accountSync(config);
+      onLoginSuccess();
+    });
+
+    // After successful web wallet transaction (or guarded transaction that use web wallet 2FA hook) we will land back on our website
+    if (config.initOptions?.chainType) {
+      // We need to get params from callback url and finalize the transaction
+      // It will only trigger when there is a WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED in url params
+      await webWalletTxFinalize(
+        config.dappProvider,
+        config.networkProvider,
+        networkConfig[config.initOptions.chainType][
+          state.loginMethod === LoginMethodsEnum.xAlias
+            ? 'xAliasAddress'
+            : 'walletAddress'
+        ],
+        state.nonce
       );
-      throw new Error(`Getting transaction information failed! ${err}`);
-    }
 
-    return signedTx;
-  }
-
-  /**
-   * Sign a single message
-   */
-  static async signMessage(
-    message: string,
-    options?: { callbackUrl?: string }
-  ) {
-    if (!this.dappProvider) {
-      const error = 'Message signing failed: There is no active session!';
-      EventsStore.run(EventStoreEvents.onSignMsgFailure, message, error);
-      throw new Error(error);
-    }
-    if (!this.networkProvider) {
-      const error =
-        'Message signing failed: There is no active network provider!';
-      EventsStore.run(EventStoreEvents.onSignMsgFailure, message, error);
-      throw new Error(error);
-    }
-
-    let messageSignature = '';
-
-    try {
-      EventsStore.run(EventStoreEvents.onSignMsgStart, message);
-
-      if (this.dappProvider instanceof ExtensionProvider) {
-        const signedMessage = await this.dappProvider.signMessage(
-          new Message({ data: stringToBytes(message) })
-        );
-
-        if (typeof signedMessage !== 'string' && signedMessage?.signature) {
-          messageSignature = bytesToHex(signedMessage.signature);
-        }
-      }
-
-      if (
-        this.mobileProvider &&
-        this.dappProvider instanceof this.mobileProvider.WalletConnectV2Provider
-      ) {
-        const signedMessage = await this.dappProvider.signMessage(
-          new Message({ data: stringToBytes(message) })
-        );
-
-        if (typeof signedMessage !== 'string' && signedMessage?.signature) {
-          messageSignature = bytesToHex(signedMessage.signature);
-        }
-      }
-
-      if (this.dappProvider instanceof WebviewProvider) {
-        const signedMessage = await this.dappProvider.signMessage(
-          new Message({ data: stringToBytes(message) })
-        );
-
-        if (typeof signedMessage !== 'string' && signedMessage?.signature) {
-          messageSignature = bytesToHex(signedMessage.signature);
-        }
-      }
-      if (this.dappProvider instanceof WalletProvider) {
-        const encodeRFC3986URIComponent = (str: string) => {
-          return encodeURIComponent(str).replace(
-            /[!'()*]/g,
-            (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
-          );
-        };
-
-        const url = options?.callbackUrl || window.location.origin;
-        await this.dappProvider.signMessage(
-          new Message({ data: stringToBytes(message) }),
-          {
-            callbackUrl: encodeURIComponent(
-              `${url}${
-                url.includes('?') ? '&' : '?'
-              }message=${encodeRFC3986URIComponent(message)}`
-            ),
-          }
-        );
-      }
-
-      const currentState = ls.get();
-
-      if (
-        currentState.loginMethod !== LoginMethodsEnum.webWallet &&
-        currentState.loginMethod !== LoginMethodsEnum.xAlias
-      ) {
-        EventsStore.run(
-          EventStoreEvents.onSignMsgFinalized,
-          message,
-          messageSignature
-        );
-      }
-
-      return { message, messageSignature };
-    } catch (e) {
-      const err = errorParse(e);
-      EventsStore.run(EventStoreEvents.onSignMsgFailure, message, err);
-      throw new Error(`Message signing failed! ${err}`);
+      // We need to get the signature in case of signing a message with web wallet or guardians 2FA hook
+      webWalletSignMessageFinalize();
     }
   }
+};
 
-  /**
-   * Query Smart Contracts
-   */
-  static async queryContract({
+/**
+ * Login function
+ */
+export const login = async (
+  loginMethod: LoginMethodsEnum,
+  options?: LoginOptions
+) => {
+  const isProperLoginMethod =
+    Object.values(LoginMethodsEnum).includes(loginMethod);
+  if (!isProperLoginMethod) {
+    const error = 'Wrong login method!';
+    EventsStore.run(EventStoreEvents.onLoginFailure, error);
+    throw new Error(error);
+  }
+
+  if (!config.networkProvider) {
+    const error = 'Login failed: Use ElvenJs.init() first!';
+    EventsStore.run(EventStoreEvents.onLoginFailure, error);
+    throw new Error(error);
+  }
+
+  await withLoginEvents(async () => {
+    // Native auth login token initialization
+    const nativeAuthClient = new NativeAuthClient({
+      apiUrl: config.initOptions?.apiUrl,
+      origin: window.location.origin,
+    });
+
+    const loginToken = await nativeAuthClient.initialize({
+      timestamp: `${Math.floor(Date.now() / 1000)}`,
+    });
+
+    // Login with browser extension
+    if (loginMethod === LoginMethodsEnum.browserExtension) {
+      const dp = await loginWithExtension(
+        config,
+        loginToken,
+        nativeAuthClient,
+        options?.callbackRoute
+      );
+      config.dappProvider = dp;
+    }
+
+    // Login with optional mobile provider
+    if (loginMethod === LoginMethodsEnum.mobile && config.mobileProvider) {
+      const dp = await config.mobileProvider?.loginWithMobile(
+        config,
+        loginToken,
+        nativeAuthClient
+      );
+      config.dappProvider = dp;
+    }
+
+    // Login with Web Wallet
+    if (
+      loginMethod === LoginMethodsEnum.webWallet &&
+      config.initOptions?.chainType
+    ) {
+      const dp = await loginWithWebWallet(
+        networkConfig[config.initOptions.chainType].walletAddress,
+        loginToken,
+        config.initOptions?.chainType,
+        options?.callbackRoute
+      );
+      config.dappProvider = dp;
+    }
+
+    // Login with xAlias
+    if (
+      loginMethod === LoginMethodsEnum.xAlias &&
+      config.initOptions?.chainType
+    ) {
+      // Login with xAlias is almost the same as with the web wallet, only endpoints are different
+      const dp = await loginWithWebWallet(
+        networkConfig[config.initOptions.chainType].xAliasAddress,
+        loginToken,
+        config.initOptions?.chainType,
+        options?.callbackRoute
+      );
+      config.dappProvider = dp;
+    }
+  });
+};
+
+/**
+ * Logout function
+ */
+export const logout = async () => {
+  try {
+    const isLoggedOut = await logoutHelper(config);
+    config.dappProvider = undefined;
+    return isLoggedOut;
+  } catch (e) {
+    const err = errorParse(e);
+    console.warn('Something went wrong when logging out: ', err);
+  }
+};
+
+/**
+ * Sign and send function
+ */
+export const signAndSendTransaction = async (transaction: Transaction) => {
+  if (!config.dappProvider) {
+    const error = 'Transaction signing failed: There is no active session!';
+    EventsStore.run(EventStoreEvents.onTxFailure, transaction, error);
+    throw new Error(error);
+  }
+  if (!config.networkProvider) {
+    const error =
+      'Transaction signing failed: There is no active network provider!';
+    EventsStore.run(EventStoreEvents.onTxFailure, transaction, error);
+    throw new Error(error);
+  }
+
+  let signedTx = guardianPreSignTxOperations(transaction);
+
+  try {
+    EventsStore.run(EventStoreEvents.onTxStart, transaction);
+
+    const currentState = ls.get();
+
+    transaction.nonce = currentState.nonce;
+
+    if (config.dappProvider instanceof ExtensionProvider) {
+      signedTx = await config.dappProvider.signTransaction(transaction);
+    }
+    if (
+      config.mobileProvider &&
+      config.dappProvider instanceof
+        config.mobileProvider.WalletConnectV2Provider
+    ) {
+      signedTx = await config.dappProvider.signTransaction(transaction);
+    }
+    if (config.dappProvider instanceof WebviewProvider) {
+      signedTx = await config.dappProvider.signTransaction(transaction);
+    }
+    if (config.dappProvider instanceof WalletProvider) {
+      await config.dappProvider.signTransaction(transaction);
+    }
+
+    if (
+      currentState.loginMethod !== LoginMethodsEnum.webWallet &&
+      currentState.loginMethod !== LoginMethodsEnum.xAlias
+    ) {
+      const needsGuardianSign = checkNeedsGuardianSigning(signedTx);
+
+      if (!needsGuardianSign) {
+        preSendTx(signedTx);
+      }
+
+      if (needsGuardianSign && config.initOptions?.chainType) {
+        await sendTxToGuardian(
+          signedTx,
+          networkConfig[config.initOptions.chainType].walletAddress
+        );
+
+        return;
+      }
+
+      const response = await config.networkProvider.sendTransaction(signedTx);
+      await postSendTx(response, config.networkProvider);
+    }
+  } catch (e) {
+    const err = errorParse(e);
+    EventsStore.run(
+      EventStoreEvents.onTxFailure,
+      signedTx,
+      `Getting transaction information failed! ${err}`
+    );
+    throw new Error(`Getting transaction information failed! ${err}`);
+  }
+
+  return signedTx;
+};
+
+/**
+ * Sign a single message
+ */
+export const signMessage = async (
+  message: string,
+  options?: { callbackUrl?: string }
+) => {
+  if (!config.dappProvider) {
+    const error = 'Message signing failed: There is no active session!';
+    EventsStore.run(EventStoreEvents.onSignMsgFailure, message, error);
+    throw new Error(error);
+  }
+  if (!config.networkProvider) {
+    const error =
+      'Message signing failed: There is no active network provider!';
+    EventsStore.run(EventStoreEvents.onSignMsgFailure, message, error);
+    throw new Error(error);
+  }
+
+  let messageSignature = '';
+
+  try {
+    EventsStore.run(EventStoreEvents.onSignMsgStart, message);
+
+    if (config.dappProvider instanceof ExtensionProvider) {
+      const signedMessage = await config.dappProvider.signMessage(
+        new Message({ data: stringToBytes(message) })
+      );
+
+      if (typeof signedMessage !== 'string' && signedMessage?.signature) {
+        messageSignature = bytesToHex(signedMessage.signature);
+      }
+    }
+
+    if (
+      config.mobileProvider &&
+      config.dappProvider instanceof
+        config.mobileProvider.WalletConnectV2Provider
+    ) {
+      const signedMessage = await config.dappProvider.signMessage(
+        new Message({ data: stringToBytes(message) })
+      );
+
+      if (typeof signedMessage !== 'string' && signedMessage?.signature) {
+        messageSignature = bytesToHex(signedMessage.signature);
+      }
+    }
+
+    if (config.dappProvider instanceof WebviewProvider) {
+      const signedMessage = await config.dappProvider.signMessage(
+        new Message({ data: stringToBytes(message) })
+      );
+
+      if (typeof signedMessage !== 'string' && signedMessage?.signature) {
+        messageSignature = bytesToHex(signedMessage.signature);
+      }
+    }
+    if (config.dappProvider instanceof WalletProvider) {
+      const encodeRFC3986URIComponent = (str: string) => {
+        return encodeURIComponent(str).replace(
+          /[!'()*]/g,
+          (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
+        );
+      };
+
+      const url = options?.callbackUrl || window.location.origin;
+      await config.dappProvider.signMessage(
+        new Message({ data: stringToBytes(message) }),
+        {
+          callbackUrl: encodeURIComponent(
+            `${url}${
+              url.includes('?') ? '&' : '?'
+            }message=${encodeRFC3986URIComponent(message)}`
+          ),
+        }
+      );
+    }
+
+    const currentState = ls.get();
+
+    if (
+      currentState.loginMethod !== LoginMethodsEnum.webWallet &&
+      currentState.loginMethod !== LoginMethodsEnum.xAlias
+    ) {
+      EventsStore.run(
+        EventStoreEvents.onSignMsgFinalized,
+        message,
+        messageSignature
+      );
+    }
+
+    return { message, messageSignature };
+  } catch (e) {
+    const err = errorParse(e);
+    EventsStore.run(EventStoreEvents.onSignMsgFailure, message, err);
+    throw new Error(`Message signing failed! ${err}`);
+  }
+};
+
+/**
+ * Query Smart Contracts
+ */
+export const queryContract = async ({
+  address,
+  func,
+  args = [],
+  value = 0,
+  caller,
+}: SmartContractQueryArgs) => {
+  if (!config.networkProvider) {
+    throw new Error('Query failed: There is no active network provider!');
+  }
+
+  if (!address || !func) {
+    throw new Error(
+      'Query failed: The Query arguments are not valid! Address and func required'
+    );
+  }
+
+  const queryArgs = {
     address,
     func,
-    args = [],
-    value = 0,
+    args,
+    value,
     caller,
-  }: SmartContractQueryArgs) {
-    if (!this.networkProvider) {
-      throw new Error('Query failed: There is no active network provider!');
-    }
-
-    if (!address || !func) {
-      throw new Error(
-        'Query failed: The Query arguments are not valid! Address and func required'
-      );
-    }
-
-    const queryArgs = {
-      address,
-      func,
-      args,
-      value,
-      caller,
-    };
-
-    try {
-      EventsStore.run(EventStoreEvents.onQueryStart, queryArgs);
-      const response = await this.networkProvider.queryContract(queryArgs);
-      EventsStore.run(EventStoreEvents.onQueryFinalized, response);
-      return response;
-    } catch (e) {
-      const err = errorParse(e);
-      EventsStore.run(EventStoreEvents.onQueryFinalized, queryArgs, err);
-      throw new Error(`Smart contract query failed! ${err}`);
-    }
-  }
-
-  /**
-   * Main storage
-   */
-  static storage = ls;
-
-  /**
-   * Destroy and cleanup if needed
-   */
-  static destroy = () => {
-    this.networkProvider = undefined;
-    this.dappProvider = undefined;
-    this.initOptions = undefined;
-    EventsStore.clear();
   };
-}
+
+  try {
+    EventsStore.run(EventStoreEvents.onQueryStart, queryArgs);
+    const response = await config.networkProvider.queryContract(queryArgs);
+    EventsStore.run(EventStoreEvents.onQueryFinalized, response);
+    return response;
+  } catch (e) {
+    const err = errorParse(e);
+    EventsStore.run(EventStoreEvents.onQueryFinalized, queryArgs, err);
+    throw new Error(`Smart contract query failed! ${err}`);
+  }
+};
+
+/**
+ * Main storage
+ */
+export const storage = ls;
+
+/**
+ * Destroy and cleanup if needed
+ */
+export const destroy = () => {
+  resetConfig();
+  EventsStore.clear();
+};

@@ -1,3 +1,4 @@
+- remove callbacks from the API - base everything on promises
 - prepare a new API for token operations
 - prepare a new API for smart contracts interactions - the the best would be to pass the arguments as is (always requiring ABI without typed helpers ???)
   - pass ABI as link to a file or as content or both?
@@ -11,3 +12,4 @@
 - check TODOs in code
 - use Knip to detect unused stuff (in both packages) and do the cleanup
 - test on  the testnet
+- add jsdoc comments for main functions

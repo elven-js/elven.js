@@ -168,7 +168,13 @@
 
     // Elven.js tools
     import {
-      ElvenJS,
+      init,
+      login,
+      logout,
+      storage,
+      signMessage,
+      signAndSendTransaction,
+      queryContract,
       Transaction,
       parseAmount,
     } from './elven.js';
@@ -179,7 +185,7 @@
     // You don't have to add them if you want to use default setup
     // You can only add your custom callbacks
     const initElven = async () => {
-      await ElvenJS.init(
+      await init(
         {
           apiUrl: 'https://devnet-api.multiversx.com',
           chainType: 'devnet',
@@ -240,7 +246,7 @@
     document.getElementById('button-login-extension').addEventListener('click', async () => {
       try {
         clearQrCodeContainer();
-        await ElvenJS.login('browser-extension');
+        await login('browser-extension');
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);
       }
@@ -249,7 +255,7 @@
     document.getElementById('button-login-mobile').addEventListener('click', async () => {
       clearQrCodeContainer();
       try {
-        await ElvenJS.login('mobile');
+        await login('mobile');
       } catch (e) {
         console.log('Login: Something went wrong, try again!', e?.message);
       }
@@ -258,7 +264,7 @@
     document.getElementById('button-login-web').addEventListener('click', async () => {
       try {
         clearQrCodeContainer();
-        await ElvenJS.login('web-wallet', {
+        await login('web-wallet', {
           callbackRoute: '/',
         });
       } catch (e) {
@@ -269,7 +275,7 @@
     document.getElementById('button-login-x-alias').addEventListener('click', async () => {
       try {
         clearQrCodeContainer();
-        await ElvenJS.login('x-alias', {
+        await login('x-alias', {
           callbackRoute: '/',
         });
       } catch (e) {
@@ -279,7 +285,7 @@
 
     document.getElementById('button-logout').addEventListener('click', async () => {
       try {
-        const isLoggedOut = await ElvenJS.logout();
+        const isLoggedOut = await logout();
       } catch (e) {
         console.error(e.message);
       }
@@ -291,8 +297,8 @@
     document.getElementById('button-tx').addEventListener('click', async () => {
       const demoMessage = 'Transaction demo from Elven.js!';
 
-      const isGuardian = ElvenJS.storage.get('activeGuardian');
-      const isXalias = ElvenJS.storage.get('loginMethod') === 'x-alias';
+      const isGuardian = storage.get('activeGuardian');
+      const isXalias = storage.get('loginMethod') === 'x-alias';
       // Additional 50000 when there is an active guardian
       // See more about gas limit calculation here: https://docs.multiversx.com/developers/gas-and-fees/overview/
       const gasLimit = ((isGuardian || isXalias) ? 100000 : 50000) + 1500 * demoMessage.length;
@@ -300,17 +306,17 @@
       const textEncoder = new TextEncoder();
 
       const tx = new Transaction({
-        nonce: ElvenJS.storage.get('nonce'),
+        nonce: storage.get('nonce'),
         receiver: egldTransferAddress,
         gasLimit,
         chainID: 'D',
         data: textEncoder.encode(demoMessage),
         value: parseAmount({ amount: '0.001', decimals: 18 }),
-        sender: ElvenJS.storage.get('address'),
+        sender: storage.get('address'),
       });
 
       try {
-        await ElvenJS.signAndSendTransaction(tx);
+        await signAndSendTransaction(tx);
       } catch (e) {
         throw new Error(e?.message);
       }
@@ -335,12 +341,12 @@
 
       const tx = factory.createTransactionForESDTTokenTransfer({
         receiver: new Address(esdtTransferAddress),
-        sender: new Address(ElvenJS.storage.get('address')),
+        sender: new Address(storage.get('address')),
         tokenTransfers: [tokenTransfer]
       });
 
       try {
-        await ElvenJS.signAndSendTransaction(tx);
+        await signAndSendTransaction(tx);
       } catch (e) {
         throw new Error(e?.message);
       }
@@ -352,7 +358,7 @@
     document.getElementById('button-mint').addEventListener('click', async () => {
       const contractAddress = new Address(nftMinterSmartContract);
 
-      const isGuardian = ElvenJS.storage.get('activeGuardian');
+      const isGuardian = storage.get('activeGuardian');
       // Additional 50000 when there is an active guardian
       // See more about gas limit calculation here: https://docs.multiversx.com/developers/gas-and-fees/overview/
       const gasLimit = isGuardian ? 14050000 : 14000000;
@@ -362,7 +368,7 @@
       });
 
       const tx = factory.createTransactionForExecute({
-        sender: new Address(ElvenJS.storage.get('address')),
+        sender: new Address(storage.get('address')),
         contract: new Address(contractAddress),
         function: 'mint',
         nativeTransferAmount: parseAmount({ amount: '0.01', decimals: 18 }),
@@ -371,7 +377,7 @@
       });
 
       try {
-        await ElvenJS.signAndSendTransaction(tx);
+        await signAndSendTransaction(tx);
       } catch (e) {
         throw new Error(e?.message);
       }
@@ -385,10 +391,10 @@
     // Read more about the Elven Tools Smart Contract here: https://www.elven.tools/docs/sc-endpoints.html
     document.getElementById('button-query').addEventListener('click', async () => {
       try {
-        await ElvenJS.queryContract({
+        await queryContract({
           address: new Address(nftMinterSmartContract),
           func: 'getMintedPerAddressTotal',
-          args: [new AddressValue(new Address(ElvenJS.storage.get('address')))]
+          args: [new AddressValue(new Address(storage.get('address')))]
         });
       } catch (e) {
         throw new Error(e?.message);
@@ -397,10 +403,10 @@
 
     // You can sign a single message, use 
     // You will get a message and signature back in the ElvenJS callback function 'onSignMsgFinalized'
-    // In case of browser extension provider and xPortal you can also get it from ElvenJS.signMessage return
+    // In case of browser extension provider and xPortal you can also get it from signMessage return
     document.getElementById('button-sign-message').addEventListener('click', async () => {
       try {
-        await ElvenJS.signMessage('ElvenFamily');
+        await signMessage('ElvenFamily');
       } catch (e) {
         throw new Error(e?.message);
       }

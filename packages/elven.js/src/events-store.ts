@@ -1,25 +1,22 @@
 import { EventStoreEvents } from './types';
 
-export class EventsStore {
-  private static events: Record<string, (...args: any[]) => void> | undefined;
+let events: Record<string, (...args: any[]) => void> | undefined;
 
-  static set(name: EventStoreEvents, fn: (...args: any[]) => void) {
-    if (!name) return;
-    const eventsObj = { ...this.events, [name]: fn };
-    this.events = eventsObj;
-  }
+export function set(name: EventStoreEvents, fn: (...args: any[]) => void) {
+  if (!name) return;
+  events = { ...events, [name]: fn };
+}
 
-  static get(name: EventStoreEvents) {
-    if (!name || !this.events) return;
-    return this.events[name];
-  }
+export function get(name: EventStoreEvents) {
+  if (!name || !events) return;
+  return events[name];
+}
 
-  static run(name: EventStoreEvents, ...args: any[]) {
-    if (!name || !this.events) return;
-    this.events[name]?.(...args);
-  }
+export function run(name: EventStoreEvents, ...args: any[]) {
+  if (!name || !events) return;
+  events[name]?.(...args);
+}
 
-  static clear() {
-    this.events = undefined;
-  }
+export function clear() {
+  events = undefined;
 }

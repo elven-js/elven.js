@@ -1,4 +1,4 @@
-import { EventsStore } from '../events-store';
+import * as EventsStore from '../events-store';
 import { EventStoreEvents } from '../types';
 import { getParamFromUrl } from '../utils/get-param-from-url';
 

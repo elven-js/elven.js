@@ -2,7 +2,7 @@ import { Account } from '../core/account';
 import { TransactionWatcher } from '../core/transaction-watcher';
 import { ApiNetworkProvider } from '../core/network-provider';
 import { ls } from '../utils/ls-helpers';
-import { EventsStore } from '../events-store';
+import * as EventsStore from '../events-store';
 import { EventStoreEvents } from '../types';
 import { ISentTransactionResponse } from '../core/types';
 

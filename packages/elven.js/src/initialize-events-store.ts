@@ -1,4 +1,4 @@
-import { EventsStore } from './events-store';
+import * as EventsStore from './events-store';
 import { InitOptions, EventStoreEvents } from './types';
 
 export const initializeEventsStore = (initOptions: InitOptions) => {
