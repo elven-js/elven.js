@@ -1,0 +1,24 @@
+{
+  "name": "elven.js",
+  "version": "1.0.0",
+  "description": "Sync, sign and send transactions on the MultiversX blockchain in the browser.",
+  "type": "module",
+  "module": "build/elven.js",
+  "types": "build/types/elven.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/types/elven.d.ts",
+      "import": "./build/elven.js",
+      "browser": "./build/elven.js",
+      "default": "./build/elven.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "rimraf build && node ./esbuild.config.js && tsc --project ./tsconfig.json && cp build/elven.js ../../demo-app/elven.js",
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix",
+    "prettier": "prettier --write 'src/**/*.{js,ts,json}'",
+    "check-types": "tsc --noEmit",
+    "clean": "rimraf build node_modules"
+  }
+}

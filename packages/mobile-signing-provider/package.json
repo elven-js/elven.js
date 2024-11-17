@@ -1,0 +1,33 @@
+{
+  "name": "@elven.js/mobile-signing-provider",
+  "version": "1.0.0",
+  "description": "Mobile signing provider for Elven.js.",
+  "type": "module",
+  "module": "build/mobile-signing-provider.js",
+  "types": "build/types/mobile-signing-provider.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/types/mobile-signing-provider.d.ts",
+      "import": "./build/mobile-signing-provider.js",
+      "browser": "./build/mobile-signing-provider.js",
+      "default": "./build/mobile-signing-provider.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "rimraf build && node ./esbuild.config.js && tsc && cp build/mobile-signing-provider.js ../../demo-app/mobile-signing-provider.js",
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix",
+    "prettier": "prettier --write 'src/**/*.{js,ts,json}'",
+    "check-types": "tsc --noEmit",
+    "clean": "rimraf build node_modules"
+  },
+  "devDependencies": {
+    "@walletconnect/sign-client": "2.17.2",
+    "@walletconnect/types": "2.17.2",
+    "@walletconnect/utils": "2.17.2",
+    "uqr": "0.1.2"
+  },
+  "peerDependencies": {
+    "elven.js": "*"
+  }
+}

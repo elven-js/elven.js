@@ -1,0 +1,13 @@
+{
+  "name": "@configs/esbuild",
+  "type": "module",
+  "private": true,
+  "main": "index.js",
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  },
+  "scripts": {
+    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\" --fix",
+    "prettier": "prettier --write '**/*.{js,ts,json}'"
+  }
+}
