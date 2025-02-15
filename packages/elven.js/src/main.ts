@@ -267,7 +267,8 @@ export const logout = async () => {
 };
 
 /**
- * Sign and send function
+ * Sign and send transaction. More universal function that can be used for any transaction.
+ * Building block for other methods like transfers, smart contract interactions, etc.
  */
 export const signAndSendTransaction = async (transaction: Transaction) => {
   if (!config.dappProvider) {
@@ -342,6 +343,48 @@ export const signAndSendTransaction = async (transaction: Transaction) => {
 
   return signedTx;
 };
+
+/**
+ * Transfer EGLD
+ */
+export const transferEgld = async (receiver: string, amount: string) => {};
+
+/**
+ * Transfer ESDTs
+ */
+export const transferEsdtTokens = async (
+  receiver: string,
+  tokens: any[] // TODO TBD: probably only tokenid not collection id, amount and type, no amount for NFT
+) => {};
+
+/**
+ * Call a smart contract
+ * TODO: TBD: should handle:
+ * - Call a function on a smart contract with arguments
+ * - Call a function on a smart contract with native EGLD transfer
+ * - Call a function on a smart contract with ESDT transfer, all types of tokens
+ * - Call a function on a smart contract with Both EGLD and ESDT transfer
+ * - Handle arguments with ABI or manually, probably only with ABI
+ * - To rethink, what should be done with the response, should it be handled here?
+ */
+export const callSmartContract = async (
+  contract: string,
+  functionName: string,
+  args: any[],
+  tokens: any[], // TODO TBD: probably only tokenid not collection id, amount and type, no amount for NFT
+  nativeAmount: BigInt // EGLD amount
+) => {};
+
+/**
+ * Deploy a smart contract
+ * TODO: should outcome parsing be done here?
+ * TODO: handle ABI or manually handle the arguments?
+ */
+export const deploySmartContract = async (
+  bytecode: string,
+  gasLimit: number,
+  args: any[]
+) => {};
 
 /**
  * Sign a single message
@@ -444,8 +487,11 @@ export const signMessage = async (
 
 /**
  * Query Smart Contracts
+ * - TODO: review and rewrite the logic
+ * - Should use ABI or manually handle the arguments (to rethink)
+ * - What with the response, should it be parsed here?
  */
-export const queryContract = async ({
+export const querySmartContract = async ({
   address,
   func,
   args = [],
@@ -462,13 +508,7 @@ export const queryContract = async ({
     );
   }
 
-  const queryArgs = {
-    address,
-    func,
-    args,
-    value,
-    caller,
-  };
+  const queryArgs = { address, func, args, value, caller };
 
   try {
     EventsStore.run(EventStoreEvents.onQueryStart, queryArgs);
