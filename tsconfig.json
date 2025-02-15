@@ -1,16 +1,14 @@
 {
-  "include": ["src/**/*"],
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./configs/tsconfig/base.json",
   "compilerOptions": {
-    "strict": true,
-    "target": "ES2020",
-    "module": "ES2020",
-    "declaration": true,
-    "declarationDir": "build/types",
-    "emitDeclarationOnly": true,
-    "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "types": ["node"],
-    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "elven.js(/*)": ["packages/elven.js/src$1"],
+      "mobile-signing-provider(/*)": ["packages/mobile-signing-provider/src$1"]
+    },
+    "types": ["node"]
   },
+  "include": ["packages/*/src/**/*"],
+  "exclude": ["node_modules"]
 }
