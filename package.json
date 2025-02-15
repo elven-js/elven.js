@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "dev:server": "node dev-server.js",
+    "setup:dev-certs": "node setup-dev-certs.js",
+    "dev:server": "npm run setup:dev-certs && node dev-server.js",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "prettier": "turbo run prettier",
@@ -19,15 +20,12 @@
     "@configs/esbuild": "workspace:*",
     "@configs/eslint-config": "workspace:*",
     "@configs/tsconfig": "workspace:*",
-    "@types/node": "22.9.0",
-    "eslint": "9.15.0",
-    "prettier": "3.3.3",
+    "@types/node": "22.13.4",
+    "eslint": "9.20.1",
+    "prettier": "3.5.1",
     "rimraf": "6.0.1",
     "serve-handler": "6.1.6",
-    "turbo": "2.3.0",
-    "typescript": "5.6.3"
-  },
-  "overrides": {
-    "elliptic": "6.6.0"
+    "turbo": "2.4.2",
+    "typescript": "5.7.3"
   }
 }

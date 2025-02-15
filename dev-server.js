@@ -1,18 +1,20 @@
 import handler from 'serve-handler';
-import http from 'http';
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
 
-const server = http.createServer((request, response) => {
+const options = {
+  key: fs.readFileSync(path.join(process.cwd(), 'certs/key.pem')),
+  cert: fs.readFileSync(path.join(process.cwd(), 'certs/cert.pem')),
+};
+
+const server = https.createServer(options, (request, response) => {
   return handler(request, response, {
     public: 'demo-app',
     headers: [
       {
         source: '**/*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-cache',
-          },
-        ],
+        headers: [{ key: 'Cache-Control', value: 'no-cache' }],
       },
     ],
   });
@@ -20,6 +22,6 @@ const server = http.createServer((request, response) => {
 
 server.listen(process.env.PORT || 3000, () => {
   console.log(
-    `Dev server running at http://localhost:${process.env.PORT || 3000}`
+    `Dev server running at https://localhost:${process.env.PORT || 3000}`
   );
 });
