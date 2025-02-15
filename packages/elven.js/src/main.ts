@@ -347,15 +347,15 @@ export const signAndSendTransaction = async (transaction: Transaction) => {
 /**
  * Transfer EGLD
  */
-export const transferEgld = async (receiver: string, amount: string) => {};
+export const transferEgld = async (/*receiver: string, amount: string*/) => {};
 
 /**
  * Transfer ESDTs
  */
-export const transferEsdtTokens = async (
-  receiver: string,
-  tokens: any[] // TODO TBD: probably only tokenid not collection id, amount and type, no amount for NFT
-) => {};
+export const transferEsdtTokens = async () =>
+  /*receiver: string,
+  tokens: any[] // TODO TBD: probably only tokenid not collection id, amount and type, no amount for NFT*/
+  {};
 
 /**
  * Call a smart contract
@@ -367,24 +367,24 @@ export const transferEsdtTokens = async (
  * - Handle arguments with ABI or manually, probably only with ABI
  * - To rethink, what should be done with the response, should it be handled here?
  */
-export const callSmartContract = async (
-  contract: string,
+export const callSmartContract = async () =>
+  /*contract: string,
   functionName: string,
   args: any[],
   tokens: any[], // TODO TBD: probably only tokenid not collection id, amount and type, no amount for NFT
-  nativeAmount: BigInt // EGLD amount
-) => {};
+  nativeAmount: bigint // EGLD amount*/
+  {};
 
 /**
  * Deploy a smart contract
  * TODO: should outcome parsing be done here?
  * TODO: handle ABI or manually handle the arguments?
  */
-export const deploySmartContract = async (
-  bytecode: string,
+export const deploySmartContract = async () =>
+  /*bytecode: string,
   gasLimit: number,
-  args: any[]
-) => {};
+  args: any[]*/
+  {};
 
 /**
  * Sign a single message

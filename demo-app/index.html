@@ -174,7 +174,7 @@
       storage,
       signMessage,
       signAndSendTransaction,
-      queryContract,
+      querySmartContract,
       Transaction,
       parseAmount,
     } from './elven.js';
@@ -391,7 +391,7 @@
     // Read more about the Elven Tools Smart Contract here: https://www.elven.tools/docs/sc-endpoints.html
     document.getElementById('button-query').addEventListener('click', async () => {
       try {
-        await queryContract({
+        await querySmartContract({
           address: new Address(nftMinterSmartContract),
           func: 'getMintedPerAddressTotal',
           args: [new AddressValue(new Address(storage.get('address')))]
