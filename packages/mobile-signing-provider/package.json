@@ -14,6 +14,9 @@
     },
     "./package.json": "./package.json"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "rimraf build && node ./esbuild.config.js && tsc && cp build/mobile-signing-provider.js ../../demo-app/mobile-signing-provider.js",
     "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix",

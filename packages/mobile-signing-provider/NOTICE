@@ -1,0 +1,16 @@
+Third-Party Licenses and Attributions
+
+This distribution of the @elven.js/mobile-signing-provider package bundles third-party libraries to enhance its functionality. In compliance with open-source licensing requirements, please find below the acknowledgments and license details for these dependencies:
+
+1. uqr
+   - License: MIT License
+   - Attribution: This package uses uqr for QR code rendering functionality. Please refer to the uqr repository for the full license text.
+
+2. WalletConnect v2
+   - License: MIT License
+   - Attribution: The WalletConnect v2 functionality is integrated into this package through bundled code. For complete details, please see the WalletConnect repository (https://github.com/WalletConnect) and its LICENSE file.
+
+3. MultiversX
+   - License: MIT License
+   - Attribution: This package incorporates parts of the MultiversX code with small modifications, which are licensed under the MIT License. Please refer to the MultiversX repository for the full license text.
+

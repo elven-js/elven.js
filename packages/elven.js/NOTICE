@@ -1,0 +1,8 @@
+Third-Party Licenses and Attributions
+
+This distribution of the Elven.js package bundles third-party libraries to enhance its functionality. In compliance with open-source licensing requirements, please find below the acknowledgments and license details for the dependencies included in this package:
+
+1. MultiversX
+   - License: MIT License
+   - Attribution: This package incorporates parts of the MultiversX code with small modifications, which are licensed under the MIT License. Please refer to the MultiversX repository for the full license text.
+
